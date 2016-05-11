@@ -102,7 +102,7 @@ CreateProfiles()
   # $SUDO KUBE_CONTROLLER_MANAGER_ARGS="--service_account_private_key_file=/tmp/kube-serviceaccount.key"
 
 
-  cd /home/$USER
+  cd ~
   mv .bash_profile .bash_profile_bck
 
   echo "# .bash_profile" > .bash_profile
@@ -137,7 +137,7 @@ CreateProfiles()
     echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> .bash_profile 
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> .bash_profile
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> .bash_profile
-    # echo "export CLOUD_CONFIG=/home/$USER/.aws/config" >> .bash_profile
+    # echo "export CLOUD_CONFIG=~/.aws/config" >> .bash_profile
     echo "export KUBE_AWS_ZONE=$ZONE" >> .bash_profile
     echo "export AWS_DEFAULT_REGION=$REGION" >> .bash_profile
     echo "export KUBE_AWS_REGION=$REGION" >> .bash_profile
@@ -174,22 +174,22 @@ CreateProfiles()
 
     echo "" >> newbashrc
     echo "#go environment" >> newbashrc
-    echo "export GOPATH=/home/$USER/go" >> newbashrc
+    echo "export GOPATH=~/go" >> newbashrc
     echo "GOPATH1=/usr/local/go" >> newbashrc
     echo "GO_BIN_PATH=/usr/local/go/bin" >> newbashrc
     echo "" >> newbashrc
-    echo "PATH=$PATH:$HOME/bin:/usr/local/go/bin:/home/$USER/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:/home/$USER/go/src/github.com/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
+    echo "PATH=$PATH:$HOME/bin:/usr/local/go/bin:~/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:~/go/src/github.com/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
     echo "" >> newbashrc
     echo "export PATH" >> newbashrc
   fi
 
   echo "" >> .bash_profile
   echo "#go environment" >> .bash_profile
-  echo "export GOPATH=/home/$USER/go" >> .bash_profile
+  echo "export GOPATH=~/go" >> .bash_profile
   echo "GOPATH1=/usr/local/go" >> .bash_profile
   echo "GO_BIN_PATH=/usr/local/go/bin" >> .bash_profile
   echo "" >> .bash_profile
-  echo "PATH=$PATH:$HOME/bin:/usr/local/go/bin:/home/$USER/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:/home/$USER/go/src/github.com/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
+  echo "PATH=$PATH:$HOME/bin:/usr/local/go/bin:~/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:~/go/src/github.com/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
   echo "" >> .bash_profile
   echo "export PATH" >> .bash_profile
 
@@ -201,23 +201,23 @@ CreateProfiles()
 CreateConfigs()
 {
   echo "...creating config-k8.sh"
-  cd /home/$USER
-  echo "$SUDO cp /home/$USER/go/src/github.com/kubernetes/_output/local/bin/linux/amd64/kube*  /usr/bin" > config-k8.sh
+  cd ~
+  echo "$SUDO cp ~/go/src/github.com/kubernetes/_output/local/bin/linux/amd64/kube*  /usr/bin" > config-k8.sh
   echo "" >> config-k8.sh
   echo ""
 
   echo ""
-  echo "/home/$USER/go/src/github.com/kubernetes/cluster/kubectl.sh config set-cluster local --server=http://127.0.0.1:8080 --insecure-skip-tls-verify=true" >> config-k8.sh
-  echo "/home/$USER/go/src/github.com/kubernetes/cluster/kubectl.sh config set-context local --cluster=local" >> config-k8.sh
-  echo "/home/$USER/go/src/github.com/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
+  echo "~/go/src/github.com/kubernetes/cluster/kubectl.sh config set-cluster local --server=http://127.0.0.1:8080 --insecure-skip-tls-verify=true" >> config-k8.sh
+  echo "~/go/src/github.com/kubernetes/cluster/kubectl.sh config set-context local --cluster=local" >> config-k8.sh
+  echo "~/go/src/github.com/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
   chmod +x config-k8.sh
 
   echo ""
   echo "...creating config-ose.sh"
-  echo "chmod +r /home/$USER/openshift.local.config/master/admin.kubeconfig" > config-ose.sh
-  echo "oadm groups new myclusteradmingroup admin --config=/home/$USER/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
-  echo "oadm policy add-cluster-role-to-group cluster-admin myclusteradmingroup --config=/home/$USER/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
-  echo "oadm policy add-scc-to-group privileged myclusteradmingroup --config=/home/$USER/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "chmod +r ~/openshift.local.config/master/admin.kubeconfig" > config-ose.sh
+  echo "oadm groups new myclusteradmingroup admin --config=~/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm policy add-cluster-role-to-group cluster-admin myclusteradmingroup --config=~/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm policy add-scc-to-group privileged myclusteradmingroup --config=~/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
   chmod +x config-ose.sh
   echo ""
 
@@ -225,16 +225,16 @@ CreateConfigs()
   echo "...creating start-ose.sh"
   mkdir data
   echo "$SUDO rm -rf /usr/bin/kube*" > start-ose.sh
-  echo "openshift start --write-config=/home/$USER/openshift.local.config --public-master=$INTERNALHOST --volume-dir=/home/$USER/data --loglevel=4  &> openshift.log" >> start-ose.sh
-  echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"' /home/$USER/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
-  echo "echo \"kubeletArguments:\" >> /home/$USER/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-  echo "echo \"  cloud-provider:\" >> /home/$USER/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-  echo "echo \"    - \\\"aws\\\"\" >> /home/$USER/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-  echo "echo \"  cloud-config:\" >> /home/$USER/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-  echo "echo \"    - \\\"/etc/aws/aws.conf\\\"\" >> /home/$USER/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+  echo "openshift start --write-config=~/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
+  echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"' ~/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+  echo "echo \"kubeletArguments:\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+  echo "echo \"  cloud-provider:\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+  echo "echo \"    - \\\"aws\\\"\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+  echo "echo \"  cloud-config:\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+  echo "echo \"    - \\\"/etc/aws/aws.conf\\\"\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
   echo "" >> start-ose.sh
-  echo "openshift start --master-config=/home/$USER/openshift.local.config/master/master-config.yaml --node-config=/home/$USER/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=4 &> openshift.log" >> start-ose.sh
-  #echo "openshift start --public-master=$INTERNALHOST --volume-dir=/home/$USER/data --loglevel=4  &> openshift.log" >> start-ose.sh
+  echo "openshift start --master-config=~/openshift.local.config/master/master-config.yaml --node-config=~/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=4 &> openshift.log" >> start-ose.sh
+  #echo "openshift start --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
   chmod +x start-ose.sh
   echo ""
   
@@ -243,14 +243,14 @@ CreateConfigs()
   echo "$SUDO docker ps | awk 'index(\$NF,"k8s_")==1 { print \$1 }' | xargs -l -r $SUDO docker stop" >> stop-ose.sh
   echo "mount | grep "openshift.local.volumes" | awk '{ print \$3}' | xargs -l -r sudo umount" >> stop-ose.sh
   echo "mount | grep "nfs1.rhs" | awk '{ print $3}' | xargs -l -r sudo umount" >> stop-ose.sh
-  echo "cd /home/$USER/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64; sudo rm -rf openshift.local.*" >> stop-ose.sh
-  echo "cd /home/$USER; sudo rm -rf openshift.local.*" >> stop-ose.sh
+  echo "cd ~/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64; sudo rm -rf openshift.local.*" >> stop-ose.sh
+  echo "cd ~; sudo rm -rf openshift.local.*" >> stop-ose.sh
   chmod +x stop-ose.sh
   echo ""
   
   if [ "$ISCLOUD" == "aws" ]
   then
-    cd /home/$USER
+    cd ~
     echo "...creating aws cli input"
     echo "$AWSKEY" > myconf.txt
     echo "$AWSSECRET" >> myconf.txt
@@ -263,7 +263,7 @@ CreateConfigs()
 
 CreateTestYamlEC2()
 {
-  cd /home/$USER/dev-configs
+  cd ~/dev-configs
   echo "apiVersion: v1" > busybox-ebs.yaml
   echo "kind: Pod" >> busybox-ebs.yaml
   echo "metadata:"  >> busybox-ebs.yaml
@@ -393,7 +393,7 @@ then
   $SUDO yum install go -y> /dev/null
 else
   echo "Installing go1.6..."
-  cd /home/$USER
+  cd ~
   $SUDO wget https://storage.googleapis.com/golang/go1.6.1.linux-amd64.tar.gz
   $SUDO rm -rf /usr/local/go
   $SUDO tar -C /usr/local -xzf go1.6.1.linux-amd64.tar.gz
@@ -404,7 +404,7 @@ echo ""
 # Config .bash_profile and such
 echo "Creating directory structure and workspace..."
 echo ""
-cd /home/$USER
+cd ~
 mkdir go
 cd go
 mkdir src
@@ -417,7 +417,7 @@ git clone https://github.com/kubernetes/kubernetes.git
 mkdir openshift
 cd openshift
 git clone https://github.com/openshift/origin.git
-cd /home/$USER
+cd ~
 git clone https://github.com/openshift/openshift-ansible
 echo ""
 echo "...Creating bash_profile and configs for user: $USER"
@@ -428,7 +428,7 @@ CreateConfigs
 if [ "$ISCLOUD" == "aws" ]
 then
   echo "Install ec2 api tools (aws cli)..."
-  cd /home/$USER
+  cd ~
   curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
   unzip awscli-bundle.zip
   $SUDO ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
@@ -446,7 +446,7 @@ then
   cd /etc/aws
   echo "[Global]" > aws.conf
   echo "Zone = $ZONE" >> aws.conf
-  cd /home/$USER
+  cd ~
   echo ""
 fi
 echo ""
@@ -455,8 +455,8 @@ echo ""
 echo "disabling SELinux and Firewalls for now..."
 sudo setenforce 0
 sudo iptables -F
-echo "...Creating some K8 yaml file directory /home/$USER/dev-configs"
-cd /home/$USER
+echo "...Creating some K8 yaml file directory ~/dev-configs"
+cd ~
 mkdir dev-configs
 cd dev-configs
 CreateTestYamlEC2
@@ -468,16 +468,16 @@ then
   # can't get this to work the way I want so doing 2nd approach for now
   # and will come back - for now just removing the function test_docker
   echo "Editing local-up-cluster.sh"
-  # sed -i "s/${DOCKER[@]} ps/sudo ${DOCKER[@]} ps/" /home/$USER/go/src/github.com/kubernetes/hack/local-up-cluster.sh
-  sed -i '/function test_docker/,+6d' /home/$USER/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
-  sed -i '/test_docker/d' /home/$USER/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
+  # sed -i "s/${DOCKER[@]} ps/sudo ${DOCKER[@]} ps/" ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh
+  sed -i '/function test_docker/,+6d' ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
+  sed -i '/test_docker/d' ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
   
   # making sure we also have --cloud-config working
-  sed -i '/^# You may need to run this as root to allow kubelet to open docker/a CLOUD_CONFIG=${CLOUD_CONFIG:-\"\"}' /home/$USER/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
-  sed -i '/      --cloud-provider=/a\ \ \ \ \ \ --cloud-config=\"${CLOUD_CONFIG}\" \\' /home/$USER/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
+  sed -i '/^# You may need to run this as root to allow kubelet to open docker/a CLOUD_CONFIG=${CLOUD_CONFIG:-\"\"}' ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
+  sed -i '/      --cloud-provider=/a\ \ \ \ \ \ --cloud-config=\"${CLOUD_CONFIG}\" \\' ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
 
-  # mv /home/$USER/go/src/github.com/kubernetes/hack/local-up-cluster.sh /home/$USER/go/src/github.com/kubernetes/hack/local-up-cluster.sh.bck
-  # cp /home/$USER/local-up-cluster.sh /home/$USER/go/src/github.com/kubernetes/hack/
+  # mv ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh.bck
+  # cp ~/local-up-cluster.sh ~/go/src/github.com/kubernetes/hack/
 fi
 
 # Install Docker yum version
@@ -518,10 +518,10 @@ echo "    this will pick up your .bash_profile and all your paths"
 echo " 2. Now you can run the ./hack/local-up-cluster.sh to build and start K8"
 echo "       or"
 echo "    make clean build on OSE (make clean build)"
-echo " 3. Finally, open a 2nd terminal and run the /home/$USER/config-k8.sh" 
+echo " 3. Finally, open a 2nd terminal and run the ~/config-k8.sh" 
 echo "    script for K8 since it is already running"
-echo "    If using OpenShift - need to run the /home/$USER/start-ose.sh script"
-echo "    and then /home/$USER/config-ose.sh"
+echo "    If using OpenShift - need to run the ~/start-ose.sh script"
+echo "    and then ~/config-ose.sh"
 echo " 4. Now you should be able to interact and use kubectl or openshift as usual"
 echo ""
 echo "Environment: "
