@@ -2,15 +2,17 @@
 # Some automation to setting up OSE/K8 VM's
 
 
-INTERNALHOST=$1
-SUDO=$2
-GOYUM=$3
-ISCLOUD=$4
-ZONE=$5
-AWSKEY=$6
-AWSSECRET=$7
-RHNUSER=$8
-RHNPASS=$9
+# INTERNALHOST=$1
+# SUDO=$2
+# GOYUM=$3
+# ISCLOUD=$4
+# ZONE=$5
+# AWSKEY=$6
+# AWSSECRET=$7
+# RHNUSER=$8
+# RHNPASS=$9
+
+source setupvm.config
 
 if ([ "$SUDO" == "" ] && [ "$ISCLOUD" == "" ] && [ "$GOYUM" == ""]) || ([ "$SUDO" == "help" ])
 then
