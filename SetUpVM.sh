@@ -14,7 +14,6 @@
 
 source setupvm.config
 
-STIME = time
 
 if ([ "$SUDO" == "" ] && [ "$ISCLOUD" == "" ] && [ "$GOYUM" == ""]) || ([ "$SUDO" == "help" ])
 then
