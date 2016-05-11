@@ -14,6 +14,8 @@
 
 source setupvm.config
 
+STIME = time
+
 if ([ "$SUDO" == "" ] && [ "$ISCLOUD" == "" ] && [ "$GOYUM" == ""]) || ([ "$SUDO" == "help" ])
 then
   echo "No parameters passed in, all are required at this time"
@@ -225,16 +227,26 @@ CreateConfigs()
   echo "...creating start-ose.sh"
   mkdir data
   echo "$SUDO rm -rf /usr/bin/kube*" > start-ose.sh
-  echo "openshift start --write-config=~/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
-  echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"' ~/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
-  echo "echo \"kubeletArguments:\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-  echo "echo \"  cloud-provider:\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-  echo "echo \"    - \\\"aws\\\"\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-  echo "echo \"  cloud-config:\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-  echo "echo \"    - \\\"/etc/aws/aws.conf\\\"\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-  echo "" >> start-ose.sh
-  echo "openshift start --master-config=~/openshift.local.config/master/master-config.yaml --node-config=~/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=4 &> openshift.log" >> start-ose.sh
-  #echo "openshift start --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
+
+  if [ "$ISCLOUD" == "aws" ]
+  then
+    echo "openshift start --write-config=~/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
+    echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"' ~/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    echo "echo \"kubeletArguments:\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "echo \"  cloud-provider:\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "echo \"    - \\\"aws\\\"\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "echo \"  cloud-config:\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "echo \"    - \\\"/etc/aws/aws.conf\\\"\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "" >> start-ose.sh
+    echo "openshift start --master-config=~/openshift.local.config/master/master-config.yaml --node-config=~/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=4 &> openshift.log" >> start-ose.sh
+  else if [ "$ISCLOUD" == "gce" ]
+  then
+    echo ""
+  else  
+    echo ""
+    echo "openshift start --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
+  fi
+
   chmod +x start-ose.sh
   echo ""
   
@@ -508,7 +520,9 @@ $SUDO systemctl stop docker
 $SUDO rm -rf /var/lib/docker/*
 $SUDO systemctl restart docker
 
-
+echo ""
+echo " *******************************************"
+echo ""
 echo "PreReq SetUp Complete!!!!"
 echo ""
 echo "At this point we should be ready to run our build"
