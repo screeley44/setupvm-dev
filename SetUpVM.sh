@@ -15,7 +15,7 @@
 source setupvm.config
 
 
-if ([ "$SUDO" == "" ] && [ "$ISCLOUD" == "" ] && [ "$GOYUM" == ""]) || ([ "$SUDO" == "help" ])
+if ([ "$SUDO" == "" ] && [ "$ISCLOUD" == "" ] && [ "$GOYUM" == "" ]) || ([ "$SUDO" == "help" ])
 then
   echo "No parameters passed in, all are required at this time"
   echo ""
@@ -238,9 +238,6 @@ CreateConfigs()
     echo "echo \"    - \\\"/etc/aws/aws.conf\\\"\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "" >> start-ose.sh
     echo "openshift start --master-config=~/openshift.local.config/master/master-config.yaml --node-config=~/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=4 &> openshift.log" >> start-ose.sh
-  else if [ "$ISCLOUD" == "gce" ]
-  then
-    echo ""
   else  
     echo ""
     echo "openshift start --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
