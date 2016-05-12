@@ -11,6 +11,9 @@
 # AWSSECRET=$7
 # RHNUSER=$8
 # RHNPASS=$9
+# ORIGINWORKDIR=$10
+# KUBEWORKDIR=$11
+# GOWORKDIR=$12
 
 source setupvm.config
 
@@ -37,6 +40,9 @@ then
   echo "   AWSSECRET = the secret key value"
   echo "   RHNUSER = rhn support id - for use with subscription manager"
   echo "   RHNPASS = rhs support password - for use with subscription manager"
+  echo "   ORIGINWORKDIR = where you want your OpenShift specific configs and workspace to be located - default is users home directory"
+  echo "   KUBEWORKDIR = where you want your K8 specific configs and workspace to be located - default is users home directory"
+  echo "   SOURCEDIR = where you want your cloned repos to live (GOPATH) default is home directory /go/src/github.com"
   exit 1
 fi
 
@@ -77,6 +83,69 @@ cm3='\\\$ "'
 
 cm11=
 cm12=
+OSEPATH=""
+KUBEPATH=""
+GOLANGPATH=""
+
+# determine if using defaults or values
+# for paths
+if [[ -z "$ORIGINWORKDIR" ]]
+then
+  if [ "$USER" == "ec2-user" ]
+  then
+    OSEPATH="/home/ec2-user"
+  elif [ "$USER" == "root" ]
+  then
+    OSEPATH="/root"  
+  else
+    OSEPATH=~
+  fi
+  echo "Setting Origin Working Directory to $OSEPATH"
+else
+  OSEPATH=$ORIGINWORKDIR
+  echo "Setting Origin Working Directory to $OSEPATH"
+fi
+
+if [[ -z "$KUBEWORKDIR" ]]
+then
+  if [ "$USER" == "ec2-user" ]
+  then
+    KUBEPATH="/home/ec2-user"
+  elif [ "$USER" == "root" ]
+  then
+    KUBEPATH="/root"  
+  else
+    KUBEPATH=~
+  fi
+  echo "Setting Kube Working Directory to $KUBEPATH"
+else
+  KUBEPATH=$KUBEWORKDIR
+  echo "Setting Kube Working Directory to $KUBEPATH"
+fi
+
+if [[ -z "$SOURCEDIR" ]]
+then
+  if [ "$USER" == "ec2-user" ]
+  then
+    GOLANGPATH="/home/ec2-user"
+  elif [ "$USER" == "root" ]
+  then
+    GOLANGPATH="/root"  
+  else
+    GOLANGPATH=~
+  fi
+  echo "Setting GOLANG (GOPATH) Working Directory to $GOLANGPATH"
+else
+  GOLANGPATH=$SOURCEDIR
+  echo "Setting GOLANG (GOPATH) Working Directory to $GOLANGPATH"
+fi
+
+$SUDO mkdir -p $GOLANGPATH
+$SUDO mkdir -p $OSEPATH
+$SUDO mkdir -p $KUBEPATH
+$SUDO -i chmod -R 777 $GOLANGPATH
+$SUDO -i chmod -R 777 $OSEPATH
+$SUDO -i chmod -R 777 $KUBEPATH
 
 CreateProfiles()
 {
@@ -132,18 +201,6 @@ CreateProfiles()
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> .bash_profile
     echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> .bash_profile
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> .bash_profile
-    # echo "export KUBE_AWS_ZONE=$ZONE" >> .bash_profile
-    # echo "export AWS_DEFAULT_REGION=$REGION" >> .bash_profile
-    # echo "export KUBE_AWS_REGION=$REGION" >> .bash_profile
-    # echo "export AWS_REGION=$REGION" >> .bash_profile
-    # echo "export NUM_NODES=1" >> .bash_profile
-    # echo "export MASTER_SIZE=t2.large" >> .bash_profile
-    # echo "export NODE_SIZE=t2.large" >> .bash_profile
-    # echo "export AWS_S3_REGION=$REGION" >> .bash_profile
-    # echo "export AWS_S3_BUCKET=aos-storage-dev" >> .bash_profile
-    # echo "export INSTANCE_PREFIX=k8s" >> .bash_profile
-    # echo "export KUBE_API_ARGS='--service_account_key_file=/tmp/serviceaccount.key'" >> .bash_profile
-    # echo "export KUBE_CONTROLLER_MANAGER_ARGS='--service_account_private_key_file=/tmp/serviceaccount.key'" >> .bash_profile
 
     $SUDO echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> newbashrc 
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> newbashrc
@@ -151,58 +208,27 @@ CreateProfiles()
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> newbashrc
     echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> newbashrc
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> newbashrc
-    # echo "export CLOUD_CONFIG=/etc/cloud/cloud.cfg" >> newbashrc
-    # echo "export KUBE_AWS_ZONE=$ZONE" >> newbashrc
-    # echo "export AWS_DEFAULT_REGION=$REGION" >> newbashrc
-    # echo "export KUBE_AWS_REGION=$REGION" >> newbashrc
-    # echo "export AWS_REGION=$REGION" >> newbashrc
-    # echo "export NUM_NODES=1" >> newbashrc
-    # echo "export MASTER_SIZE=t2.large" >> newbashrc
-    # echo "export NODE_SIZE=t2.large" >> newbashrc
-    # echo "export AWS_S3_REGION=$REGION" >> newbashrc
-    # echo "export AWS_S3_BUCKET=aos-storage-dev" >> newbashrc
-    # echo "export INSTANCE_PREFIX=k8s" >> newbashrc
-    # echo "export KUBE_API_ARGS='--service_account_key_file=/tmp/serviceaccount.key'" >> newbashrc
-    # echo "export KUBE_CONTROLLER_MANAGER_ARGS='--service_account_private_key_file=/tmp/serviceaccount.key'" >> newbashrc
   fi
     
   echo "" >> newbashrc
   echo "#go environment" >> newbashrc
-  if [ "$SUDO" == "sudo" ] 
-  then
-    echo "export GOPATH=/home/$USER/go" >> newbashrc
-  else
-    echo "export GOPATH=~/go" >> newbashrc
-  fi
+  echo "export GOPATH=$GOLANGPATH/go" >> newbashrc
   echo "GOPATH1=/usr/local/go" >> newbashrc
   echo "GO_BIN_PATH=/usr/local/go/bin" >> newbashrc
   echo "" >> newbashrc
-  if [ "$SUDO" == "sudo" ] 
-  then
-    echo "PATH=\$PATH:$HOME/bin:/usr/local/go/bin:/home/$USER/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:/home/$USER/go/src/github.com/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
-  else
-    echo "PATH=\$PATH:$HOME/bin:/usr/local/go/bin:~/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:~/go/src/github.com/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
-  fi
+
+
+  echo "PATH=\$PATH:$HOME/bin:/usr/local/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/github.com/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
   echo "" >> newbashrc
   echo "export PATH" >> newbashrc
 
   echo "" >> .bash_profile
   echo "#go environment" >> .bash_profile
-  if [ "$SUDO" == "sudo" ] 
-  then
-    echo "export GOPATH=/home/$USER/go" >> .bash_profile
-  else
-    echo "export GOPATH=~/go" >> .bash_profile
-  fi
+  echo "export GOPATH=$GOLANGPATH/go" >> .bash_profile
   echo "GOPATH1=/usr/local/go" >> .bash_profile
   echo "GO_BIN_PATH=/usr/local/go/bin" >> .bash_profile
   echo "" >> .bash_profile
-  if [ "$SUDO" == "sudo" ] 
-  then
-    echo "PATH=\$PATH:$HOME/bin:/usr/local/go/bin:/home/$USER/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:/home/$USER/go/src/github.com/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
-  else
-    echo "PATH=\$PATH:$HOME/bin:/usr/local/go/bin:~/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:~/go/src/github.com/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
-  fi 
+  echo "PATH=\$PATH:$HOME/bin:/usr/local/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/github.com/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
   echo "" >> .bash_profile
   echo "export PATH" >> .bash_profile
 
@@ -214,82 +240,47 @@ CreateProfiles()
 CreateConfigs()
 {
   echo "...creating config-k8.sh"
-  cd ~
-  if [ "$SUDO" == "sudo" ]
-  then  
-    echo "$SUDO cp /home/$USER/go/src/github.com/kubernetes/_output/local/bin/linux/amd64/kube*  /usr/bin" > config-k8.sh
-  else
-    echo "$SUDO cp ~/go/src/github.com/kubernetes/_output/local/bin/linux/amd64/kube*  /usr/bin" > config-k8.sh
-  fi
+  cd $KUBEPATH
+  echo "$SUDO cp $GOLANGPATH/go/src/github.com/kubernetes/_output/local/bin/linux/amd64/kube*  /usr/bin" > config-k8.sh
   echo "" >> config-k8.sh
   echo ""
-
-  echo ""
-  if [ "$SUDO" == "sudo" ]
-  then 
-    echo "/home/$USER/go/src/github.com/kubernetes/cluster/kubectl.sh config set-cluster local --server=http://127.0.0.1:8080 --insecure-skip-tls-verify=true" >> config-k8.sh
-    echo "/home/$USER/go/src/github.com/kubernetes/cluster/kubectl.sh config set-context local --cluster=local" >> config-k8.sh
-    echo "/home/$USER/go/src/github.com/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
-  else
-    echo "~/go/src/github.com/kubernetes/cluster/kubectl.sh config set-cluster local --server=http://127.0.0.1:8080 --insecure-skip-tls-verify=true" >> config-k8.sh
-    echo "~/go/src/github.com/kubernetes/cluster/kubectl.sh config set-context local --cluster=local" >> config-k8.sh
-    echo "~/go/src/github.com/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
-  fi
+  echo "$GOLANGPATH/go/src/github.com/kubernetes/cluster/kubectl.sh config set-cluster local --server=http://127.0.0.1:8080 --insecure-skip-tls-verify=true" >> config-k8.sh
+  echo "$GOLANGPATH/go/src/github.com/kubernetes/cluster/kubectl.sh config set-context local --cluster=local" >> config-k8.sh
+  echo "$GOLANGPATH/go/src/github.com/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
   chmod +x config-k8.sh
 
   echo ""
   echo "...creating config-ose.sh"
-  if [ "$SUDO" == "sudo" ]
-  then
-    echo "chmod +r ~/openshift.local.config/master/admin.kubeconfig" > config-ose.sh
-    echo "oadm groups new myclusteradmingroup admin --config=/home/$USER/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
-    echo "oadm policy add-cluster-role-to-group cluster-admin myclusteradmingroup --config=/home/$USER/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
-    echo "oadm policy add-scc-to-group privileged myclusteradmingroup --config=/home/$USER/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
-  else
-    echo "chmod +r ~/openshift.local.config/master/admin.kubeconfig" > config-ose.sh
-    echo "oadm groups new myclusteradmingroup admin --config=~/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
-    echo "oadm policy add-cluster-role-to-group cluster-admin myclusteradmingroup --config=~/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
-    echo "oadm policy add-scc-to-group privileged myclusteradmingroup --config=~/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
-  fi
+  cd $OSEPATH
+  echo "chmod +r $OSEPATH/openshift.local.config/master/admin.kubeconfig" > config-ose.sh
+  echo "oadm groups new myclusteradmingroup admin --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm policy add-cluster-role-to-group cluster-admin myclusteradmingroup --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm policy add-scc-to-group privileged myclusteradmingroup --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
   chmod +x config-ose.sh
   echo ""
 
 
   echo "...creating start-ose.sh"
-  mkdir data
+  mkdir -p $OSEPATH/data
   echo "$SUDO rm -rf /usr/bin/kube*" > start-ose.sh
+  cd $OSEPATH
 
   if [ "$ISCLOUD" == "aws" ]
   then
-    if [ "$SUDO" == "sudo" ]
-    then
-      echo "openshift start --write-config=/home/$USER/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
-      echo "sed -i '/apiServerArguments: null/,+2d' /home/$USER/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
-      echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"' /home/$USER/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
-      echo "echo \"kubeletArguments:\" >> /home/$USER/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-      echo "echo \"  cloud-provider:\" >> /home/$USER/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-      echo "echo \"    - \\\"aws\\\"\" >> /home/$USER/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-      echo "echo \"  cloud-config:\" >> /home/$USER/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-      echo "echo \"    - \\\"/etc/aws/aws.conf\\\"\" >> /home/$USER/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-      echo "" >> start-ose.sh
-      echo "openshift start --master-config=/home/$USER/openshift.local.config/master/master-config.yaml --node-config=~/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=4 &> openshift.log" >> start-ose.sh
-    else
-      echo "openshift start --write-config=~/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
-      echo "sed -i '/apiServerArguments: null/,+2d' ~/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
-      echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"' ~/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
-      echo "echo \"kubeletArguments:\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-      echo "echo \"  cloud-provider:\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-      echo "echo \"    - \\\"aws\\\"\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-      echo "echo \"  cloud-config:\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-      echo "echo \"    - \\\"/etc/aws/aws.conf\\\"\" >> ~/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-      echo "" >> start-ose.sh
-      echo "openshift start --master-config=~/openshift.local.config/master/master-config.yaml --node-config=~/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=4 &> openshift.log" >> start-ose.sh
-    fi
+    echo "openshift start --write-config=$OSEPATH/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
+    echo "sed -i '/apiServerArguments: null/,+2d' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    echo "echo \"kubeletArguments:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "echo \"  cloud-provider:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "echo \"    - \\\"aws\\\"\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "echo \"  cloud-config:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "echo \"    - \\\"/etc/aws/aws.conf\\\"\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "" >> start-ose.sh
+    echo "openshift start --master-config=/home/$USER/openshift.local.config/master/master-config.yaml --node-config=~/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=4 &> openshift.log" >> start-ose.sh
   else  
     echo ""
-    echo "openshift start --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
+    echo "openshift start --public-master=$INTERNALHOST --volume-dir=$OSEPATH/data --loglevel=4  &> openshift.log" >> start-ose.sh
   fi
-
   chmod +x start-ose.sh
   echo ""
   
@@ -298,21 +289,14 @@ CreateConfigs()
   echo "$SUDO docker ps | awk 'index(\$NF,"k8s_")==1 { print \$1 }' | xargs -l -r $SUDO docker stop" >> stop-ose.sh
   echo "mount | grep "openshift.local.volumes" | awk '{ print \$3}' | xargs -l -r sudo umount" >> stop-ose.sh
   echo "mount | grep "nfs1.rhs" | awk '{ print $3}' | xargs -l -r sudo umount" >> stop-ose.sh
-  echo "cd /home/$USER/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64; sudo rm -rf openshift.local.*" >> stop-ose.sh
-  echo "cd /home/$USER; sudo rm -rf openshift.local.*" >> stop-ose.sh
-  echo "cd ~/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64; sudo rm -rf openshift.local.*" >> stop-ose.sh
-  echo "cd ~; sudo rm -rf openshift.local.*" >> stop-ose.sh
+  echo "cd $GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64; sudo rm -rf openshift.local.*" >> stop-ose.sh
+  echo "cd $GOLANGPATH; sudo rm -rf openshift.local.*" >> stop-ose.sh
   chmod +x stop-ose.sh
   echo ""
   
   if [ "$ISCLOUD" == "aws" ]
   then
-    if [ "$SUDO" == "sudo" ]
-    then
-      cd /home/$USER
-    else
-      cd ~
-    fi
+    cd $GOLANGPATH
     echo "...creating aws cli input"
     echo "$AWSKEY" > myconf.txt
     echo "$AWSSECRET" >> myconf.txt
@@ -321,11 +305,16 @@ CreateConfigs()
     echo ""
   fi
 
+  cp $OSEPATH/config-ose.sh $GOLANGPATH
+  cp $OSEPATH/start-ose.sh $GOLANGPATH
+  cp $OSEPATH/stop-ose.sh $GOLANGPATH
+  cp $KUBEPATH/config-k8.sh $GOLANGPATH
+
 }
 
 CreateTestYamlEC2()
 {
-  cd ~/dev-configs
+  cd $GOLANGPATH/dev-configs
   echo "apiVersion: v1" > busybox-ebs.yaml
   echo "kind: Pod" >> busybox-ebs.yaml
   echo "metadata:"  >> busybox-ebs.yaml
@@ -386,7 +375,8 @@ CreateTestYamlEC2()
   echo "      persistentVolumeClaim:" >> busybox-ebs-pvc.yaml
   echo "        claimName: ebs-claim" >> busybox-ebs-pvc.yaml
 
-
+  cp *.yaml $OSEPATH/dev-configs
+  cp *.yaml $KUBEPATH/dev-configs
 
 
 }
@@ -466,23 +456,28 @@ echo ""
 # Config .bash_profile and such
 echo "Creating directory structure and workspace..."
 echo ""
-cd ~
-mkdir go
-cd go
-mkdir src
-cd src
-mkdir github.com
-cd github.com
+$SUDO mkdir -p $GOLANGPATH/go/src/github.com
+$SUDO -i chmod -R 777 $GOLANGPATH
+
+cd $GOLANGPATH/go/src/github.com
 echo "...Cloning Kubernetes, OpenShift Origin and Openshift Ansible"
 echo ""
 git clone https://github.com/kubernetes/kubernetes.git
-mkdir openshift
-cd openshift
+$SUDO mkdir -p $GOLANGPATH/go/src/github.com/openshift
+$SUDO -i chmod -R 777 $GOLANGPATH
+
+cd $GOLANGPATH/go/src/github.com/openshift
 git clone https://github.com/openshift/origin.git
-cd ~
+cd $GOLANGPATH
 git clone https://github.com/openshift/openshift-ansible
 echo ""
 echo "...Creating bash_profile and configs for user: $USER"
+$SUDO mkdir -p $OSEPATH/dev-configs
+$SUDO mkdir -p $KUBEPATH/dev-configs
+$SUDO mkdir -p $GOLANGPATH/dev-configs
+$SUDO -i chmod -R 777 $GOLANGPATH
+$SUDO -i chmod -R 777 $OSEPATH
+$SUDO -i chmod -R 777 $KUBEPATH
 CreateProfiles
 CreateConfigs
 
@@ -490,7 +485,7 @@ CreateConfigs
 if [ "$ISCLOUD" == "aws" ]
 then
   echo "Install ec2 api tools (aws cli)..."
-  cd ~
+  cd $GOLANGPATH
   curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
   unzip awscli-bundle.zip
   $SUDO ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
@@ -499,16 +494,12 @@ then
 
   echo "...creating aws.conf file"  
   cd /etc
-  # one way
-  # $SUDO -s
-  # then exit after??
-
   $SUDO mkdir aws
   $SUDO -i chmod -R 777 /etc/aws  
   cd /etc/aws
   echo "[Global]" > aws.conf
   echo "Zone = $ZONE" >> aws.conf
-  cd ~
+  cd $GOLANGPATH
   echo ""
 fi
 echo ""
@@ -518,9 +509,7 @@ echo "disabling SELinux and Firewalls for now..."
 sudo setenforce 0
 sudo iptables -F
 echo "...Creating some K8 yaml file directory ~/dev-configs"
-cd ~
-mkdir dev-configs
-cd dev-configs
+cd $GOLANGPATH/dev-configs
 CreateTestYamlEC2
 # CreateTestYamlNFS
 
@@ -531,12 +520,12 @@ then
   # and will come back - for now just removing the function test_docker
   echo "Editing local-up-cluster.sh"
   # sed -i "s/${DOCKER[@]} ps/sudo ${DOCKER[@]} ps/" ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh
-  sed -i '/function test_docker/,+6d' ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
-  sed -i '/test_docker/d' ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
+  sed -i '/function test_docker/,+6d' $GOLANGPATH/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
+  sed -i '/test_docker/d' $GOLANGPATH/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
   
   # making sure we also have --cloud-config working
-  sed -i '/^# You may need to run this as root to allow kubelet to open docker/a CLOUD_CONFIG=${CLOUD_CONFIG:-\"\"}' ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
-  sed -i '/      --cloud-provider=/a\ \ \ \ \ \ --cloud-config=\"${CLOUD_CONFIG}\" \\' ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
+  sed -i '/^# You may need to run this as root to allow kubelet to open docker/a CLOUD_CONFIG=${CLOUD_CONFIG:-\"\"}' $GOLANGPATH/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
+  sed -i '/      --cloud-provider=/a\ \ \ \ \ \ --cloud-config=\"${CLOUD_CONFIG}\" \\' $GOLANGPATH/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
 
   # mv ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh.bck
   # cp ~/local-up-cluster.sh ~/go/src/github.com/kubernetes/hack/
@@ -582,15 +571,20 @@ echo "    this will pick up your .bash_profile and all your paths"
 echo " 2. Now you can run the ./hack/local-up-cluster.sh to build and start K8"
 echo "       or"
 echo "    make clean build on OSE (make clean build)"
-echo " 3. Finally, open a 2nd terminal and run the ~/config-k8.sh" 
-echo "    script for K8 since it is already running"
-echo "    If using OpenShift - need to run the ~/start-ose.sh script"
-echo "    and then ~/config-ose.sh"
+echo " 3. Finally, open a 2nd terminal and run the /home/ec2-user/config-k8.sh" 
+echo "    script for K8 since it is already running (or /root/config-k8.sh if logged in as root when script ran)"
+echo "    If using OpenShift - need to run the home/ec2-user/start-ose.sh script (or /root/start-ose.sh if logged in as root when script ran)"
+echo "    and then /home/ec2-user/config-ose.sh (or /root/config-ose.sh if logged in as root when script ran)"
 echo " 4. Now you should be able to interact and use kubectl or openshift as usual"
 echo ""
 echo "Environment: "
-echo "  dev dir: /home/ec2-user/go/src/github.com  kubernetes | openshift/origin"
-echo "  yaml dir: /home/ec2-user/dev-configs"
+echo "  dev dir: $GOLANGPATH/go/src/github.com  kubernetes | openshift/origin"
+echo "  Origin Working Dir: $OSEPATH (configs are in openshift.local.config, log is openshift.log)"
+echo "      scripts (start-ose.sh, stop-ose.sh, config-ose.sh)"
+echo "  Kube Working Dir: $KUBEPATH "
+echo "      scripts (config-k8.sh)"
+echo ""
+echo "  yaml dir (copied to multiple locations): $OSEPATH/dev-configs  $KUBEPATH/dev-configs  $GOLANGPATH/dev-configs"
 echo "  need sudo to interact with docker i.e. sudo docker ps unless you have already 'sudo -s'"
 
 

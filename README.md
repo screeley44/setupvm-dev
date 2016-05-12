@@ -17,17 +17,25 @@ For RHEL 7.x instances
 7.  after completion
       - sudo -s   (to work as root and also pick up .bashrc/.bash_profile exports)
       - cd /home/ec2-user/go/src/github.com/kubernetes
-      - ./hack/local-up-cluster.sh
+      - ./hack/local-up-cluster.sh   (note:  this will build and run the K8 process in this terminal, to stop ctrl+C)
 
       or
 
       - sudo -s
       - cd /home/ec2-user/go/src/github.com/openshift/origin
       - make clean build
+      - after completion, cd back to your home directory where all the scripts are stored
+        
+           cd /home/ec2-user or cd /root   (depending on what user you used to run the script)
       
+      - ./start-ose.sh   (this will run openshift as a process - logging is in home dir at openshift.log)
 
 8.  open 2nd terminal
       - run ./config-k8.sh  or  ./config-ose.sh
       - cd /home/ec2-user/dev-configs
       - update busybox-ebs.yaml with correct volumeID
       - try to run it
+
+# Some Things To Note:
+
+1.  All work is performed in your home directory - all scripts should be run from here and it will set up your config dirs as well
