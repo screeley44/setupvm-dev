@@ -46,14 +46,14 @@ then
   exit 1
 fi
 
-if [ "$SUDO" == "" ] || [ "$SUDO" == "sudo" ]
-then
+# if [ "$SUDO" == "" ] || [ "$SUDO" == "sudo" ]
+# then
   # do nothing
-  echo ""
-else
+#  echo ""
+# else
   # change to blank because another value was entered
-  SUDO=""
-fi
+#  SUDO=""
+# fi
 
 if [ "$ISCLOUD" == "aws" ]
 then
@@ -89,6 +89,16 @@ GOLANGPATH=""
 
 # determine if using defaults or values
 # for paths
+if [ "$USER" == "ec2-user" ]
+then
+  SUDO="sudo"
+elif [ "$USER" == "root" ]
+then
+  SUDO=""
+else
+  SUDO="sudo"
+fi
+
 if [[ -z "$ORIGINWORKDIR" ]]
 then
   if [ "$USER" == "ec2-user" ]
@@ -96,7 +106,7 @@ then
     OSEPATH="/home/ec2-user"
   elif [ "$USER" == "root" ]
   then
-    OSEPATH="/root"  
+    OSEPATH="/root"
   else
     OSEPATH=~
   fi

@@ -38,4 +38,7 @@ For RHEL 7.x instances
 
 # Some Things To Note:
 
-1.  All work is performed in your home directory - all scripts should be run from here and it will set up your config dirs as well
+1.  By default, if you did not specify particular work directories in the .config, then everything will go into the current users home directory at the time the script was run.
+    All tasks, scripts and configurations (openshift in particular) will be located there.
+
+2.  
