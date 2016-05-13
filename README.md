@@ -22,18 +22,15 @@ For RHEL 7.x instances
       or
 
       - sudo -s
-      - cd /home/ec2-user/go/src/github.com/openshift/origin
+      - cd to your source working directory specified in .config file (default is users home directory/go/src/github.com)
       - make clean build
-      - after completion, cd back to your home directory where all the scripts are stored
-        
-           cd /home/ec2-user or cd /root   (depending on what user you used to run the script)
-      
+      - after completion, you will need to run the start-ose.sh script (these scripts are found in home directory or in your openshift working dir)
       - ./start-ose.sh   (this will run openshift as a process - logging is in home dir at openshift.log)
 
 8.  open 2nd terminal
       - run ./config-k8.sh  or  ./config-ose.sh
-      - cd /home/ec2-user/dev-configs
-      - update busybox-ebs.yaml with correct volumeID
+      - cd /home/ec2-user/dev-configs or in one of your working directories (sample files are copied to 3 common locations)
+      - update busybox-ebs.yaml with correct volumeID (for ebs)
       - try to run it
 
 # Some Things To Note:

@@ -46,14 +46,7 @@ then
   exit 1
 fi
 
-# if [ "$SUDO" == "" ] || [ "$SUDO" == "sudo" ]
-# then
-  # do nothing
-#  echo ""
-# else
-  # change to blank because another value was entered
-#  SUDO=""
-# fi
+echo ""
 
 if [ "$ISCLOUD" == "aws" ]
 then
@@ -99,6 +92,7 @@ else
   SUDO="sudo"
 fi
 
+OSEDEFAULT=""
 if [[ -z "$ORIGINWORKDIR" ]]
 then
   if [ "$USER" == "ec2-user" ]
@@ -116,6 +110,7 @@ else
   echo "Setting Origin Working Directory to $OSEPATH"
 fi
 
+KUBEDEFAULT=""
 if [[ -z "$KUBEWORKDIR" ]]
 then
   if [ "$USER" == "ec2-user" ]
@@ -133,6 +128,7 @@ else
   echo "Setting Kube Working Directory to $KUBEPATH"
 fi
 
+GODEFAULT=""
 if [[ -z "$SOURCEDIR" ]]
 then
   if [ "$USER" == "ec2-user" ]
@@ -144,29 +140,41 @@ then
   else
     GOLANGPATH=~
   fi
-  echo "Setting GOLANG (GOPATH) Working Directory to $GOLANGPATH"
+  echo "Setting GOLANG Default (GOPATH) Working Directory to $GOLANGPATH"
+  GODEFAULT="yes"
 else
   GOLANGPATH=$SOURCEDIR
   echo "Setting GOLANG (GOPATH) Working Directory to $GOLANGPATH"
 fi
+echo ""
 
-$SUDO mkdir -p $GOLANGPATH
-$SUDO mkdir -p $OSEPATH
-$SUDO mkdir -p $KUBEPATH
-$SUDO -i chmod -R 777 $GOLANGPATH
-$SUDO -i chmod -R 777 $OSEPATH
-$SUDO -i chmod -R 777 $KUBEPATH
+
+if [ "$GODEFAULt" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
+then
+  mkdir -p $GOLANGPATH
+else
+  $SUDO mkdir -p $GOLANGPATH
+  $SUDO -i chmod -R 777 $GOLANGPATH
+fi
+
+if [ "$OSEDEFAULt" == "yes" ] || [ "$OSEPATH" == "/home/ec2-user" ] || [ "$OSEPATH" == "/root" ] || [[ "$OSEPATH" =~ /home ]] 
+then
+  mkdir -p $OSEPATH
+else
+  $SUDO mkdir -p $OSEPATH
+  $SUDO -i chmod -R 777 $OSEPATH
+fi
+
+if [ "$KUBEDEFAULt" == "yes" ] || [ "$KUBEPATH" == "/home/ec2-user" ] || [ "$KUBEPATH" == "/root" ] || [[ "$KUBEPATH" =~ /home ]] 
+then
+  mkdir -p $KUBEPATH
+else
+  $SUDO mkdir -p $KUBEPATH
+  $SUDO -i chmod -R 777 $KUBEPATH
+fi
 
 CreateProfiles()
 {
-  # Lastly - this came up on Main AWS Account - but not on Sub Account
-  # $SUDO openssl genrsa -out /tmp/serviceaccount.key 2048
-  # $SUDO KUBE_API_ARGS="--service_account_key_file=/tmp/serviceaccount.key"
-  # $SUDO KUBE_CONTROLLER_MANAGER_ARGS="--service_account_private_key_file=/tmp/serviceaccount.key"
-  # $SUDO openssl genrsa -out /tmp/kube-serviceaccount.key 2048
-  # $SUDO KUBE_API_ARGS="--service_account_key_file=/tmp/kube-serviceaccount.key"
-  # $SUDO KUBE_CONTROLLER_MANAGER_ARGS="--service_account_private_key_file=/tmp/kube-serviceaccount.key"
-
 
   if [ "$SUDO" == "sudo" ] 
   then  
@@ -223,6 +231,8 @@ CreateProfiles()
   fi
     
   echo "" >> newbashrc
+  echo "export DIDRUN=yes" >> newbashrc
+  echo ""
   echo "#go environment" >> newbashrc
   echo "export GOPATH=$GOLANGPATH/go" >> newbashrc
   echo "GOPATH1=/usr/local/go" >> newbashrc
@@ -230,17 +240,19 @@ CreateProfiles()
   echo "" >> newbashrc
 
 
-  echo "PATH=\$PATH:$HOME/bin:/usr/local/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/github.com/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
+  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/github.com/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
   echo "" >> newbashrc
   echo "export PATH" >> newbashrc
 
   echo "" >> .bash_profile
+  echo "export DIDRUN=yes" >> .bash_profile
+  echo ""
   echo "#go environment" >> .bash_profile
   echo "export GOPATH=$GOLANGPATH/go" >> .bash_profile
   echo "GOPATH1=/usr/local/go" >> .bash_profile
   echo "GO_BIN_PATH=/usr/local/go/bin" >> .bash_profile
   echo "" >> .bash_profile
-  echo "PATH=\$PATH:$HOME/bin:/usr/local/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/github.com/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
+  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/github.com/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
   echo "" >> .bash_profile
   echo "export PATH" >> .bash_profile
 
@@ -288,7 +300,7 @@ CreateConfigs()
     echo "echo \"  cloud-config:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "echo \"    - \\\"/etc/aws/aws.conf\\\"\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "" >> start-ose.sh
-    echo "openshift start --master-config=/home/$USER/openshift.local.config/master/master-config.yaml --node-config=~/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=4 &> openshift.log" >> start-ose.sh
+    echo "openshift start --master-config=$OSEPATH/openshift.local.config/master/master-config.yaml --node-config=$OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=4 &> openshift.log" >> start-ose.sh
   else  
     echo ""
     echo "openshift start --public-master=$INTERNALHOST --volume-dir=$OSEPATH/data --loglevel=4  &> openshift.log" >> start-ose.sh
@@ -435,61 +447,99 @@ echo "   -docker from yum and docker registry configuration"
 echo "   -and misc tools and configuration scripts to help run the projects"
 echo ""
 
-# Subscription Manager Stuffs - for RHEL 7.X devices
-echo "Setting up subscription services from RHEL..."
-$SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS
-$SUDO subscription-manager list --available | sed -n '/OpenShift Employee Subscription/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
-$SUDO subscription-manager repos --disable="*"> /dev/null
-$SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.1-rpms"> /dev/null
-echo ""
-
-# Install software
-echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion telnet etcd unzip ... this will take several minutes"
-$SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet etcd unzip -y> /dev/null
-$SUDO yum update -y> /dev/null
-$SUDO yum install atomic-openshift-utils -y> /dev/null
-echo ""
-
-# Install Go and do other config
-if [ "$GOYUM" == "y" ] || [ "$GOYUM" == "Y" ]
+if [ "$DIDRUN" == "yes" ] || [ -f "$GOLANGPATH/didrun" ]
 then
-  echo "Installing go1.4..."
-  $SUDO yum install go -y> /dev/null
+  echo " Skipping subscription services and yum install of software as this script was run once already..."
+  echo ""
 else
-  echo "Installing go1.6..."
-  cd ~
-  $SUDO wget https://storage.googleapis.com/golang/go1.6.1.linux-amd64.tar.gz
-  $SUDO rm -rf /usr/local/go
-  $SUDO tar -C /usr/local -xzf go1.6.1.linux-amd64.tar.gz
-fi
-echo ""
+  # Subscription Manager Stuffs - for RHEL 7.X devices
+  echo "Setting up subscription services from RHEL..."
+  $SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS
+  $SUDO subscription-manager list --available | sed -n '/OpenShift Employee Subscription/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+  $SUDO subscription-manager repos --disable="*"> /dev/null
+  $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.1-rpms"> /dev/null
+  echo ""
 
+  # Install software
+  echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion telnet etcd unzip ... this will take several minutes"
+  $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet etcd unzip -y> /dev/null
+  $SUDO yum update -y> /dev/null
+  $SUDO yum install atomic-openshift-utils -y> /dev/null
+  echo ""
+
+  # Install Go and do other config
+  if [ "$GOYUM" == "y" ] || [ "$GOYUM" == "Y" ]
+  then
+    echo "Installing go1.4..."
+    $SUDO yum install go -y> /dev/null
+  else
+    echo "Installing go1.6..."
+    cd ~
+    $SUDO wget https://storage.googleapis.com/golang/go1.6.1.linux-amd64.tar.gz
+    $SUDO rm -rf /usr/local/go
+    $SUDO tar -C /usr/local -xzf go1.6.1.linux-amd64.tar.gz
+  fi
+  echo ""
+fi
 
 # Config .bash_profile and such
 echo "Creating directory structure and workspace..."
 echo ""
-$SUDO mkdir -p $GOLANGPATH/go/src/github.com
-$SUDO -i chmod -R 777 $GOLANGPATH
+if [ "$GODEFAULt" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
+then
+  mkdir -p $GOLANGPATH/go/src/github.com
+else
+  $SUDO mkdir -p $GOLANGPATH/go/src/github.com
+  $SUDO -i chmod -R 777 $GOLANGPATH
+fi
 
 cd $GOLANGPATH/go/src/github.com
+rm -rf kubernetes
 echo "...Cloning Kubernetes, OpenShift Origin and Openshift Ansible"
 echo ""
 git clone https://github.com/kubernetes/kubernetes.git
-$SUDO mkdir -p $GOLANGPATH/go/src/github.com/openshift
-$SUDO -i chmod -R 777 $GOLANGPATH
+
+if [ "$GODEFAULt" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
+then
+  mkdir -p $GOLANGPATH/go/src/github.com/openshift
+else
+  $SUDO mkdir -p $GOLANGPATH/go/src/github.com/openshift
+  $SUDO -i chmod -R 777 $GOLANGPATH
+fi
 
 cd $GOLANGPATH/go/src/github.com/openshift
+rm -rf origin
 git clone https://github.com/openshift/origin.git
 cd $GOLANGPATH
+rm -rf openshift-ansible
 git clone https://github.com/openshift/openshift-ansible
 echo ""
 echo "...Creating bash_profile and configs for user: $USER"
-$SUDO mkdir -p $OSEPATH/dev-configs
-$SUDO mkdir -p $KUBEPATH/dev-configs
-$SUDO mkdir -p $GOLANGPATH/dev-configs
-$SUDO -i chmod -R 777 $GOLANGPATH
-$SUDO -i chmod -R 777 $OSEPATH
-$SUDO -i chmod -R 777 $KUBEPATH
+
+if [ "$GODEFAULt" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
+then
+  mkdir -p $GOLANGPATH/dev-configs
+else
+  $SUDO mkdir -p $GOLANGPATH/dev-configs
+  $SUDO -i chmod -R 777 $GOLANGPATH
+fi
+
+if [ "$OSEDEFAULT" == "yes" ] || [ "$OSEPATH" == "/home/ec2-user" ] || [ "$OSEPATH" == "/root" ] || [[ "$OSEPATH" =~ /home ]] 
+then
+  mkdir -p $OSEPATH/dev-configs
+else
+  $SUDO mkdir -p $OSEPATH/dev-configs
+  $SUDO -i chmod -R 777 $OSEPATH
+fi
+
+if [ "$KUBEDEFAULT" == "yes" ] || [ "$KUBEPATH" == "/home/ec2-user" ] || [ "$KUBEPATH" == "/root" ] || [[ "$KUBEPATH" =~ /home ]] 
+then
+  mkdir -p $KUBEPATH/dev-configs
+else
+  $SUDO mkdir -p $KUBEPATH/dev-configs
+  $SUDO -i chmod -R 777 $KUBEPATH
+fi
+
 CreateProfiles
 CreateConfigs
 
@@ -543,33 +593,43 @@ then
   # cp ~/local-up-cluster.sh ~/go/src/github.com/kubernetes/hack/
 fi
 
-# Install Docker yum version
-echo "...Installing Docker"
-$SUDO yum install docker -y> /dev/null
-echo ""
 
-# Docker Registry Stuff
-echo "...Updating the docker config file with insecure-registry"
-$SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
-echo ""
+if [ "$DIDRUN" == "yes" ] || [ -f "$GOLANGPATH/didrun" ]
+then
+  echo " Skipping docker install and config as this script was run once already..."
+  echo ""
+else
+  # Install Docker yum version
+  echo "...Installing Docker"
+  $SUDO yum install docker -y> /dev/null
+  echo ""
 
-# Update the docker-storage-setup
-DoBlock
-echo ""
+  # Docker Registry Stuff
+  echo "...Updating the docker config file with insecure-registry"
+  $SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
+  echo ""
 
-$SUDO cat /etc/sysconfig/docker-storage-setup
-echo "...Running docker-storage-setup"
-$SUDO docker-storage-setup
-$SUDO lvs
-echo ""
+  # Update the docker-storage-setup
+  DoBlock
+  echo ""
 
-# Restart Docker
-echo "...Restarting Docker"
-$SUDO groupadd docker
-$SUDO gpasswd -a ${USER} docker
-$SUDO systemctl stop docker
-$SUDO rm -rf /var/lib/docker/*
-$SUDO systemctl restart docker
+  $SUDO cat /etc/sysconfig/docker-storage-setup
+  echo "...Running docker-storage-setup"
+  $SUDO docker-storage-setup
+  $SUDO lvs
+  echo ""
+
+  # Restart Docker
+  echo "...Restarting Docker"
+  $SUDO groupadd docker
+  $SUDO gpasswd -a ${USER} docker
+  $SUDO systemctl stop docker
+  $SUDO rm -rf /var/lib/docker/*
+  $SUDO systemctl restart docker
+fi
+
+echo "DIDRUN" > $GOLANGPATH/didrun
+
 
 echo ""
 echo " *******************************************"
@@ -589,10 +649,12 @@ echo "    If using OpenShift - need to run the home/ec2-user/start-ose.sh script
 echo "    and then /home/ec2-user/config-ose.sh (or /root/config-ose.sh if logged in as root when script ran)"
 echo " 4. Now you should be able to interact and use kubectl or openshift as usual"
 echo ""
-echo "Environment: "
-echo "  dev dir: $GOLANGPATH/go/src/github.com  kubernetes | openshift/origin"
+echo "Environment Recap: "
+echo "  dev dir (gopath and source): $GOLANGPATH/go/src/github.com  kubernetes | openshift/origin"
+echo ""
 echo "  Origin Working Dir: $OSEPATH (configs are in openshift.local.config, log is openshift.log)"
 echo "      scripts (start-ose.sh, stop-ose.sh, config-ose.sh)"
+echo ""
 echo "  Kube Working Dir: $KUBEPATH "
 echo "      scripts (config-k8.sh)"
 echo ""
