@@ -211,6 +211,7 @@ CreateProfiles()
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> .bash_profile
     echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> .bash_profile
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> .bash_profile
+    echo "export ZONE=$ZONE" >> .bash_profile
 
     $SUDO echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> newbashrc 
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> newbashrc
@@ -218,6 +219,7 @@ CreateProfiles()
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> newbashrc
     echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> newbashrc
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> newbashrc
+    echo "export ZONE=$ZONE" >> newbashrc
   fi
     
   echo "" >> newbashrc
