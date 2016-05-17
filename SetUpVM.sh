@@ -485,7 +485,7 @@ fi
 # Config .bash_profile and such
 echo "Creating directory structure and workspace..."
 echo ""
-if [ "$GODEFAULt" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
+if [ "$GODEFAULT" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
 then
   mkdir -p $GOLANGPATH/go/src/github.com
 else
@@ -499,7 +499,7 @@ echo "...Cloning Kubernetes, OpenShift Origin and Openshift Ansible"
 echo ""
 git clone https://github.com/kubernetes/kubernetes.git
 
-if [ "$GODEFAULt" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
+if [ "$GODEFAULT" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
 then
   mkdir -p $GOLANGPATH/go/src/github.com/openshift
 else
