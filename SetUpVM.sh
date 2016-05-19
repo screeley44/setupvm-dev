@@ -238,9 +238,11 @@ CreateProfiles()
   echo "GOPATH1=/usr/local/go" >> newbashrc
   echo "GO_BIN_PATH=/usr/local/go/bin" >> newbashrc
   echo "" >> newbashrc
+  #TODO: set up KPATH as well
+  # export KPATH=$GOPATH/src/k8s.io/kubernetes
+  # export PATH=$KPATH/_output/local/bin/linux/amd64:/home/tsclair/scripts/:$GOPATH/bin:$PATH
 
-
-  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/github.com/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
+  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
   echo "" >> newbashrc
   echo "export PATH" >> newbashrc
 
@@ -251,8 +253,11 @@ CreateProfiles()
   echo "export GOPATH=$GOLANGPATH/go" >> .bash_profile
   echo "GOPATH1=/usr/local/go" >> .bash_profile
   echo "GO_BIN_PATH=/usr/local/go/bin" >> .bash_profile
+  #TODO: set up KPATH as well
+  # export KPATH=$GOPATH/src/k8s.io/kubernetes
+  # export PATH=$KPATH/_output/local/bin/linux/amd64:/home/tsclair/scripts/:$GOPATH/bin:$PATH
   echo "" >> .bash_profile
-  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/github.com/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
+  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
   echo "" >> .bash_profile
   echo "export PATH" >> .bash_profile
 
@@ -265,12 +270,12 @@ CreateConfigs()
 {
   echo "...creating config-k8.sh"
   cd $KUBEPATH
-  echo "$SUDO cp $GOLANGPATH/go/src/github.com/kubernetes/_output/local/bin/linux/amd64/kube*  /usr/bin" > config-k8.sh
+  echo "$SUDO cp $GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64/kube*  /usr/bin" > config-k8.sh
   echo "" >> config-k8.sh
   echo ""
-  echo "$GOLANGPATH/go/src/github.com/kubernetes/cluster/kubectl.sh config set-cluster local --server=http://127.0.0.1:8080 --insecure-skip-tls-verify=true" >> config-k8.sh
-  echo "$GOLANGPATH/go/src/github.com/kubernetes/cluster/kubectl.sh config set-context local --cluster=local" >> config-k8.sh
-  echo "$GOLANGPATH/go/src/github.com/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
+  echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-cluster local --server=http://127.0.0.1:8080 --insecure-skip-tls-verify=true" >> config-k8.sh
+  echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-context local --cluster=local" >> config-k8.sh
+  echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
   chmod +x config-k8.sh
 
   echo ""
@@ -317,7 +322,11 @@ CreateConfigs()
   echo "cd $GOLANGPATH; sudo rm -rf openshift.local.*" >> stop-ose.sh
   chmod +x stop-ose.sh
   echo ""
-  
+
+  # TODO: maybe create a start-k8.sh script so we can pass in params
+  # i.e.  ALLOW_PRIVILEGED=true ALLOW_SECURITY_CONTEXT=true hack/local-up-cluster.sh  
+
+
   if [ "$ISCLOUD" == "aws" ]
   then
     cd $GOLANGPATH
@@ -488,12 +497,14 @@ echo ""
 if [ "$GODEFAULT" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
 then
   mkdir -p $GOLANGPATH/go/src/github.com
+  mkdir -p $GOLANGPATH/go/src/k8s.io
 else
   $SUDO mkdir -p $GOLANGPATH/go/src/github.com
+  $SUDO mkdir -p $GOLANGPATH/go/src/k8s.io
   $SUDO -i chmod -R 777 $GOLANGPATH
 fi
 
-cd $GOLANGPATH/go/src/github.com
+cd $GOLANGPATH/go/src/k8s.io
 rm -rf kubernetes
 echo "...Cloning Kubernetes, OpenShift Origin and Openshift Ansible"
 echo ""
@@ -581,16 +592,13 @@ then
   # can't get this to work the way I want so doing 2nd approach for now
   # and will come back - for now just removing the function test_docker
   echo "Editing local-up-cluster.sh"
-  # sed -i "s/${DOCKER[@]} ps/sudo ${DOCKER[@]} ps/" ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh
-  sed -i '/function test_docker/,+6d' $GOLANGPATH/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
-  sed -i '/test_docker/d' $GOLANGPATH/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
+  sed -i '/function test_docker/,+6d' $GOLANGPATH/go/src/k8s.io/kubernetes/hack/local-up-cluster.sh> /dev/null
+  sed -i '/test_docker/d' $GOLANGPATH/go/src/k8s.io/kubernetes/hack/local-up-cluster.sh> /dev/null
   
   # making sure we also have --cloud-config working
-  sed -i '/^# You may need to run this as root to allow kubelet to open docker/a CLOUD_CONFIG=${CLOUD_CONFIG:-\"\"}' $GOLANGPATH/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
-  sed -i '/      --cloud-provider=/a\ \ \ \ \ \ --cloud-config=\"${CLOUD_CONFIG}\" \\' $GOLANGPATH/go/src/github.com/kubernetes/hack/local-up-cluster.sh> /dev/null
+  sed -i '/^# You may need to run this as root to allow kubelet to open docker/a CLOUD_CONFIG=${CLOUD_CONFIG:-\"\"}' $GOLANGPATH/go/src/k8s.io/kubernetes/hack/local-up-cluster.sh> /dev/null
+  sed -i '/      --cloud-provider=/a\ \ \ \ \ \ --cloud-config=\"${CLOUD_CONFIG}\" \\' $GOLANGPATH/go/src/k8s.io/kubernetes/hack/local-up-cluster.sh> /dev/null
 
-  # mv ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh ~/go/src/github.com/kubernetes/hack/local-up-cluster.sh.bck
-  # cp ~/local-up-cluster.sh ~/go/src/github.com/kubernetes/hack/
 fi
 
 
@@ -640,17 +648,33 @@ echo "At this point we should be ready to run our build"
 echo " BUT A FEW STEPS NEEDED "
 echo " 1. you must logout of ssh and log back or 'sudo -s' "
 echo "    this will pick up your .bash_profile and all your paths"
-echo " 2. Now you can run the ./hack/local-up-cluster.sh to build and start K8"
-echo "       or"
-echo "    make clean build on OSE (make clean build)"
-echo " 3. Finally, open a 2nd terminal and run the /home/ec2-user/config-k8.sh" 
-echo "    script for K8 since it is already running (or /root/config-k8.sh if logged in as root when script ran)"
-echo "    If using OpenShift - need to run the home/ec2-user/start-ose.sh script (or /root/start-ose.sh if logged in as root when script ran)"
-echo "    and then /home/ec2-user/config-ose.sh (or /root/config-ose.sh if logged in as root when script ran)"
+echo " 2. Now you can build and run K8 or Origin"
+echo ""
+echo "        K8 "
+echo "       -------- "
+echo "       cd $GOLANGPATH/src/k8s.io/kubernetes/"
+echo "       ./hack/local-up-cluster.sh" 
+echo ""
+echo "        Origin"
+echo "       --------"
+echo "       cd $GOLANGPATH/src/github.com/openshift/origin"
+echo "       make clean build (to build source)"
+echo "       then run $OSEPATH/start-ose.sh  (to start the openshift process)"
+echo "       to stop OSE:  $OSEPATH/stop-ose.sh"
+echo ""
+echo " 3. Finally, open a 2nd terminal and run: "
+echo "        K8 "
+echo "       -------- "
+echo "       $KUBEPATH/config-k8.sh" 
+echo ""
+echo "        Origin"
+echo "       --------"
+echo "       $OSEPATH/config-ose.sh"
+echo ""
 echo " 4. Now you should be able to interact and use kubectl or openshift as usual"
 echo ""
 echo "Environment Recap: "
-echo "  dev dir (gopath and source): $GOLANGPATH/go/src/github.com  kubernetes | openshift/origin"
+echo "  dev dir (gopath and source): $GOLANGPATH/go/src/k8s.io/kubernetes $GOLANGPATH/go/src/github.com/openshift/origin"
 echo ""
 echo "  Origin Working Dir: $OSEPATH (configs are in openshift.local.config, log is openshift.log)"
 echo "      scripts (start-ose.sh, stop-ose.sh, config-ose.sh)"
@@ -658,7 +682,7 @@ echo ""
 echo "  Kube Working Dir: $KUBEPATH "
 echo "      scripts (config-k8.sh)"
 echo ""
-echo "  yaml dir (copied to multiple locations): $OSEPATH/dev-configs  $KUBEPATH/dev-configs  $GOLANGPATH/dev-configs"
+echo "  yaml dir (copied to multiple locations): $OSEPATH/dev-configs  $KUBEPATH/dev-configs  /home/$USER/dev-configs or /root/dev-configs"
 echo "  need sudo to interact with docker i.e. sudo docker ps unless you have already 'sudo -s'"
 
 
