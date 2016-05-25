@@ -211,6 +211,7 @@ CreateProfiles()
   # removing this from the config-k8.sh script
   # as it doesn't transfer terminals - so need all terminal
   # processes to get this
+  #TODO: ALLOW_SECURITY_CONTEXT=true 
   if [ "$ISCLOUD" == "aws" ]
   then
     echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> .bash_profile 
@@ -470,7 +471,7 @@ else
   echo ""
 
   # Install software
-  echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion telnet etcd unzip ... this will take several minutes"
+  echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, bridge-utils, gcc, python-virtualenv, bash-completion telnet etcd unzip ... this will take several minutes"
   $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet etcd unzip -y> /dev/null
   $SUDO yum update -y> /dev/null
   $SUDO yum install atomic-openshift-utils -y> /dev/null
