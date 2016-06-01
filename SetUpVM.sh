@@ -467,12 +467,12 @@ else
   $SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS
   $SUDO subscription-manager list --available | sed -n '/OpenShift Employee Subscription/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
   $SUDO subscription-manager repos --disable="*"> /dev/null
-  $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.1-rpms"> /dev/null
+  $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.2-rpms"> /dev/null
   echo ""
 
   # Install software
-  echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet etcd unzip ... this will take several minutes"
-  $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet etcd unzip -y> /dev/null
+  echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client atomic-openshift-utils bridge-utils, gcc, python-virtualenv, bash-completion telnet etcd unzip ... this will take several minutes"
+  $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client atomic-openshift-utils, bridge-utils gcc python-virtualenv bash-completion telnet etcd unzip -y> /dev/null
   $SUDO yum update -y> /dev/null
   $SUDO yum install atomic-openshift-utils -y> /dev/null
   echo ""
