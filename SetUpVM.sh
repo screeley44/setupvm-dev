@@ -472,7 +472,7 @@ else
 
   # Install software
   echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client atomic-openshift-utils bridge-utils, gcc, python-virtualenv, bash-completion telnet etcd unzip ... this will take several minutes"
-  $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client atomic-openshift-utils, bridge-utils gcc python-virtualenv bash-completion telnet etcd unzip -y> /dev/null
+  $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client atomic-openshift-utils bridge-utils gcc python-virtualenv bash-completion telnet etcd unzip -y> /dev/null
   $SUDO yum update -y> /dev/null
   $SUDO yum install atomic-openshift-utils -y> /dev/null
   echo ""
