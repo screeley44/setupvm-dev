@@ -140,11 +140,11 @@ then
   else
     GOLANGPATH=~
   fi
-  echo "Setting GOLANG Default (GOPATH) Working Directory to $GOLANGPATH"
+  echo "Setting GOLANG Default (GOPATH) Working Directory to $GOLANGPATH/go"
   GODEFAULT="yes"
 else
   GOLANGPATH=$SOURCEDIR
-  echo "Setting GOLANG (GOPATH) Working Directory to $GOLANGPATH"
+  echo "Setting GOLANG (GOPATH) Working Directory to $GOLANGPATH/go"
 fi
 echo ""
 
@@ -324,6 +324,24 @@ CreateConfigs()
   chmod +x stop-ose.sh
   echo ""
 
+  #TODO: incorporate this for kube-up-local.sh (hyperconverged kube)
+  ## This is for the kube-up-local.sh which" > clean-k8.sh
+  ## creates a functioning all in one cluster" >> clean-k8.sh
+  ## hyperconverged - running Docker
+
+  ## kill all services
+  #kubectl delete services --all"
+  #kubectl delete rc --all"
+  #kubectl delete pods --all"
+
+  ## kill all docker containers
+  #sudo docker ps | awk 'index($NF,k8s_)==1 { print $1 }' | xargs -l -r sudo docker stop"
+
+  ## undo all mounts
+  # mount | grep openshift.local.volumes | awk '{ print $3}' | xargs -l -r sudo umount"
+  # mount | grep nfs1.rhs | awk '{ print }' | xargs -l -r sudo umount"
+
+
   # TODO: maybe create a start-k8.sh script so we can pass in params
   # i.e.  ALLOW_PRIVILEGED=true ALLOW_SECURITY_CONTEXT=true hack/local-up-cluster.sh  
 
@@ -343,6 +361,8 @@ CreateConfigs()
   cp $OSEPATH/start-ose.sh $GOLANGPATH
   cp $OSEPATH/stop-ose.sh $GOLANGPATH
   cp $KUBEPATH/config-k8.sh $GOLANGPATH
+  # TODO:
+  #cp $KUBEPATH/clean-hyperkube.sh $GOLANGPATH
 
 }
 
@@ -471,8 +491,8 @@ else
   echo ""
 
   # Install software
-  echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client atomic-openshift-utils bridge-utils, gcc, python-virtualenv, bash-completion telnet etcd unzip ... this will take several minutes"
-  $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client atomic-openshift-utils bridge-utils gcc python-virtualenv bash-completion telnet etcd unzip -y> /dev/null
+  echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet etcd unzip ... this will take several minutes"
+  $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet etcd unzip -y> /dev/null
   $SUDO yum update -y> /dev/null
   $SUDO yum install atomic-openshift-utils -y> /dev/null
   echo ""
@@ -502,7 +522,7 @@ then
 else
   $SUDO mkdir -p $GOLANGPATH/go/src/github.com
   $SUDO mkdir -p $GOLANGPATH/go/src/k8s.io
-  $SUDO -i chmod -R 777 $GOLANGPATH
+  $SUDO chmod -R 777 $GOLANGPATH
 fi
 
 cd $GOLANGPATH/go/src/k8s.io
