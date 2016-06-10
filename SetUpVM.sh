@@ -321,6 +321,7 @@ CreateConfigs()
   echo "mount | grep "nfs1.rhs" | awk '{ print $3}' | xargs -l -r sudo umount" >> stop-ose.sh
   echo "cd $GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64; sudo rm -rf openshift.local.*" >> stop-ose.sh
   echo "cd $GOLANGPATH; sudo rm -rf openshift.local.*" >> stop-ose.sh
+  echo "cd $OSEPATH; sudo rm -rf openshift.local.*" >> stop-ose.sh
   chmod +x stop-ose.sh
   echo ""
 
