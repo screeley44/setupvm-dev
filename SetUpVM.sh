@@ -48,7 +48,7 @@ fi
 
 echo ""
 
-if [ "$ISCLOUD" == "aws" ]
+if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
 then
   if [ "$AWSKEY" == "" ] || [ "$AWSSECRET" == "" ]
   then
@@ -212,8 +212,9 @@ CreateProfiles()
   # as it doesn't transfer terminals - so need all terminal
   # processes to get this
   #TODO: ALLOW_SECURITY_CONTEXT=true 
-  if [ "$ISCLOUD" == "aws" ]
+  if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
   then
+    echo "...Creating Cloud bash profiles"
     echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> .bash_profile 
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> .bash_profile
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> .bash_profile
@@ -230,6 +231,7 @@ CreateProfiles()
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> newbashrc
     echo "export ZONE=$ZONE" >> newbashrc
   fi
+
     
   echo "" >> newbashrc
   echo "export DIDRUN=yes" >> newbashrc
@@ -286,6 +288,7 @@ CreateConfigs()
   echo "oadm groups new myclusteradmingroup admin --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
   echo "oadm policy add-cluster-role-to-group cluster-admin myclusteradmingroup --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
   echo "oadm policy add-scc-to-group privileged myclusteradmingroup --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm policy add-role-to-user basic-user jdoe -n default --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
   chmod +x config-ose.sh
   echo ""
 
@@ -307,6 +310,16 @@ CreateConfigs()
     echo "echo \"    - \\\"/etc/aws/aws.conf\\\"\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "" >> start-ose.sh
     echo "openshift start --master-config=$OSEPATH/openshift.local.config/master/master-config.yaml --node-config=$OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=4 &> openshift.log" >> start-ose.sh
+  elif ["$ISCLOUD" == "gce" ]
+  then
+    echo "openshift start --write-config=$OSEPATH/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
+    echo "sed -i '/apiServerArguments: null/,+2d' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"gce\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"gce\"' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    echo "echo \"kubeletArguments:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "echo \"  cloud-provider:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "echo \"    - \\\"gce\\\"\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "" >> start-ose.sh
+    echo "openshift start --master-config=$OSEPATH/openshift.local.config/master/master-config.yaml --node-config=$OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=4 &> openshift.log" >> start-ose.sh    
   else  
     echo ""
     echo "openshift start --public-master=$INTERNALHOST --volume-dir=$OSEPATH/data --loglevel=4  &> openshift.log" >> start-ose.sh
@@ -347,7 +360,7 @@ CreateConfigs()
   # i.e.  ALLOW_PRIVILEGED=true ALLOW_SECURITY_CONTEXT=true hack/local-up-cluster.sh  
 
 
-  if [ "$ISCLOUD" == "aws" ]
+  if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
   then
     cd $GOLANGPATH
     echo "...creating aws cli input"
@@ -483,6 +496,13 @@ then
   echo " Skipping subscription services and yum install of software as this script was run once already..."
   echo ""
 else
+  if [ "$ISCLOUD" == "gce" ]
+  then
+    # Installing subscription manager on GCE
+    echo "...Checking to make sure subscription manager is installed..."
+    $SUDO yum install subscription-manager -y> /dev/null
+  fi
+
   # Subscription Manager Stuffs - for RHEL 7.X devices
   echo "Setting up subscription services from RHEL..."
   $SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS
@@ -577,7 +597,7 @@ CreateProfiles
 CreateConfigs
 
 # Install ec2 api tools and ruby
-if [ "$ISCLOUD" == "aws" ]
+if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
 then
   echo "Install ec2 api tools (aws cli)..."
   cd $GOLANGPATH
@@ -596,6 +616,13 @@ then
   echo "Zone = $ZONE" >> aws.conf
   cd $GOLANGPATH
   echo ""
+
+  # echo "Install GCE tools (gcloud)..."
+  # cd /home/$USER
+  # curl "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-113.0.0-linux-x86_64.tar.gz" -o "google-cloud-sdk-113.0.0-linux-x86_64.tar.gz"
+  # tar -zxvf google-cloud-sdk-113.0.0-linux-x86_64.tar.gz
+  
+
 fi
 echo ""
 
@@ -608,7 +635,7 @@ cd $GOLANGPATH/dev-configs
 CreateTestYamlEC2
 # CreateTestYamlNFS
 
-if [ "$ISCLOUD" == "aws" ]
+if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
 then 
   # TODO: fix this, just want to run sudo if needed
   # can't get this to work the way I want so doing 2nd approach for now
