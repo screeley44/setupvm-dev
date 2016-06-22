@@ -222,6 +222,12 @@ CreateProfiles()
     echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> .bash_profile
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> .bash_profile
     echo "export ZONE=$ZONE" >> .bash_profile
+    if [ "$ISCLOUD" == "gce" ]
+    then
+      echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> .bash_profile
+    fi
+    echo "source '/home/$USER/Downloads/google-cloud-sdk/path.bash.inc'" >> .bash_profile
+    echo "source '/home/$USER/Downloads/google-cloud-sdk/completion.bash.inc'" >> .bash_profile
 
     $SUDO echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> newbashrc 
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> newbashrc
@@ -230,6 +236,12 @@ CreateProfiles()
     echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> newbashrc
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> newbashrc
     echo "export ZONE=$ZONE" >> newbashrc
+    if [ "$ISCLOUD" == "gce" ]
+    then
+      echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> newbashrc
+    fi
+    echo "source '/home/$USER/Downloads/google-cloud-sdk/path.bash.inc'" >> newbashrc
+    echo "source '/home/$USER/Downloads/google-cloud-sdk/completion.bash.inc'" >> newbashrc
   fi
 
     
@@ -382,7 +394,7 @@ CreateConfigs()
 
 CreateTestYamlEC2()
 {
-  cd $GOLANGPATH/dev-configs
+  cd $GOLANGPATH/dev-configs/aws
   echo "apiVersion: v1" > busybox-ebs.yaml
   echo "kind: Pod" >> busybox-ebs.yaml
   echo "metadata:"  >> busybox-ebs.yaml
@@ -443,8 +455,134 @@ CreateTestYamlEC2()
   echo "      persistentVolumeClaim:" >> busybox-ebs-pvc.yaml
   echo "        claimName: ebs-claim" >> busybox-ebs-pvc.yaml
 
-  cp *.yaml $OSEPATH/dev-configs
-  cp *.yaml $KUBEPATH/dev-configs
+  cd $GOLANGPATH/dev-configs/gce
+  echo "apiVersion: v1" > busybox-gce.yaml
+  echo "kind: Pod" >> busybox-gce.yaml
+  echo "metadata:"  >> busybox-gce.yaml
+  echo "  name: gce-bb-pod1"  >> busybox-gce.yaml
+  echo "spec:"  >> busybox-gce.yaml
+  echo "  containers:"  >> busybox-gce.yaml
+  echo "  - name: gce-bb-pod1"  >> busybox-gce.yaml
+  echo "    image: busybox"  >> busybox-gce.yaml
+  echo "    command: [\"sleep\", \"600000\"]" >> busybox-gce.yaml
+  echo "    volumeMounts:"  >> busybox-gce.yaml
+  echo "    - mountPath: /usr/share/busybox"  >> busybox-gce.yaml
+  echo "      name: gcevol"  >> busybox-gce.yaml
+  echo "  volumes:"  >> busybox-gce.yaml
+  echo "  - name: gcevol"  >> busybox-gce.yaml
+  echo "    gcePersistentDisk:"  >> busybox-gce.yaml
+  echo "      readOnly: false" >> busybox-gce.yaml
+  echo "      pdName: yourdisk"  >> busybox-gce.yaml
+  echo "      fsType: ext4"  >> busybox-gce.yaml
+
+  echo "apiVersion: v1" > gce-pv.yaml
+  echo "kind: PersistentVolume" >> gce-pv.yaml
+  echo "metadata:" >> gce-pv.yaml
+  echo " name: pv-gce" >> gce-pv.yaml
+  echo "spec:" >> gce-pv.yaml
+  echo " capacity:" >> gce-pv.yaml
+  echo "   storage: 1Gi" >> gce-pv.yaml
+  echo " accessModes:" >> gce-pv.yaml
+  echo "   - ReadWriteOnce" >> gce-pv.yaml
+  echo " gcePersistentDisk:" >> gce-pv.yaml
+  echo "   readOnly: false" >> gce-pv.yaml
+  echo "   pdName: yourdisk" >> gce-pv.yaml
+  echo "   fsType: ext4" >> gce-pv.yaml
+
+
+  echo "apiVersion: v1" > gce-pvc.yaml
+  echo "kind: PersistentVolumeClaim" >> gce-pvc.yaml
+  echo "metadata:" >> gce-pvc.yaml
+  echo " name: gce-claim" >> gce-pvc.yaml
+  echo "spec:" >> gce-pvc.yaml
+  echo " accessModes:" >> gce-pvc.yaml
+  echo "  - ReadWriteOnce" >> gce-pvc.yaml
+  echo " resources:" >> gce-pvc.yaml
+  echo "   requests:" >> gce-pvc.yaml
+  echo "     storage: 1Gi" >> gce-pvc.yaml
+
+  echo "apiVersion: v1" > busybox-gce-pvc.yaml
+  echo "kind: Pod" >> busybox-gce-pvc.yaml
+  echo "metadata:" >> busybox-gce-pvc.yaml
+  echo "  name: gce-bb-pod2" >> busybox-gce-pvc.yaml
+  echo "spec:" >> busybox-gce-pvc.yaml
+  echo "  containers:" >> busybox-gce-pvc.yaml
+  echo "  - name: gce-bb-pod2" >> busybox-gce-pvc.yaml
+  echo "    image: busybox" >> busybox-gce-pvc.yaml
+  echo "    command: [\"sleep\", \"600000\"]" >> busybox-gce-pvc.yaml
+  echo "    volumeMounts:" >> busybox-gce-pvc.yaml
+  echo "    - mountPath: /usr/share/busybox" >> busybox-gce-pvc.yaml
+  echo "      name: gcevol" >> busybox-gce-pvc.yaml
+  echo "  volumes:" >> busybox-gce-pvc.yaml
+  echo "    - name: gcevol" >> busybox-gce-pvc.yaml
+  echo "      persistentVolumeClaim:" >> busybox-gce-pvc.yaml
+  echo "        claimName: gce-claim" >> busybox-gce-pvc.yaml
+
+  cd $GOLANGPATH/dev-configs/nfs
+  echo "apiVersion: v1" > busybox-nfs.yaml
+  echo "kind: Pod" >> busybox-nfs.yaml
+  echo "metadata:"  >> busybox-nfs.yaml
+  echo "  name: nfs-bb-pod1"  >> busybox-nfs.yaml
+  echo "spec:"  >> busybox-nfs.yaml
+  echo "  containers:"  >> busybox-nfs.yaml
+  echo "  - name: nfs-bb-pod1"  >> busybox-nfs.yaml
+  echo "    image: busybox"  >> busybox-nfs.yaml
+  echo "    command: [\"sleep\", \"600000\"]" >> busybox-nfs.yaml
+  echo "    volumeMounts:"  >> busybox-nfs.yaml
+  echo "    - mountPath: /usr/share/busybox"  >> busybox-nfs.yaml
+  echo "      name: nfsvol"  >> busybox-nfs.yaml
+  echo "  volumes:"  >> busybox-nfs.yaml
+  echo "  - name: nfsvol"  >> busybox-nfs.yaml
+  echo "    nfs:"  >> busybox-nfs.yaml
+  echo "      path: /opt/data12" >> busybox-nfs.yaml
+  echo "      pdName: nfs1.rhs"  >> busybox-nfs.yaml
+
+  echo "apiVersion: v1" > nfs-pv.yaml
+  echo "kind: PersistentVolume" >> nfs-pv.yaml
+  echo "metadata:" >> nfs-pv.yaml
+  echo " name: pv-gce" >> nfs-pv.yaml
+  echo "spec:" >> nfs-pv.yaml
+  echo " capacity:" >> nfs-pv.yaml
+  echo "   storage: 1Gi" >> nfs-pv.yaml
+  echo " accessModes:" >> nfs-pv.yaml
+  echo "   - ReadWriteOnce" >> nfs-pv.yaml
+  echo " nfs:" >> nfs-pv.yaml
+  echo "   path: /opt/data12" >> nfs-pv.yaml
+  echo "   server: nfs1.rhs" >> nfs-pv.yaml
+
+
+  echo "apiVersion: v1" > nfs-pvc.yaml
+  echo "kind: PersistentVolumeClaim" >> nfs-pvc.yaml
+  echo "metadata:" >> nfs-pvc.yaml
+  echo " name: nfs-claim" >> nfs-pvc.yaml
+  echo "spec:" >> nfs-pvc.yaml
+  echo " accessModes:" >> nfs-pvc.yaml
+  echo "  - ReadWriteOnce" >> nfs-pvc.yaml
+  echo " resources:" >> nfs-pvc.yaml
+  echo "   requests:" >> nfs-pvc.yaml
+  echo "     storage: 1Gi" >> nfs-pvc.yaml
+
+  echo "apiVersion: v1" > busybox-nfs-pvc.yaml
+  echo "kind: Pod" >> busybox-nfs-pvc.yaml
+  echo "metadata:" >> busybox-nfs-pvc.yaml
+  echo "  name: nfs-bb-pod2" >> busybox-nfs-pvc.yaml
+  echo "spec:" >> busybox-nfs-pvc.yaml
+  echo "  containers:" >> busybox-nfs-pvc.yaml
+  echo "  - name: nfs-bb-pod2" >> busybox-nfs-pvc.yaml
+  echo "    image: busybox" >> busybox-nfs-pvc.yaml
+  echo "    command: [\"sleep\", \"600000\"]" >> busybox-nfs-pvc.yaml
+  echo "    volumeMounts:" >> busybox-nfs-pvc.yaml
+  echo "    - mountPath: /usr/share/busybox" >> busybox-nfs-pvc.yaml
+  echo "      name: nfsvol" >> busybox-nfs-pvc.yaml
+  echo "  volumes:" >> busybox-nfs-pvc.yaml
+  echo "    - name: nfsvol" >> busybox-nfs-pvc.yaml
+  echo "      persistentVolumeClaim:" >> busybox-nfs-pvc.yaml
+  echo "        claimName: nfs-claim" >> busybox-nfs-pvc.yaml
+
+
+
+  cp -R $GOLANGPATH/dev-configs/* $OSEPATH/dev-configs
+  cp -R $GOLANGPATH/dev-configs/* $KUBEPATH/dev-configs
 
 
 }
@@ -572,24 +710,48 @@ echo "...Creating bash_profile and configs for user: $USER"
 if [ "$GODEFAULt" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
 then
   mkdir -p $GOLANGPATH/dev-configs
+  mkdir -p $GOLANGPATH/dev-configs/aws
+  mkdir -p $GOLANGPATH/dev-configs/gce
+  mkdir -p $GOLANGPATH/dev-configs/nfs
+  mkdir -p $GOLANGPATH/dev-configs/glusterfs
 else
   $SUDO mkdir -p $GOLANGPATH/dev-configs
+  $SUDO mkdir -p $GOLANGPATH/dev-configs/aws
+  $SUDO mkdir -p $GOLANGPATH/dev-configs/gce
+  $SUDO mkdir -p $GOLANGPATH/dev-configs/nfs
+  $SUDO mkdir -p $GOLANGPATH/dev-configs/glusterfs
   $SUDO -i chmod -R 777 $GOLANGPATH
 fi
 
 if [ "$OSEDEFAULT" == "yes" ] || [ "$OSEPATH" == "/home/ec2-user" ] || [ "$OSEPATH" == "/root" ] || [[ "$OSEPATH" =~ /home ]] 
 then
   mkdir -p $OSEPATH/dev-configs
+  mkdir -p $OSEPATH/dev-configs/aws
+  mkdir -p $OSEPATH/dev-configs/gce
+  mkdir -p $OSEPATH/dev-configs/nfs
+  mkdir -p $OSEPATH/dev-configs/glusterfs
 else
   $SUDO mkdir -p $OSEPATH/dev-configs
+  $SUDO mkdir -p $OSEPATH/dev-configs/aws
+  $SUDO mkdir -p $OSEPATH/dev-configs/gce
+  $SUDO mkdir -p $OSEPATH/dev-configs/nfs
+  $SUDO mkdir -p $OSEPATH/dev-configs/glusterfs
   $SUDO -i chmod -R 777 $OSEPATH
 fi
 
 if [ "$KUBEDEFAULT" == "yes" ] || [ "$KUBEPATH" == "/home/ec2-user" ] || [ "$KUBEPATH" == "/root" ] || [[ "$KUBEPATH" =~ /home ]] 
 then
   mkdir -p $KUBEPATH/dev-configs
+  mkdir -p $KUBEPATH/dev-configs/aws
+  mkdir -p $KUBEPATH/dev-configs/gce
+  mkdir -p $KUBEPATH/dev-configs/nfs
+  mkdir -p $KUBEPATH/dev-configs/glusterfs
 else
   $SUDO mkdir -p $KUBEPATH/dev-configs
+  $SUDO mkdir -p $KUBEPATH/dev-configs/aws
+  $SUDO mkdir -p $KUBEPATH/dev-configs/gce
+  $SUDO mkdir -p $KUBEPATH/dev-configs/nfs
+  $SUDO mkdir -p $KUBEPATH/dev-configs/glusterfs
   $SUDO -i chmod -R 777 $KUBEPATH
 fi
 
@@ -621,7 +783,7 @@ then
   # cd /home/$USER
   # curl "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-113.0.0-linux-x86_64.tar.gz" -o "google-cloud-sdk-113.0.0-linux-x86_64.tar.gz"
   # tar -zxvf google-cloud-sdk-113.0.0-linux-x86_64.tar.gz
-  
+  # $SUDO ./google-cloud-sdk/install.sh
 
 fi
 echo ""
