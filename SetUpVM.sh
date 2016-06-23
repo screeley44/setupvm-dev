@@ -222,7 +222,7 @@ CreateProfiles()
     echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> .bash_profile
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> .bash_profile
     echo "export ZONE=$ZONE" >> .bash_profile
-    if [ "$ISCLOUD" == "gce" ]
+    if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "aws" ]
     then
       echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> .bash_profile
     fi
@@ -236,7 +236,7 @@ CreateProfiles()
     echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> newbashrc
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> newbashrc
     echo "export ZONE=$ZONE" >> newbashrc
-    if [ "$ISCLOUD" == "gce" ]
+    if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "aws" ]
     then
       echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> newbashrc
     fi
