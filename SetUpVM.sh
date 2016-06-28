@@ -17,7 +17,6 @@
 
 source setupvm.config
 
-
 if ([ "$SUDO" == "" ] && [ "$ISCLOUD" == "" ] && [ "$GOYUM" == "" ]) || ([ "$SUDO" == "help" ])
 then
   echo ""
@@ -322,7 +321,7 @@ CreateConfigs()
     echo "echo \"    - \\\"/etc/aws/aws.conf\\\"\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "" >> start-ose.sh
     echo "openshift start --master-config=$OSEPATH/openshift.local.config/master/master-config.yaml --node-config=$OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=4 &> openshift.log" >> start-ose.sh
-  elif ["$ISCLOUD" == "gce" ]
+  elif [ "$ISCLOUD" == "gce" ]
   then
     echo "openshift start --write-config=$OSEPATH/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
     echo "sed -i '/apiServerArguments: null/,+2d' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
@@ -669,6 +668,7 @@ else
     $SUDO tar -C /usr/local -xzf go1.6.1.linux-amd64.tar.gz
   fi
   echo ""
+  echo "DIDRUN" > $GOLANGPATH/didrun
 fi
 
 # Config .bash_profile and such
@@ -684,26 +684,30 @@ else
   $SUDO chmod -R 777 $GOLANGPATH
 fi
 
-cd $GOLANGPATH/go/src/k8s.io
-rm -rf kubernetes
-echo "...Cloning Kubernetes, OpenShift Origin and Openshift Ansible"
-echo ""
-git clone https://github.com/kubernetes/kubernetes.git
-
-if [ "$GODEFAULT" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
+if [ "$SETDEV" == "Y" ]
 then
-  mkdir -p $GOLANGPATH/go/src/github.com/openshift
-else
-  $SUDO mkdir -p $GOLANGPATH/go/src/github.com/openshift
-  $SUDO -i chmod -R 777 $GOLANGPATH
-fi
+  cd $GOLANGPATH/go/src/k8s.io
+  rm -rf kubernetes
+  echo "...Cloning Kubernetes, OpenShift Origin and Openshift Ansible"
+  echo ""
+  git clone https://github.com/kubernetes/kubernetes.git
 
-cd $GOLANGPATH/go/src/github.com/openshift
-rm -rf origin
-git clone https://github.com/openshift/origin.git
-cd $GOLANGPATH
-rm -rf openshift-ansible
-git clone https://github.com/openshift/openshift-ansible
+  if [ "$GODEFAULT" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
+  then
+    mkdir -p $GOLANGPATH/go/src/github.com/openshift
+  else
+    $SUDO mkdir -p $GOLANGPATH/go/src/github.com/openshift
+    $SUDO -i chmod -R 777 $GOLANGPATH
+  fi
+
+  cd $GOLANGPATH/go/src/github.com/openshift
+  rm -rf origin
+  git clone https://github.com/openshift/origin.git
+  cd $GOLANGPATH
+  rm -rf openshift-ansible
+  git clone https://github.com/openshift/openshift-ansible
+fi
+  
 echo ""
 echo "...Creating bash_profile and configs for user: $USER"
 
@@ -813,14 +817,19 @@ then
 fi
 
 
-if [ "$DIDRUN" == "yes" ] || [ -f "$GOLANGPATH/didrun" ]
+if [ -f "$GOLANGPATH/didcomplete" ]
 then
   echo " Skipping docker install and config as this script was run once already..."
   echo ""
 else
   # Install Docker yum version
   echo "...Installing Docker"
-  $SUDO yum install docker -y> /dev/null
+  if [ "$DOCKERVER" == "" ]
+  then
+    $SUDO yum install docker -y> /dev/null
+  else
+    $SUDO yum install docker-$DOCKERVER -y> /dev/null
+  fi
   echo ""
 
   # Docker Registry Stuff
@@ -847,8 +856,52 @@ else
   $SUDO systemctl restart docker
 fi
 
-echo "DIDRUN" > $GOLANGPATH/didrun
+if [ "$FORSCOTT" == "Y" ]
+then  
+  echo "" >> /etc/hosts
+  echo "192.168.122.120 dev1.rhs" >> /etc/hosts
+  echo "192.168.122.121 dev2.rhs" >> /etc/hosts
+  echo "192.168.122.122 dev3.rhs" >> /etc/hosts
+  echo "192.168.122.250 openshift1.rhs" >> /etc/hosts
+  echo "192.168.122.251 ose1.rhs" >> /etc/hosts
+  echo "192.168.122.252 ose2.rhs" >> /etc/hosts
+  echo "192.168.122.253 ose3.rhs" >> /etc/hosts
+  echo "192.168.122.161 ose11.rhs" >> /etc/hosts
+  echo "192.168.122.162 ose12.rhs" >> /etc/hosts
+  echo "192.168.122.163 ose13.rhs" >> /etc/hosts
+  echo "192.168.122.248 kminion2.rhs" >> /etc/hosts
+  echo "192.168.122.247 kminion1.rhs" >> /etc/hosts
+  echo "192.168.122.246 kminion.rhs" >> /etc/hosts
+  echo "192.168.122.245 k8node2.rhs" >> /etc/hosts
+  echo "192.168.122.244 k8node1.rhs" >> /etc/hosts
+  echo "192.168.122.243 k8master.rhs" >> /etc/hosts
+  echo "192.168.122.210 aplomaster.rhs" >> /etc/hosts
+  echo "192.168.122.211 aplo1.rhs" >> /etc/hosts
+  echo "192.168.122.212 aplo2.rhs" >> /etc/hosts
+  echo "192.168.122.213 aplo3.rhs" >> /etc/hosts
+  echo "192.168.122.221 gluster1.rhs" >> /etc/hosts
+  echo "192.168.122.222 gluster2.rhs" >> /etc/hosts
+  echo "192.168.122.111 ceph1.rhs" >> /etc/hosts
+  echo "192.168.122.101 nfs1.rhs" >> /etc/hosts
+  echo "192.168.122.102 k8dev.rhs" >> /etc/hosts
 
+  if [[ -z "$SSHPASS" ]]
+  then
+    # do nothing
+    # echo "not copying ssh keys...as this is not the master or was not configured"
+    echo ""
+  else
+    # short cut for me, secret param, assumes this is only run from master
+    echo "copying ssh keys..."
+    sshpass -p "$SSHPASS" ssh-copy-id -i /root/.ssh/id_rsa.pub root@aplo1.rhs
+    sshpass -p "$SSHPASS" ssh-copy-id -i /root/.ssh/id_rsa.pub root@aplo2.rhs
+    sshpass -p "$SSHPASS" ssh-copy-id -i /root/.ssh/id_rsa.pub root@aplo3.rhs
+    sshpass -p "$SSHPASS" ssh-copy-id -i /root/.ssh/id_rsa.pub root@aplomaster.rhs
+  fi 
+fi
+
+
+echo "DIDRUN" > $GOLANGPATH/didcomplete
 
 echo ""
 echo " *******************************************"
