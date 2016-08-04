@@ -256,7 +256,7 @@ CreateProfiles()
   # export KPATH=$GOPATH/src/k8s.io/kubernetes
   # export PATH=$KPATH/_output/local/bin/linux/amd64:/home/tsclair/scripts/:$GOPATH/bin:$PATH
 
-  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
+  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:$GOLANGPATH/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
   echo "" >> newbashrc
   echo "export PATH" >> newbashrc
 
@@ -271,7 +271,7 @@ CreateProfiles()
   # export KPATH=$GOPATH/src/k8s.io/kubernetes
   # export PATH=$KPATH/_output/local/bin/linux/amd64:/home/tsclair/scripts/:$GOPATH/bin:$PATH
   echo "" >> .bash_profile
-  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
+  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:$GOLANGPATH/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
   echo "" >> .bash_profile
   echo "export PATH" >> .bash_profile
 
@@ -534,7 +534,7 @@ CreateTestYamlEC2()
   echo "  - name: nfsvol"  >> busybox-nfs.yaml
   echo "    nfs:"  >> busybox-nfs.yaml
   echo "      path: /opt/data12" >> busybox-nfs.yaml
-  echo "      pdName: nfs1.rhs"  >> busybox-nfs.yaml
+  echo "      server: nfs1.rhs"  >> busybox-nfs.yaml
 
   echo "apiVersion: v1" > nfs-pv.yaml
   echo "kind: PersistentVolume" >> nfs-pv.yaml
@@ -628,7 +628,7 @@ echo "   -docker from yum and docker registry configuration"
 echo "   -and misc tools and configuration scripts to help run the projects"
 echo ""
 
-if [ "$DIDRUN" == "yes" ] || [ -f "$GOLANGPATH/didrun" ]
+if [ "$DIDRUN" == "yes" ] || [ -f "$GOLANGPATH/didrun" ] || [ -f /root/didrun ] || [ -f ~/didrun ]
 then
   echo " Skipping subscription services and yum install of software as this script was run once already..."
   echo ""
@@ -649,26 +649,48 @@ else
   echo ""
 
   # Install software
-  echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet etcd unzip ... this will take several minutes"
-  $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet etcd unzip -y> /dev/null
-  $SUDO yum update -y> /dev/null
-  $SUDO yum install atomic-openshift-utils -y> /dev/null
-  echo ""
+  if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "aplo" ]
+  then  
+    echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet etcd unzip ... this will take several minutes"
+    $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet etcd unzip -y> /dev/null
+    $SUDO yum update -y> /dev/null
+    $SUDO yum install atomic-openshift-utils -y> /dev/null
+    echo ""
 
-  # Install Go and do other config
-  if [ "$GOYUM" == "y" ] || [ "$GOYUM" == "Y" ]
-  then
-    echo "Installing go1.4..."
-    $SUDO yum install go -y> /dev/null
+    # Install Go and do other config
+    if [ "$GOYUM" == "y" ] || [ "$GOYUM" == "Y" ]
+    then
+      echo "Installing go1.4..."
+      $SUDO yum install go -y> /dev/null
+    else
+      echo "Installing go1.6..."
+      cd ~
+      $SUDO wget https://storage.googleapis.com/golang/go1.6.1.linux-amd64.tar.gz
+      $SUDO rm -rf /usr/local/go
+      $SUDO tar -C /usr/local -xzf go1.6.1.linux-amd64.tar.gz
+    fi
+    echo ""
   else
-    echo "Installing go1.6..."
-    cd ~
-    $SUDO wget https://storage.googleapis.com/golang/go1.6.1.linux-amd64.tar.gz
-    $SUDO rm -rf /usr/local/go
-    $SUDO tar -C /usr/local -xzf go1.6.1.linux-amd64.tar.gz
+    echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, etcd, unzip  ... this will take several minutes"
+    $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet etcd unzip -y> /dev/null
+    $SUDO yum update -y> /dev/null
+    $SUDO yum install atomic-openshift-utils atomic-openshift-clients -y> /dev/null
+    echo ""  
   fi
-  echo ""
+
   echo "DIDRUN" > $GOLANGPATH/didrun
+  echo "DIDRUN" > ~/didrun
+fi
+
+if [ "$SETUP_TYPE" == "client" ]
+then
+  cd ~
+  wget http://download.eng.bos.redhat.com/brewroot/packages/heketi/2.0.6/1.el7rhgs/x86_64/heketi-client-2.0.6-1.el7rhgs.x86_64.rpm
+  $SUDO yum install heketi-client-2.0.6-1.el7rhgs.x86_64.rpm -y> /dev/null
+
+  wget http://download.eng.bos.redhat.com/brewroot/packages/heketi/2.0.6/1.el7rhgs/x86_64/heketi-templates-2.0.6-1.el7rhgs.x86_64.rpm
+  $SUDO yum install heketi-templates-2.0.6-1.el7rhgs.x86_64.rpm -y> /dev/null
+
 fi
 
 # Config .bash_profile and such
@@ -684,7 +706,7 @@ else
   $SUDO chmod -R 777 $GOLANGPATH
 fi
 
-if [ "$SETDEV" == "Y" ]
+if [ "$SETUP_TYPE" == "dev" ]
 then
   cd $GOLANGPATH/go/src/k8s.io
   rm -rf kubernetes
@@ -823,37 +845,40 @@ then
   echo ""
 else
   # Install Docker yum version
-  echo "...Installing Docker"
-  if [ "$DOCKERVER" == "" ]
+  if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "aplo" ] 
   then
-    $SUDO yum install docker -y> /dev/null
-  else
-    $SUDO yum install docker-$DOCKERVER -y> /dev/null
+    echo "...Installing Docker"
+    if [ "$DOCKERVER" == "" ]
+    then
+      $SUDO yum install docker -y> /dev/null
+    else
+      $SUDO yum install docker-$DOCKERVER -y> /dev/null
+    fi
+    echo ""
+  
+    # Docker Registry Stuff
+    echo "...Updating the docker config file with insecure-registry"
+    $SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
+    echo ""
+
+    # Update the docker-storage-setup
+    DoBlock
+    echo ""
+
+    $SUDO cat /etc/sysconfig/docker-storage-setup
+    echo "...Running docker-storage-setup"
+    $SUDO docker-storage-setup
+    $SUDO lvs
+    echo ""
+
+    # Restart Docker
+    echo "...Restarting Docker"
+    $SUDO groupadd docker
+    $SUDO gpasswd -a ${USER} docker
+    $SUDO systemctl stop docker
+    $SUDO rm -rf /var/lib/docker/*
+    $SUDO systemctl restart docker
   fi
-  echo ""
-
-  # Docker Registry Stuff
-  echo "...Updating the docker config file with insecure-registry"
-  $SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
-  echo ""
-
-  # Update the docker-storage-setup
-  DoBlock
-  echo ""
-
-  $SUDO cat /etc/sysconfig/docker-storage-setup
-  echo "...Running docker-storage-setup"
-  $SUDO docker-storage-setup
-  $SUDO lvs
-  echo ""
-
-  # Restart Docker
-  echo "...Restarting Docker"
-  $SUDO groupadd docker
-  $SUDO gpasswd -a ${USER} docker
-  $SUDO systemctl stop docker
-  $SUDO rm -rf /var/lib/docker/*
-  $SUDO systemctl restart docker
 fi
 
 if [ "$FORSCOTT" == "Y" ]
