@@ -621,9 +621,9 @@ echo "This will install all prereqs including: "
 echo "   -all RHEL prereq software from yum"
 echo "   -golang1.4 or 1.6 and configure GOPATH"
 echo "   -github source repos"
-echo "   -if cloud - aws cli and configurations"
+echo "   -if cloud - aws cli and configurations or gce sdk"
 echo "   -working directory structures"
-echo "   -sample yaml for aws"
+echo "   -sample yaml for aws, gce, nfs and gluster"
 echo "   -docker from yum and docker registry configuration"
 echo "   -and misc tools and configuration scripts to help run the projects"
 echo ""
@@ -651,8 +651,8 @@ else
   # Install software
   if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "aplo" ]
   then  
-    echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet etcd unzip ... this will take several minutes"
-    $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet etcd unzip -y> /dev/null
+    echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet unzip ... this will take several minutes"
+    $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet unzip -y> /dev/null
     $SUDO yum update -y> /dev/null
     $SUDO yum install atomic-openshift-utils -y> /dev/null
     echo ""
@@ -671,12 +671,19 @@ else
     fi
     echo ""
   else
-    echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, etcd, unzip  ... this will take several minutes"
-    $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet etcd unzip -y> /dev/null
+    echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip  ... this will take several minutes"
+    $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip -y> /dev/null
     $SUDO yum update -y> /dev/null
     $SUDO yum install atomic-openshift-utils atomic-openshift-clients -y> /dev/null
     echo ""  
   fi
+
+  # TODO: Install etcd 3.0.4
+  $SUDO wget https://github.com/coreos/etcd/releases/download/v3.0.4/etcd-v3.0.4-linux-amd64.tar.gz
+  $SUDO rm -rf /usr/bin/etcd
+  $SUDO tar -zxvf etcd-v3.0.4-linux-amd64.tar.gz
+  $SUDO cp etcd-v3.0.4-linux-amd64/etcd /usr/bin
+  
 
   echo "DIDRUN" > $GOLANGPATH/didrun
   echo "DIDRUN" > ~/didrun
