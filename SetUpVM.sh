@@ -153,7 +153,7 @@ then
   mkdir -p $GOLANGPATH
 else
   $SUDO mkdir -p $GOLANGPATH
-  $SUDO -i chmod -R 777 $GOLANGPATH
+  $SUDO chmod -R 777 $GOLANGPATH
 fi
 
 if [ "$OSEDEFAULt" == "yes" ] || [ "$OSEPATH" == "/home/ec2-user" ] || [ "$OSEPATH" == "/root" ] || [[ "$OSEPATH" =~ /home ]] 
@@ -161,7 +161,7 @@ then
   mkdir -p $OSEPATH
 else
   $SUDO mkdir -p $OSEPATH
-  $SUDO -i chmod -R 777 $OSEPATH
+  $SUDO chmod -R 777 $OSEPATH
 fi
 
 if [ "$KUBEDEFAULt" == "yes" ] || [ "$KUBEPATH" == "/home/ec2-user" ] || [ "$KUBEPATH" == "/root" ] || [[ "$KUBEPATH" =~ /home ]] 
@@ -169,7 +169,7 @@ then
   mkdir -p $KUBEPATH
 else
   $SUDO mkdir -p $KUBEPATH
-  $SUDO -i chmod -R 777 $KUBEPATH
+  $SUDO chmod -R 777 $KUBEPATH
 fi
 
 CreateProfiles()
@@ -320,7 +320,7 @@ CreateConfigs()
     echo "echo \"  cloud-config:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "echo \"    - \\\"/etc/aws/aws.conf\\\"\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "" >> start-ose.sh
-    echo "openshift start --master-config=$OSEPATH/openshift.local.config/master/master-config.yaml --node-config=$OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=4 &> openshift.log" >> start-ose.sh
+    echo "openshift start --master-config=$OSEPATH/openshift.local.config/master/master-config.yaml --node-config=$OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=5 &> openshift.log" >> start-ose.sh
   elif [ "$ISCLOUD" == "gce" ]
   then
     echo "openshift start --write-config=$OSEPATH/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
@@ -330,7 +330,7 @@ CreateConfigs()
     echo "echo \"  cloud-provider:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "echo \"    - \\\"gce\\\"\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "" >> start-ose.sh
-    echo "openshift start --master-config=$OSEPATH/openshift.local.config/master/master-config.yaml --node-config=$OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=4 &> openshift.log" >> start-ose.sh    
+    echo "openshift start --master-config=$OSEPATH/openshift.local.config/master/master-config.yaml --node-config=$OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=5 &> openshift.log" >> start-ose.sh    
   else  
     echo ""
     echo "openshift start --public-master=$INTERNALHOST --volume-dir=$OSEPATH/data --loglevel=4  &> openshift.log" >> start-ose.sh
@@ -539,7 +539,7 @@ CreateTestYamlEC2()
   echo "apiVersion: v1" > nfs-pv.yaml
   echo "kind: PersistentVolume" >> nfs-pv.yaml
   echo "metadata:" >> nfs-pv.yaml
-  echo " name: pv-gce" >> nfs-pv.yaml
+  echo " name: pv-nfs" >> nfs-pv.yaml
   echo "spec:" >> nfs-pv.yaml
   echo " capacity:" >> nfs-pv.yaml
   echo "   storage: 1Gi" >> nfs-pv.yaml
@@ -548,7 +548,7 @@ CreateTestYamlEC2()
   echo " nfs:" >> nfs-pv.yaml
   echo "   path: /opt/data12" >> nfs-pv.yaml
   echo "   server: nfs1.rhs" >> nfs-pv.yaml
-
+  echo " persistentVolumeReclaimPolicy: Retain" >> nfs-pv.yaml
 
   echo "apiVersion: v1" > nfs-pvc.yaml
   echo "kind: PersistentVolumeClaim" >> nfs-pvc.yaml
@@ -578,6 +578,137 @@ CreateTestYamlEC2()
   echo "      persistentVolumeClaim:" >> busybox-nfs-pvc.yaml
   echo "        claimName: nfs-claim" >> busybox-nfs-pvc.yaml
 
+  cd $GOLANGPATH/dev-configs/glusterfs
+  echo "apiVersion: v1" > glusterfs-endpoints.yaml
+  echo "kind: Endpoints" >> glusterfs-endpoints.yaml
+  echo "metadata:" >> glusterfs-endpoints.yaml
+  echo " name: glusterfs-cluster" >> glusterfs-endpoints.yaml
+  echo "subsets:" >> glusterfs-endpoints.yaml
+  echo " - addresses:" >> glusterfs-endpoints.yaml
+  echo "   - ip: 192.168.122.221" >> glusterfs-endpoints.yaml
+  echo "   ports:" >> glusterfs-endpoints.yaml
+  echo "   - port: 1" >> glusterfs-endpoints.yaml
+  echo "     protocol: TCP" >> glusterfs-endpoints.yaml
+  echo " - addresses:" >> glusterfs-endpoints.yaml
+  echo "   - ip: 192.168.122.222" >> glusterfs-endpoints.yaml
+  echo "   ports:" >> glusterfs-endpoints.yaml
+  echo "   - port: 1" >> glusterfs-endpoints.yaml
+  echo "     protocol: TCP" >> glusterfs-endpoints.yaml
+
+  echo "apiVersion: v1" > busybox-glusterfs.yaml
+  echo "kind: Pod" >> busybox-glusterfs.yaml
+  echo "metadata:"  >> busybox-glusterfs.yaml
+  echo "  name: glusterfs-bb-pod1"  >> busybox-glusterfs.yaml
+  echo "spec:"  >> busybox-glusterfs.yaml
+  echo "  containers:"  >> busybox-glusterfs.yaml
+  echo "  - name: glusterfs-bb-pod1"  >> busybox-glusterfs.yaml
+  echo "    image: busybox"  >> busybox-glusterfs.yaml
+  echo "    command: [\"sleep\", \"600000\"]" >> busybox-glusterfs.yaml
+  echo "    volumeMounts:"  >> busybox-glusterfs.yaml
+  echo "    - mountPath: /usr/share/busybox"  >> busybox-glusterfs.yaml
+  echo "      name: glusterfsvol"  >> busybox-glusterfs.yaml
+  echo "  volumes:"  >> busybox-glusterfs.yaml
+  echo "  - name: glusterfsvol"  >> busybox-glusterfs.yaml
+  echo "    glusterfs:"  >> busybox-glusterfs.yaml
+  echo "      endpoints: glusterfs-cluster" >> busybox-glusterfs.yaml
+  echo "      path: myVol1" >> busybox-glusterfs.yaml
+  echo "      readOnly: false" >> busybox-glusterfs.yaml
+
+  echo "apiVersion: v1" > glusterfs-pv.yaml
+  echo "kind: PersistentVolume" >> glusterfs-pv.yaml
+  echo "metadata:" >> glusterfs-pv.yaml
+  echo " name: pv-gce" >> glusterfs-pv.yaml
+  echo "spec:" >> glusterfs-pv.yaml
+  echo " capacity:" >> glusterfs-pv.yaml
+  echo "   storage: 1Gi" >> glusterfs-pv.yaml
+  echo " accessModes:" >> glusterfs-pv.yaml
+  echo "   - ReadWriteMany" >> glusterfs-pv.yaml
+  echo " glusterfs:" >> glusterfs-pv.yaml
+  echo "   endpoints: glusterfs-cluster" >> glusterfs-pv.yaml
+  echo "   path: myVol1" >> glusterfs-pv.yaml
+  echo "   readOnly: false" >> glusterfs-pv.yaml
+  echo " persistentVolumeReclaimPolicy: Retain" >> glusterfs-pv.yaml
+
+  echo "apiVersion: v1" > glusterfs-pvc.yaml
+  echo "kind: PersistentVolumeClaim" >> glusterfs-pvc.yaml
+  echo "metadata:" >> glusterfs-pvc.yaml
+  echo " name: glusterfs-claim" >> glusterfs-pvc.yaml
+  echo "spec:" >> glusterfs-pvc.yaml
+  echo " accessModes:" >> glusterfs-pvc.yaml
+  echo "  - ReadWriteMany" >> glusterfs-pvc.yaml
+  echo " resources:" >> glusterfs-pvc.yaml
+  echo "   requests:" >> glusterfs-pvc.yaml
+  echo "     storage: 1Gi" >> glusterfs-pvc.yaml
+
+  echo "apiVersion: v1" > busybox-glusterfs-pvc.yaml
+  echo "kind: Pod" >> busybox-glusterfs-pvc.yaml
+  echo "metadata:" >> busybox-glusterfs-pvc.yaml
+  echo "  name: glusterfs-bb-pod2" >> busybox-glusterfs-pvc.yaml
+  echo "spec:" >> busybox-glusterfs-pvc.yaml
+  echo "  containers:" >> busybox-glusterfs-pvc.yaml
+  echo "  - name: glusterfs-bb-pod2" >> busybox-glusterfs-pvc.yaml
+  echo "    image: busybox" >> busybox-glusterfs-pvc.yaml
+  echo "    command: [\"sleep\", \"600000\"]" >> busybox-glusterfs-pvc.yaml
+  echo "    volumeMounts:" >> busybox-glusterfs-pvc.yaml
+  echo "    - mountPath: /usr/share/busybox" >> busybox-glusterfs-pvc.yaml
+  echo "      name: glusterfsvol" >> busybox-glusterfs-pvc.yaml
+  echo "  volumes:" >> busybox-glusterfs-pvc.yaml
+  echo "    - name: glusterfsvol" >> busybox-glusterfs-pvc.yaml
+  echo "      persistentVolumeClaim:" >> busybox-glusterfs-pvc.yaml
+  echo "        claimName: glusterfs-claim" >> busybox-glusterfs-pvc.yaml
+
+  echo "apiVersion: v1" > nginx-glusterfs-pvc.yaml
+  echo "kind: Pod" >> nginx-glusterfs-pvc.yaml
+  echo "metadata:" >> nginx-glusterfs-pvc.yaml
+  echo "  name: nginx-pod2" >> nginx-glusterfs-pvc.yaml
+  echo "spec:" >> nginx-glusterfs-pvc.yaml
+  echo "  containers:" >> nginx-glusterfs-pvc.yaml
+  echo "    - name: nginx-pod2" >> nginx-glusterfs-pod1.yaml
+  echo "      image: nginx" >> nginx-glusterfs-pod1.yaml
+  echo "      ports:" >> nginx-glusterfs-pod1.yaml
+  echo "        - name: web" >> nginx-glusterfs-pod1.yaml
+  echo "          containerPort: 80" >> nginx-glusterfs-pod1.yaml
+  echo "    volumeMounts:" >> nginx-glusterfs-pvc.yaml
+  echo "    - mountPath: /usr/share/busybox/html/test" >> nginx-glusterfs-pvc.yaml
+  echo "      name: glusterfsvol" >> nginx-glusterfs-pvc.yaml
+  echo "  volumes:" >> nginx-glusterfs-pvc.yaml
+  echo "    - name: glusterfsvol" >> nginx-glusterfs-pvc.yaml
+  echo "      persistentVolumeClaim:" >> nginx-glusterfs-pvc.yaml
+  echo "        claimName: glusterfs-claim" >> nginx-glusterfs-pvc.yaml
+
+  echo "kind: Service" > glusterfs-service.yaml
+  echo "apiVersion: v1" >> glusterfs-service.yaml
+  echo "metadata:" >> glusterfs-service.yaml
+  echo "  name: glusterfs-cluster" >> glusterfs-service.yaml
+  echo "spec:" >> glusterfs-service.yaml
+  echo "  ports:" >> glusterfs-service.yaml
+  echo "  - port: 1" >> glusterfs-service.yaml
+
+  echo "apiVersion: v1" > nginx-glusterfs-pod1.yaml
+  echo "kind: Pod" >> nginx-glusterfs-pod1.yaml
+  echo "metadata:" >> nginx-glusterfs-pod1.yaml
+  echo "  name: nginx-pod1" >> nginx-glusterfs-pod1.yaml
+  echo "  labels:" >> nginx-glusterfs-pod1.yaml
+  echo "    name: nginx-pod1" >> nginx-glusterfs-pod1.yaml
+  echo "spec:" >> nginx-glusterfs-pod1.yaml
+  echo "  containers:" >> nginx-glusterfs-pod1.yaml
+  echo "    - name: nginx-pod1" >> nginx-glusterfs-pod1.yaml
+  echo "      image: nginx" >> nginx-glusterfs-pod1.yaml
+  echo "      ports:" >> nginx-glusterfs-pod1.yaml
+  echo "        - name: web" >> nginx-glusterfs-pod1.yaml
+  echo "          containerPort: 80" >> nginx-glusterfs-pod1.yaml
+  echo "      volumeMounts:" >> nginx-glusterfs-pod1.yaml
+  echo "        - name: glustervol" >> nginx-glusterfs-pod1.yaml
+  echo "          mountPath: /usr/share/nginx/html/test" >> nginx-glusterfs-pod1.yaml
+  echo "      securityContext:" >> nginx-glusterfs-pod1.yaml
+  echo "        supplementalGroups: [10003]" >> nginx-glusterfs-pod1.yaml
+  echo "        privileged: true" >> nginx-glusterfs-pod1.yaml
+  echo "  volumes:" >> nginx-glusterfs-pod1.yaml
+  echo "    - name: glustervol" >> nginx-glusterfs-pod1.yaml
+  echo "      glusterfs:" >> nginx-glusterfs-pod1.yaml
+  echo "        endpoints: glusterfs-cluster" >> nginx-glusterfs-pod1.yaml
+  echo "        path: myVol1" >> nginx-glusterfs-pod1.yaml
+  echo "        readOnly: false" >> nginx-glusterfs-pod1.yaml
 
 
   cp -R $GOLANGPATH/dev-configs/* $OSEPATH/dev-configs
@@ -679,11 +810,17 @@ else
   fi
 
   # TODO: Install etcd 3.0.4
-  $SUDO wget https://github.com/coreos/etcd/releases/download/v3.0.4/etcd-v3.0.4-linux-amd64.tar.gz
-  $SUDO rm -rf /usr/bin/etcd
-  $SUDO tar -zxvf etcd-v3.0.4-linux-amd64.tar.gz
-  $SUDO cp etcd-v3.0.4-linux-amd64/etcd /usr/bin
-  
+  if [ "$ETCD_VER" == "3" ]
+  then
+    echo "installing etcd 3.0.4..."
+    $SUDO wget https://github.com/coreos/etcd/releases/download/v3.0.4/etcd-v3.0.4-linux-amd64.tar.gz
+    $SUDO rm -rf /usr/bin/etcd
+    $SUDO tar -zxvf etcd-v3.0.4-linux-amd64.tar.gz
+    $SUDO cp etcd-v3.0.4-linux-amd64/etcd /usr/bin
+  else
+    echo "installing default etcd per rhel repo configuration..."
+    $SUDO yum install etcd -y> /dev/null
+  fi
 
   echo "DIDRUN" > $GOLANGPATH/didrun
   echo "DIDRUN" > ~/didrun
@@ -726,7 +863,7 @@ then
     mkdir -p $GOLANGPATH/go/src/github.com/openshift
   else
     $SUDO mkdir -p $GOLANGPATH/go/src/github.com/openshift
-    $SUDO -i chmod -R 777 $GOLANGPATH
+    $SUDO chmod -R 777 $GOLANGPATH
   fi
 
   cd $GOLANGPATH/go/src/github.com/openshift
@@ -753,7 +890,7 @@ else
   $SUDO mkdir -p $GOLANGPATH/dev-configs/gce
   $SUDO mkdir -p $GOLANGPATH/dev-configs/nfs
   $SUDO mkdir -p $GOLANGPATH/dev-configs/glusterfs
-  $SUDO -i chmod -R 777 $GOLANGPATH
+  $SUDO chmod -R 777 $GOLANGPATH
 fi
 
 if [ "$OSEDEFAULT" == "yes" ] || [ "$OSEPATH" == "/home/ec2-user" ] || [ "$OSEPATH" == "/root" ] || [[ "$OSEPATH" =~ /home ]] 
@@ -769,7 +906,7 @@ else
   $SUDO mkdir -p $OSEPATH/dev-configs/gce
   $SUDO mkdir -p $OSEPATH/dev-configs/nfs
   $SUDO mkdir -p $OSEPATH/dev-configs/glusterfs
-  $SUDO -i chmod -R 777 $OSEPATH
+  $SUDO chmod -R 777 $OSEPATH
 fi
 
 if [ "$KUBEDEFAULT" == "yes" ] || [ "$KUBEPATH" == "/home/ec2-user" ] || [ "$KUBEPATH" == "/root" ] || [[ "$KUBEPATH" =~ /home ]] 
@@ -785,7 +922,7 @@ else
   $SUDO mkdir -p $KUBEPATH/dev-configs/gce
   $SUDO mkdir -p $KUBEPATH/dev-configs/nfs
   $SUDO mkdir -p $KUBEPATH/dev-configs/glusterfs
-  $SUDO -i chmod -R 777 $KUBEPATH
+  $SUDO chmod -R 777 $KUBEPATH
 fi
 
 CreateProfiles
@@ -805,7 +942,7 @@ then
   echo "...creating aws.conf file"  
   cd /etc
   $SUDO mkdir aws
-  $SUDO -i chmod -R 777 /etc/aws  
+  $SUDO chmod -R 777 /etc/aws  
   cd /etc/aws
   echo "[Global]" > aws.conf
   echo "Zone = $ZONE" >> aws.conf
