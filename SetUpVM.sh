@@ -346,6 +346,8 @@ CreateConfigs()
   echo "cd $GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64; sudo rm -rf openshift.local.*" >> stop-ose.sh
   echo "cd $GOLANGPATH; sudo rm -rf openshift.local.*" >> stop-ose.sh
   echo "cd $OSEPATH; sudo rm -rf openshift.local.*" >> stop-ose.sh
+  echo "# remove the file below if you are switching between kube and ocp" >> stop-ose.sh
+  echo "# sudo rm -rf ~/.kube/" >> stop-ose.sh
   chmod +x stop-ose.sh
   echo ""
 
