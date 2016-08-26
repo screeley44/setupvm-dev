@@ -1,0 +1,64 @@
+# Stop openshift, stop relevant docker containers, umount openshift mounts,
+# and delete various openshift files.
+# Options:
+#   -y - suppress prompt to delete openshift storage directory. Default is to
+#        prompt and require a user response.S
+# Based on scripts from Scott Creeley
+
+echo "========================================================================="
+echo "Cleanup openshift env by stopping openshift and docker containers, and by"
+echo "removing various openshift volumes and etcd storage directories"
+
+prompt=1 # true, default
+if [[ "$1" == '-y' ]] ; then
+  prompt=0 # false
+  shift # in case additional args added...
+fi
+
+# kill the openshift process
+pkill -x openshift
+
+# stop only k8s openshift containers (maybe?)
+echo
+echo "stopping openshift k8s containers..."
+docker ps --filter "name=^/k8s_" --format "{{.ID}}" | xargs -l -r docker stop
+
+# unmount openshift mounts
+echo
+echo "unmounting openshift mounts..."
+mount | grep openshift.local.volumes | awk '{ print $3}' | xargs -l -r umount
+
+## last step:
+# find all openshift.local dirs except for the test/ dir. These will be deleted
+dirs="$(find / -type d -name openshift.local.\* \
+  | grep -v \/openshift\/origin\/test\/)"
+
+if [[ -z "$dirs" ]] ; then
+  echo
+  echo "No openshift storage directories to delete, done"
+  exit 0
+fi
+
+# delete openshift pod and etcd storage
+echo
+echo "deleting openshift volume storage directories..."
+if (( prompt )) ; then
+  echo "(to automatically delete the directories use the \"-y\" option)"
+fi
+
+for dir in $dirs; do
+  if (( prompt )) ; then
+    read -p "Delete directory $dir? [N|y]" ans
+    case "$ans" in
+    [yY] | [yY][eE][sS])
+        ;;
+    *)
+        echo "Unconfirmed...skipping"
+	continue # skip this dir
+        ;;
+    esac
+  fi
+  echo "   $dir..."
+  rm -rf $dir
+done
+# rm -rf ~/.kube/

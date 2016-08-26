@@ -1,0 +1,52 @@
+# Configure openshift. Particularly useful switching from kube to origin.
+# Args:
+#   $1 - config path pointing to the openshift parent directory of the 
+#        "openshift.local.config" dir. If omitted then the OCP_CONFIG env
+#        variable is used. If that is empty then the user's $PWD is used.
+#        If not found there then `which admin.kubeconfig` is used.
+# Based on scripts from Scott Creeley
+
+echo "======================================================================="
+echo "Configure openshift by adding read access to its config file and adding"
+echo "a group, role and user to the cluster"
+echo
+
+cfg_prefix='openshift.local.config/master'
+cfg_file='admin.kubeconfig'
+cfg_path="$cfg_prefix/$cfg_file"
+
+ocp_conf="${1:-$OCP_CONFIG}"
+if [[ -n "$ocp_conf" && ! -f $ocp_conf/$cfg_path ]] ; then
+  echo "ERROR: $cfg_path file is missing in supplied \"$ocp_conf\""
+  exit 1
+fi
+ocp_conf="$PWD"
+if [[ ! -f $ocp_conf/$cfg_path ]] ; then
+  # use `which` in a desparate attempt to resolve the config file
+  ocp_conf="$(which $cfg_file 2>/dev/null)"
+  [[ -z "$ocp_conf" ]] && ocp_conf="$PWD" # back to PWD for error msg
+  if [[ ! -f "$ocp_conf/$cfg_path" ]] ; then
+    echo "ERROR: $cfg_path file is missing in \"$ocp_conf\""
+    exit 1
+  fi
+fi
+
+cfg="$ocp_conf/$cfg_path"
+echo
+echo "config file: \"$cfg\""
+
+echo
+echo "Setting up openshift configs..."
+echo
+
+# add read access to the openshift config file
+chmod +r $cfg
+
+# add random group, role and user to cluster
+oadm groups new myclusteradmingroup admin --config=$cfg
+
+oadm policy add-cluster-role-to-group cluster-admin myclusteradmingroup --config=$cfg
+
+oadm policy add-scc-to-group privileged myclusteradmingroup --config=$cfg
+
+oadm policy add-role-to-user basic-user jdoe -n default --config=$cfg

@@ -1,0 +1,75 @@
+# Start openshift all-in-one after removing potential k8s binaries and config.
+# Note: expected to be run in a dev/laptop-like env where k8s and openshift
+#   binaries and configs can be deleted. NOT FOR PRODUCTION!
+# Args: 
+#   $1 - prefix dir path pointing the openshift binary. If not present then the
+#        OCP_ROOT env variable is used. If that is empty then the user's CWD is
+#        used. If there is no openshift file there then `which openshift` is
+#        used.
+#   $2 - openshift volume where pod storage is located. If not present then the
+#        OCP_VOLDIR env variable is used. If that is empty then 
+#        "./openshift.local.volumes" is used.
+#   $3 - logfile. If not present then the OCP_LOG env variable is used. If that
+#        is empty then "/tmp/openshift.log" is used.
+#   $4 - log level. If not present then $OCP_LOGLEVEL is used. If that is empty
+#        then 5 is used.
+# Based on scripts from Scott Creeley
+
+echo "====================================================================="
+echo "Start openshift all-in-one after removing potentially conflicting k8s"
+echo "binaries and config files"
+echo
+
+# set ocp_dir to the dir where openshift is run from
+ocp_dir="${1:-$OCP_ROOT}"
+if [[ -n "$ocp_dir" && ! -f $ocp_dir/openshift ]] ; then
+  echo "ERROR: supplied root dir \"$ocp_dir\" is missing the openshift binary"
+  exit 1
+fi
+# use PWD next since prefix dir not supplied
+ocp_dir="$PWD"
+if [[ ! -f "$ocp_dir/openshift" ]] ; then
+  ocp_dir="$(which openshift 2>/dev/null)"
+  [[ -z "$ocp_dir" ]] && ocp_dir="$PWD" # back to PWD for error msg
+  if [[ ! -f "$ocp_dir/openshift" ]] ; then
+    echo "ERROR: openshift all-in-one binary missing in \"$ocp_dir\""
+    exit 1
+  fi
+fi
+
+# set ocp_vol to pod storage (ok for dir to be missing)
+ocp_vol=${2:-$OCP_VOLDIR}
+[[ -z "$ocp_vol" ]] && ocp_vol='./openshift.local.volumes'
+if [[ ! -d "$ocp_vol" ]] ; then
+  echo "INFO: pod's volume directory \"$ocp_vol\" will be created"
+fi
+
+# logfile
+ocp_log="${3:-$OCP_LOG}"
+[[ -z "$ocp_log" ]] && ocp_log='/tmp/openshift.log'
+
+# log level
+ocp_level="${4:-$OCP_LOGLEVEL}"
+[[ -z "$ocp_level" ]] && ocp_level=5
+
+# delete any kube* binaries or symlinks
+rm -rf /usr/bin/kube*
+
+# check that openshift is not already running
+ps -C openshift >& /dev/null
+if (( $? == 0 )) ; then
+  echo -e "WARN: openshift is already running:\n$(ps -C openshift)"
+  exit 0
+fi
+
+# delete the log file before starting openshift
+rm -f $ocp_log
+
+# start openshift all-in-one cluster as a backgroup job
+echo "starting openshift..."
+echo "   rootDir  : $ocp_dir"
+echo "   volumeDir: $ocp_vol"
+echo "   logLevel : $ocp_level"
+echo "   logfile  : $ocp_log"
+echo
+$ocp_dir/openshift start --volume-dir=$ocp_vol --loglevel=$ocp_level  &> $ocp_log &
