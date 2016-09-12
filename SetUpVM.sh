@@ -245,7 +245,7 @@ CreateProfiles()
 
     
   echo "" >> newbashrc
-  echo "export DIDRUN=yes" >> newbashrc
+  # echo "export DIDRUN=yes" >> newbashrc
   echo ""
   echo "#go environment" >> newbashrc
   echo "export GOPATH=$GOLANGPATH/go" >> newbashrc
@@ -261,7 +261,7 @@ CreateProfiles()
   echo "export PATH" >> newbashrc
 
   echo "" >> .bash_profile
-  echo "export DIDRUN=yes" >> .bash_profile
+  # echo "export DIDRUN=yes" >> .bash_profile
   echo ""
   echo "#go environment" >> .bash_profile
   echo "export GOPATH=$GOLANGPATH/go" >> .bash_profile
@@ -761,7 +761,8 @@ echo "   -docker from yum and docker registry configuration"
 echo "   -and misc tools and configuration scripts to help run the projects"
 echo ""
 
-if [ "$DIDRUN" == "yes" ] || [ -f "$GOLANGPATH/didrun" ] || [ -f /root/didrun ] || [ -f ~/didrun ]
+# if [ "$DIDRUN" == "yes" ] || [ -f "$GOLANGPATH/didrun" ] || [ -f /root/didrun ] || [ -f ~/didrun ]
+if [ -f "$GOLANGPATH/didrun" ] || [ -f /root/didrun ] || [ -f ~/didrun ]
 then
   echo " Skipping subscription services and yum install of software as this script was run once already..."
   echo ""
