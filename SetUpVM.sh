@@ -519,6 +519,28 @@ CreateTestYamlEC2()
   echo "      persistentVolumeClaim:" >> busybox-gce-pvc.yaml
   echo "        claimName: gce-claim" >> busybox-gce-pvc.yaml
 
+  echo "kind: StorageClass" > gce-storage-class1.yaml
+  echo "apiVersion: storage.k8s.io/v1beta1" >> gce-storage-class1.yaml
+  echo "metadata:" >> gce-storage-class1.yaml
+  echo "  name: slow" >> gce-storage-class1.yaml
+  echo "provisioner: kubernetes.io/gce-pd" >> gce-storage-class1.yaml
+  echo "parameters:" >> gce-storage-class1.yaml
+  echo "  type: pd-standard" >> gce-storage-class1.yaml
+  echo "  zone: us-central1-a" >> gce-storage-class1.yaml
+
+  echo "apiVersion: v1" > gce-pvc-storage-class.yaml
+  echo "kind: PersistentVolumeClaim" >> gce-pvc-storage-class.yaml
+  echo "metadata:" >> gce-pvc-storage-class.yaml
+  echo " name: gce-claim" >> gce-pvc-storage-class.yaml
+  echo " annotations:" >> gce-pvc-storage-class.yaml
+  echo "   volume.beta.kubernetes.io/storage-class: slow" >> gce-pvc-storage-class.yaml
+  echo "spec:" >> gce-pvc-storage-class.yaml
+  echo " accessModes:" >> gce-pvc-storage-class.yaml
+  echo "  - ReadWriteOnce" >> gce-pvc-storage-class.yaml
+  echo " resources:" >> gce-pvc-storage-class.yaml
+  echo "   requests:" >> gce-pvc-storage-class.yaml
+  echo "     storage: 5Gi" >> gce-pvc-storage-class.yaml
+
   cd $GOLANGPATH/dev-configs/nfs
   echo "apiVersion: v1" > busybox-nfs.yaml
   echo "kind: Pod" >> busybox-nfs.yaml
@@ -767,9 +789,9 @@ then
   echo " Skipping subscription services and yum install of software as this script was run once already..."
   echo ""
 else
-  if [ "$ISCLOUD" == "gce" ]
+  if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "aws" ]
   then
-    # Installing subscription manager on GCE
+    # Installing subscription manager on CLOUD INSTANCE
     echo "...Checking to make sure subscription manager is installed..."
     $SUDO yum install subscription-manager -y> /dev/null
   fi
