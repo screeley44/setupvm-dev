@@ -456,6 +456,57 @@ CreateTestYamlEC2()
   echo "      persistentVolumeClaim:" >> busybox-ebs-pvc.yaml
   echo "        claimName: ebs-claim" >> busybox-ebs-pvc.yaml
 
+  echo "kind: StorageClass" > aws-storage-class1.yaml
+  echo "apiVersion: storage.k8s.io/v1beta1" >> aws-storage-class1.yaml
+  echo "metadata:" >> aws-storage-class1.yaml
+  echo "  name: slow" >> aws-storage-class1.yaml
+  echo "provisioner: kubernetes.io/aws-ebs" >> aws-storage-class1.yaml
+  echo "parameters:" >> aws-storage-class1.yaml
+  echo "  type: gp2" >> aws-storage-class1.yaml
+  echo "  zone: us-east-1d" >> aws-storage-class1.yaml
+
+  echo "apiVersion: v1" > aws-pvc-storage-class.yaml
+  echo "kind: PersistentVolumeClaim" >> aws-pvc-storage-class.yaml
+  echo "metadata:" >> aws-pvc-storage-class.yaml
+  echo " name: ebs-claim" >> aws-pvc-storage-class.yaml
+  echo " annotations:" >> aws-pvc-storage-class.yaml
+  echo "   volume.beta.kubernetes.io/storage-class: slow" >> aws-pvc-storage-class.yaml
+  echo "spec:" >> aws-pvc-storage-class.yaml
+  echo " accessModes:" >> aws-pvc-storage-class.yaml
+  echo "  - ReadWriteOnce" >> aws-pvc-storage-class.yaml
+  echo " resources:" >> aws-pvc-storage-class.yaml
+  echo "   requests:" >> aws-pvc-storage-class.yaml
+  echo "     storage: 5Gi" >> aws-pvc-storage-class.yaml
+
+  echo "apiVersion: v1" > aws-pv-storageclass.yaml
+  echo "kind: PersistentVolume" >> aws-pv-storageclass.yaml
+  echo "metadata:" >> aws-pv-storageclass.yaml
+  echo " name: silver.east" >> aws-pv-storageclass.yaml
+  echo " annotations:" >> aws-pv-storageclass.yaml
+  echo "   volume.beta.kubernetes.io/storage-class: silver.east" >> aws-pv-storageclass.yaml
+  echo "spec:" >> aws-pv-storageclass.yaml
+  echo " capacity:" >> aws-pv-storageclass.yaml
+  echo "   storage: 10Gi" >> aws-pv-storageclass.yaml
+  echo " accessModes:" >> aws-pv-storageclass.yaml
+  echo "   - ReadWriteOnce" >> aws-pv-storageclass.yaml
+  echo " awsElasticBlockStore:" >> aws-pv-storageclass.yaml
+  echo "   volumeID: vol-26eaa981" >> aws-pv-storageclass.yaml
+  echo "   fsType: ext4" >> aws-pv-storageclass.yaml
+
+  echo "apiVersion: v1" > aws-pvc-storageclass.yaml
+  echo "kind: PersistentVolumeClaim" >> aws-pvc-storageclass.yaml
+  echo "metadata:" >> aws-pvc-storageclass.yaml
+  echo " name: ebs-claim-silver" >> aws-pvc-storageclass.yaml
+  echo " annotations:" >> aws-pvc-storageclass.yaml
+  echo "   volume.beta.kubernetes.io/storage-class: silver.east" >> aws-pvc-storageclass.yaml
+  echo "spec:" >> aws-pvc-storageclass.yaml
+  echo " accessModes:" >> aws-pvc-storageclass.yaml
+  echo "  - ReadWriteOnce" >> aws-pvc-storageclass.yaml
+  echo " resources:" >> aws-pvc-storageclass.yaml
+  echo "   requests:" >> aws-pvc-storageclass.yaml
+  echo "     storage: 10Gi" >> aws-pvc-storageclass.yaml
+
+
   cd $GOLANGPATH/dev-configs/gce
   echo "apiVersion: v1" > busybox-gce.yaml
   echo "kind: Pod" >> busybox-gce.yaml
@@ -1094,6 +1145,10 @@ then
   fi 
 fi
 
+#TODO: temp fix for the gobindata
+cd $GOLANGPATH/go/src/k8s.io/kubernetes/
+export GOPATH=$GOLANGPATH/go
+$SUDO go get -u github.com/jteeuwen/go-bindata/go-bindata
 
 echo "DIDRUN" > $GOLANGPATH/didcomplete
 
@@ -1111,7 +1166,7 @@ echo ""
 echo "        K8 "
 echo "       -------- "
 echo "       cd $GOLANGPATH/go/src/k8s.io/kubernetes/"
-echo "       ./hack/local-up-cluster.sh" 
+echo "       ./hack/local-up-cluster.sh (I typically run kube as root - from cloud sudo -s before building, etc...)"
 echo ""
 echo "        Origin"
 echo "       --------"
