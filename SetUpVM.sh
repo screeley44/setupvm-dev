@@ -296,10 +296,37 @@ CreateConfigs()
   echo "...creating config-ose.sh"
   cd $OSEPATH
   echo "chmod +r $OSEPATH/openshift.local.config/master/admin.kubeconfig" > config-ose.sh
+  echo "# create namespaces/projects" >> config-ose.sh
+  echo "oadm new-project dev1project --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm new-project dev2project --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "" >> config-ose.sh
+  echo "# create groups" >> config-ose.sh
   echo "oadm groups new myclusteradmingroup admin --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm groups new mystorageadmingroup screeley --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm groups new mydevgroup1 dev11 --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm groups new mydevgroup2 dev21 --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "" >> config-ose.sh
+  echo "# add policy roles to groups" >> config-ose.sh
   echo "oadm policy add-cluster-role-to-group cluster-admin myclusteradmingroup --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
-  echo "oadm policy add-scc-to-group privileged myclusteradmingroup --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm policy add-cluster-role-to-group storage-admin mystorageadmingroup --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm policy add-role-to-group basic-user mydevgroup1 -n dev1project --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm policy add-role-to-group basic-user mydevgroup2 -n dev2project --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm policy add-role-to-group view mydevgroup1 -n dev1project --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm policy add-role-to-group view mydevgroup2 -n dev2project --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm policy add-role-to-group edit mydevgroup2 -n dev2project --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
   echo "oadm policy add-role-to-user basic-user jdoe -n default --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm policy add-role-to-user view jdoe -n default --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm policy add-role-to-user edit jdoe -n default --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "" >> config-ose.sh
+  echo "# add some scc policy as well" >> config-ose.sh
+  echo "oadm policy add-scc-to-group privileged myclusteradmingroup --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "" >> config-ose.sh
+  echo "# add additional users to the groups" >> config-ose.sh
+  echo "oadm groups add-users mydevgroup1 dev12 -n dev1project --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm groups add-users mydevgroup1 dev13 --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm groups add-users mydevgroup2 dev22 -n dev2project --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm groups add-users mydevgroup2 dev23 -n dev2project --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
+  echo "oadm groups add-users mydevgroup1 dev23 -n dev1project --config=$OSEPATH/openshift.local.config/master/admin.kubeconfig" >> config-ose.sh
   chmod +x config-ose.sh
   echo ""
 
@@ -314,6 +341,7 @@ CreateConfigs()
     echo "openshift start --write-config=$OSEPATH/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
     echo "sed -i '/apiServerArguments: null/,+2d' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    # echo "sed -i 's/\ \ ingressIPNetworkCIDR:.*/\ \ ingressIPNetworkCIDR: ""/' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "echo \"kubeletArguments:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "echo \"  cloud-provider:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "echo \"    - \\\"aws\\\"\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
@@ -326,6 +354,7 @@ CreateConfigs()
     echo "openshift start --write-config=$OSEPATH/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
     echo "sed -i '/apiServerArguments: null/,+2d' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"gce\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"gce\"' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    echo "sed -i 's/\ \ ingressIPNetworkCIDR:.*/\ \ ingressIPNetworkCIDR: ""/' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "echo \"kubeletArguments:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "echo \"  cloud-provider:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "echo \"    - \\\"gce\\\"\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
@@ -850,9 +879,23 @@ else
   # Subscription Manager Stuffs - for RHEL 7.X devices
   echo "Setting up subscription services from RHEL..."
   $SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS
-  $SUDO subscription-manager list --available | sed -n '/OpenShift Employee Subscription/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+
+  # FOR DEV
+  if [ "$SETUP_TYPE" == "dev" ]
+  then
+    $SUDO subscription-manager list --available | sed -n '/OpenShift Employee Subscription/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+    $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+  fi
+  
+  # FOR APLO
+  if [ "$SETUP_TYPE" == "aplo" ]
+  then
+    $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+  fi
+
+  # FOR ALL
   $SUDO subscription-manager repos --disable="*"> /dev/null
-  $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.2-rpms"> /dev/null
+  $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.3-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
   echo ""
 
   # Install software
@@ -861,7 +904,15 @@ else
     echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet unzip ... this will take several minutes"
     $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet unzip -y> /dev/null
     $SUDO yum update -y> /dev/null
-    $SUDO yum install atomic-openshift-utils -y> /dev/null
+    if [ "$SETUP_TYPE" == "aplo" ]
+    then
+      echo "...Installing openshift utils, clients and atomic-openshift for APLO setup type..."
+      $SUDO yum install atomic-openshift-utils atomic-openshift-clients atomic-openshift -y> /dev/null
+      $SUDO yum install heketi-client heketi-templates -y> /dev/null
+    else
+      echo "...Installing openshift utils for DEV setup type..."
+      $SUDO yum install atomic-openshift-utils -y> /dev/null
+    fi
     echo ""
 
     # Install Go and do other config
@@ -878,10 +929,11 @@ else
     fi
     echo ""
   else
-    echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip  ... this will take several minutes"
+    echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip for CLIENT setup type  ... this will take several minutes"
     $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip -y> /dev/null
     $SUDO yum update -y> /dev/null
-    $SUDO yum install atomic-openshift-utils atomic-openshift-clients -y> /dev/null
+    $SUDO yum install atomic-openshift-utils atomic-openshift-clients atomic-openshift -y> /dev/null
+    $SUDO yum install heketi-client heketi-templates -y> /dev/null
     echo ""  
   fi
 
