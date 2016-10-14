@@ -42,6 +42,13 @@ then
   echo "   ORIGINWORKDIR = where you want your OpenShift specific configs and workspace to be located - default is users home directory"
   echo "   KUBEWORKDIR = where you want your K8 specific configs and workspace to be located - default is users home directory"
   echo "   SOURCEDIR = where you want your cloned repos to live (GOPATH) default is home directory /go/src/github.com"
+  echo "   SETUP_TYPE=dev, aplo, aploclient (default is dev) - dev will install a working dev environment to build from source, etc..."
+  echo "       aplo - normal ose/k8 install minus the cloning of source repos"
+  echo "       client - just base with openshift-utils and openshift-client - nothing else"
+  echo "       ocp_only - No Kube source is installed, only OCP"
+  echo "       kube_only - No OCP source is installed, only Kube"        
+  echo "   DOCKERVER= version # OR leave blank and it will get whatever is available/current for your repo sets"
+  echo "   ETCD_VER= (3 or default) (default is what is available for repo sets, 3 will trigger version 3.0.4 which is now required with latest K8)"
   exit 1
 fi
 
