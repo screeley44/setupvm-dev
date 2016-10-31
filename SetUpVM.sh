@@ -218,7 +218,7 @@ CreateProfiles()
   # as it doesn't transfer terminals - so need all terminal
   # processes to get this
   #TODO: ALLOW_SECURITY_CONTEXT=true 
-  if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
+  if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "vsphere" ]
   then
     echo "...Creating Cloud bash profiles"
     echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> .bash_profile 
@@ -228,7 +228,7 @@ CreateProfiles()
     echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> .bash_profile
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> .bash_profile
     echo "export ZONE=$ZONE" >> .bash_profile
-    if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "aws" ]
+    if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "vsphere" ]
     then
       echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> .bash_profile
     fi
