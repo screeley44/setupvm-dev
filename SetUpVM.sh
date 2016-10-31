@@ -367,6 +367,21 @@ CreateConfigs()
     echo "echo \"    - \\\"gce\\\"\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "" >> start-ose.sh
     echo "openshift start --master-config=$OSEPATH/openshift.local.config/master/master-config.yaml --node-config=$OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=5 &> openshift.log" >> start-ose.sh    
+  elif [ "$ISCLOUD" == "vsphere" ]
+  then
+    echo "openshift start --write-config=$OSEPATH/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
+    echo "sed -i '/apiServerArguments: null/,+2d' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"vsphere\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/vsphere/vsphere.conf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"vsphere\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/vsphere/vsphere.conf\"' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    # echo "sed -i 's/\ \ ingressIPNetworkCIDR:.*/\ \ ingressIPNetworkCIDR: ""/' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    echo "echo \"kubeletArguments:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    # echo "echo \"  max-pods:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    # echo "echo \"    - \\\'100\\\'\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "echo \"  cloud-provider:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "echo \"    - \\\"vsphere\\\"\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "echo \"  cloud-config:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "echo \"    - \\\"/etc/vsphere/vsphere.conf\\\"\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "" >> start-ose.sh
+    echo "openshift start --master-config=$OSEPATH/openshift.local.config/master/master-config.yaml --node-config=$OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=5 &> openshift.log" >> start-ose.sh
   else  
     echo ""
     echo "openshift start --public-master=$INTERNALHOST --volume-dir=$OSEPATH/data --loglevel=4  &> openshift.log" >> start-ose.sh
@@ -1089,7 +1104,28 @@ then
   # curl "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-113.0.0-linux-x86_64.tar.gz" -o "google-cloud-sdk-113.0.0-linux-x86_64.tar.gz"
   # tar -zxvf google-cloud-sdk-113.0.0-linux-x86_64.tar.gz
   # $SUDO ./google-cloud-sdk/install.sh
-
+elif [ "$ISCLOUD" == "vsphere" ]
+then
+  echo "...creating vSphere conf template"
+  cd /etc
+  $SUDO mkdir vsphere
+  $SUDO chmod -R 777 /etc/vsphere
+  cd /etc/vsphere
+  
+  echo "[Global]" > vsphere.conf
+  echo "  user = administrator@vsphere.local" >> vsphere.conf
+  echo "  password = mypassword" >> vsphere.conf
+  echo "  server = myipaddr" >> vsphere.conf
+  echo "  port = 443" >> vsphere.conf
+  echo "  insecure-flag = 1" >> vsphere.conf
+  echo "  datacenter = mydatacenter" >> vsphere.conf
+  echo "  datastore = mydatastore" >> vsphere.conf
+  echo "  resource_pool=\"myresourcepool\"" >> vsphere.conf
+  echo "  public-network=\"mynetwork\"" >> vsphere.conf
+  echo "[Disk]" >> vsphere.conf
+  echo "  scsicontrollertype = pvscsidawad" >> vsphere.conf
+  cd $GOLANGPATH
+  echo ""
 fi
 echo ""
 
