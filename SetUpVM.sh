@@ -2,22 +2,9 @@
 # Some automation to setting up OSE/K8 VM's
 
 
-# INTERNALHOST=$1
-# SUDO=$2
-# GOYUM=$3
-# ISCLOUD=$4
-# ZONE=$5
-# AWSKEY=$6
-# AWSSECRET=$7
-# RHNUSER=$8
-# RHNPASS=$9
-# ORIGINWORKDIR=$10
-# KUBEWORKDIR=$11
-# GOWORKDIR=$12
-
 source setupvm.config
 
-if ([ "$SUDO" == "" ] && [ "$ISCLOUD" == "" ] && [ "$GOYUM" == "" ]) || ([ "$SUDO" == "help" ])
+if ([ "$SUDO" == "" ] && [ "$ISCLOUD" == "" ] && [ "$GOVERSION" == "" ]) || ([ "$SUDO" == "help" ])
 then
   echo ""
   echo ""
@@ -32,7 +19,7 @@ then
   echo ""
   echo "   INTERNALHOST yourhostname i.e. ip-172-30-16-54.internal.amazonaws.com"
   echo "   SUDO sudo or root"
-  echo "   GOYUM Y = install golang from yum typically will get 1.4 version, N = install 1.6 version"
+  echo "   GOVERSION = 1.6, 1.7 or yum (meaning whatever comes from yum)"
   echo "   ISCLOUD = aws, gce or local"
   echo "   ZONE = if aws, then enter your aws zone i.e. us-west-2a"
   echo "   AWSKEY = the key value"
@@ -66,6 +53,11 @@ fi
 if [ "$ZONE" == "" ]
 then
   ZONE="us-west-2a"
+fi
+
+if [ "$MULTIZONE" == "" ]
+then
+  MULTIZONE="false"
 fi
 
 REGION=${ZONE%?}
@@ -224,6 +216,18 @@ CreateProfiles()
     echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> .bash_profile 
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> .bash_profile
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> .bash_profile
+    if [ "$MULTIZONE" == "true" ]
+    then
+      if [ "$ISCLOUD" == "aws" ]
+      then
+        echo "export CLOUD_CONFIG=/etc/aws/aws.conf" >> .bash_profile
+      fi
+      if [ "$ISCLOUD" == "gce" ]
+      then
+        echo "export CLOUD_CONFIG=/etc/gce/gce.conf" >> .bash_profile
+      fi
+      echo "export MULTIZONE=$MULTIZONE" >> .bash_profile    
+    fi
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> .bash_profile
     echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> .bash_profile
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> .bash_profile
@@ -238,6 +242,18 @@ CreateProfiles()
     $SUDO echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> newbashrc 
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> newbashrc
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> newbashrc
+    if [ "$MULTIZONE" == "true" ]
+    then
+      if [ "$ISCLOUD" == "aws" ]
+      then
+        echo "export CLOUD_CONFIG=/etc/aws/aws.conf" >> newbashrc
+      fi
+      if [ "$ISCLOUD" == "gce" ]
+      then
+        echo "export CLOUD_CONFIG=/etc/gce/gce.conf" >> newbashrc
+      fi
+      echo "export MULTIZONE=$MULTIZONE" >> newbashrc
+    fi
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> newbashrc
     echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> newbashrc
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> newbashrc
@@ -633,7 +649,7 @@ CreateTestYamlEC2()
   echo "apiVersion: v1" > gce-pvc-storage-class.yaml
   echo "kind: PersistentVolumeClaim" >> gce-pvc-storage-class.yaml
   echo "metadata:" >> gce-pvc-storage-class.yaml
-  echo " name: gce-claim" >> gce-pvc-storage-class.yaml
+  echo " name: gce-claim-storageclass" >> gce-pvc-storage-class.yaml
   echo " annotations:" >> gce-pvc-storage-class.yaml
   echo "   volume.beta.kubernetes.io/storage-class: slow" >> gce-pvc-storage-class.yaml
   echo "spec:" >> gce-pvc-storage-class.yaml
@@ -938,16 +954,28 @@ else
     echo ""
 
     # Install Go and do other config
-    if [ "$GOYUM" == "y" ] || [ "$GOYUM" == "Y" ]
+
+
+    if [ "$GOVERSION" == "1.6" ]
     then
-      echo "Installing go1.4..."
-      $SUDO yum install go -y> /dev/null
-    else
       echo "Installing go1.6..."
       cd ~
       $SUDO wget https://storage.googleapis.com/golang/go1.6.1.linux-amd64.tar.gz
       $SUDO rm -rf /usr/local/go
       $SUDO tar -C /usr/local -xzf go1.6.1.linux-amd64.tar.gz
+    fi
+    if [ "$GOVERSION" == "1.7" ]
+    then
+      echo "Installing go1.7..."
+      cd ~
+      $SUDO wget https://storage.googleapis.com/golang/go1.7.3.linux-amd64.tar.gz
+      $SUDO rm -rf /usr/local/go
+      $SUDO tar -C /usr/local -xzf go1.7.3.linux-amd64.tar.gz
+    fi
+    if [ "$GOVERSION" == "yum" ]
+    then
+      echo "Installing go1.X whatever version yum installs..."
+      $SUDO yum install go -y> /dev/null
     fi
     echo ""
   else
@@ -1095,7 +1123,19 @@ then
   $SUDO chmod -R 777 /etc/aws  
   cd /etc/aws
   echo "[Global]" > aws.conf
+  echo "multizone = $MULTIZONE" >> aws.conf
   echo "Zone = $ZONE" >> aws.conf
+  cd $GOLANGPATH
+  echo ""
+
+  echo "...creating gce.conf file"  
+  cd /etc
+  $SUDO mkdir gce
+  $SUDO chmod -R 777 /etc/gce  
+  cd /etc/gce
+  echo "[Global]" > gce.conf
+  echo "multizone = $MULTIZONE" >> gce.conf
+  echo "Zone = $ZONE" >> gce.conf
   cd $GOLANGPATH
   echo ""
 
