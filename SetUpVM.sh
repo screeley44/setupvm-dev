@@ -692,6 +692,22 @@ CreateTestYamlEC2()
   echo "   server: nfs1.rhs" >> nfs-pv.yaml
   echo " persistentVolumeReclaimPolicy: Retain" >> nfs-pv.yaml
 
+  echo "apiVersion: v1" > nfs-pv-gid.yaml
+  echo "kind: PersistentVolume" >> nfs-pv-gid.yaml
+  echo "metadata:" >> nfs-pv-gid.yaml
+  echo " annotations:" >> nfs-pv-gid.yaml
+  echo "  pv.beta.kubernetes.io/gid: \"1234\"" >> nfs-pv-gid.yaml
+  echo " name: pv-nfs" >> nfs-pv-gid.yaml
+  echo "spec:" >> nfs-pv-gid.yaml
+  echo " capacity:" >> nfs-pv-gid.yaml
+  echo "   storage: 1Gi" >> nfs-pv-gid.yaml
+  echo " accessModes:" >> nfs-pv-gid.yaml
+  echo "   - ReadWriteOnce" >> nfs-pv-gid.yaml
+  echo " nfs:" >> nfs-pv-gid.yaml
+  echo "   path: /opt/data12" >> nfs-pv-gid.yaml
+  echo "   server: nfs1.rhs" >> nfs-pv-gid.yaml
+  echo " persistentVolumeReclaimPolicy: Retain" >> nfs-pv-gid.yaml
+
   echo "apiVersion: v1" > nfs-pvc.yaml
   echo "kind: PersistentVolumeClaim" >> nfs-pvc.yaml
   echo "metadata:" >> nfs-pvc.yaml
@@ -851,7 +867,6 @@ CreateTestYamlEC2()
   echo "        endpoints: glusterfs-cluster" >> nginx-glusterfs-pod1.yaml
   echo "        path: myVol1" >> nginx-glusterfs-pod1.yaml
   echo "        readOnly: false" >> nginx-glusterfs-pod1.yaml
-
 
   cp -R $GOLANGPATH/dev-configs/* $OSEPATH/dev-configs
   cp -R $GOLANGPATH/dev-configs/* $KUBEPATH/dev-configs
