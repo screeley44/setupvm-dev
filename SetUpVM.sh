@@ -41,9 +41,9 @@ fi
 
 echo ""
 
-if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
+if [ "$ISCLOUD" == "aws" ]
 then
-  if [ "$AWSKEY" == "" ] || [ "$AWSSECRET" == "" ]
+  if [ "$AWSKEY" == "" ] || [ "$AWSSECRET" == "" ] || [ "$AWSSECRET" == "local" ] || [ "$AWSKEY" == "local" ]
   then
     echo "You must pass in your AWS KEY and SECRET when using aws"
     exit 1
@@ -52,7 +52,7 @@ fi
 
 if [ "$ZONE" == "" ]
 then
-  ZONE="us-west-2a"
+  ZONE="us-east1-d"
 fi
 
 if [ "$MULTIZONE" == "" ]

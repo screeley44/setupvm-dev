@@ -6,7 +6,7 @@ Use this for RHEL 7.x instances using normal dev type setup (i.e. hack/local-up-
 
 # How To Run
 
-1.  create RHEL 7.X AWS instance in us-east1-d (t2.Large) or GCE in us-east-1d or a local VM Instance (don't forget to add 2nd storage volume for docker registry) - you will run out of memory on builds without t2.large (or equivalent in GCE), at least my experience
+1.  create RHEL 7.X AWS instance in us-east-1d (t2.Large) or GCE in us-east1-d or a local VM Instance (don't forget to add 2nd storage volume for docker registry) - you will run out of memory on builds without t2.large (or equivalent in GCE), at least my experience
 2.  create unattached volume for use with our pod (if cloud based setup) - note the volumeID or identifier
 3.  scp the attached scripts (SetUpVM.sh and setupvm.config) to your VM (I base everything out of /home/$USER, i.e. /home/ec2-user if running on aws, typically /root if running local VM or GCE)
 4.  edit or modify the setupvm.config as these are the params used to run the SetUpVM.sh script and allows you to customize your source paths, gopath, etc...
