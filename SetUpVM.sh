@@ -970,7 +970,7 @@ else
 
     # Install Go and do other config
     # 1.6.1, 1.7.3, etc...
-    if [ "$GOVERSION" == "yum" || "$GOVERSION" == "" ]
+    if [ "$GOVERSION" == "yum" ] || [ "$GOVERSION" == "" ]
     then
       echo "Installing go1.X whatever version yum installs..."
       $SUDO yum install go -y> /dev/null
@@ -1005,7 +1005,7 @@ else
     read isaccepted
     if [ "$isaccepted" == "$yval1" ] || [ "$isaccepted" == "$yval2" ]
     then
-      if [ "$ETCD_VER" == "default" || "$ETCD_VER" == "" ]
+      if [ "$ETCD_VER" == "default" ] || [ "$ETCD_VER" == "" ]
       then
         echo "installing default etcd per rhel repo configuration..."
         $SUDO yum remove etcd -y> /dev/null
@@ -1020,7 +1020,7 @@ else
       fi
     fi
   else
-    if [ "$ETCD_VER" == "default" || "$ETCD_VER" == "" ]
+    if [ "$ETCD_VER" == "default" ] || [ "$ETCD_VER" == "" ]
     then
       echo "installing default etcd per rhel repo configuration..."
       $SUDO yum remove etcd -y> /dev/null
@@ -1256,7 +1256,7 @@ else
       $SUDO rm -rf /usr/bin/docker
 
       echo "...Installing Docker"
-      if [ "$DOCKERVER" == "" || "$DOCKERVER" == "default" || "$DOCKERVER" == "yum" ]
+      if [ "$DOCKERVER" == "" ] || [ "$DOCKERVER" == "default" ] || [ "$DOCKERVER" == "yum" ]
       then
         $SUDO yum install docker -y> /dev/null
       else
@@ -1297,7 +1297,7 @@ else
       $SUDO rm -rf /usr/bin/docker
 
       echo "...Installing Docker"
-      if [ "$DOCKERVER" == "" || "$DOCKERVER" == "default" || "$DOCKERVER" == "yum" ]
+      if [ "$DOCKERVER" == "" ] || [ "$DOCKERVER" == "default" ] || [ "$DOCKERVER" == "yum" ]
       then
         $SUDO yum install docker -y> /dev/null
       else
