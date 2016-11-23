@@ -1047,7 +1047,7 @@ if [ "$SETUP_TYPE" == "dev" ]
 then
   cd $GOLANGPATH/go/src/k8s.io
   rm -rf kubernetes
-  echo "...Cloning Kubernetes, OpenShift Origin and Openshift Ansible"
+  echo "...Cloning Kubernetes, OpenShift Origin, Openshift Ansible and gluster-kubernetes"
   echo ""
   git clone https://github.com/kubernetes/kubernetes.git
 
@@ -1065,6 +1065,10 @@ then
   cd $GOLANGPATH
   rm -rf openshift-ansible
   git clone https://github.com/openshift/openshift-ansible
+
+  cd $GOLANGPATH
+  rm -rf gluster-kubernetes
+  https://github.com/gluster/gluster-kubernetes.git
 fi
   
 echo ""
