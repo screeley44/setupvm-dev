@@ -1242,7 +1242,29 @@ else
   if rpm -qa | grep docker >/dev/null 2>&1
   then
     echo "Docker Already Installed...going to check docker-storage-setup..."
-    
+    echo " --- docker version info ---"
+    docker version
+    echo " -------------------------"
+    echo ""
+    echo "docker is already installed...do you want to fresh install anyway with your specified version from setupvm.config? (y/n)"
+    echo 
+    read isaccepted
+    if [ "$isaccepted" == "$yval1" ] || [ "$isaccepted" == "$yval2" ]
+    then    
+      # Removing existing docker if it exists
+      $SUDO yum remove docker -y> /dev/null
+      $SUDO rm -rf /usr/bin/docker
+
+      echo "...Installing Docker"
+      if [ "$DOCKERVER" == "" || "$DOCKERVER" == "default" || "$DOCKERVER" == "yum" ]
+      then
+        $SUDO yum install docker -y> /dev/null
+      else
+        $SUDO yum install docker-$DOCKERVER -y> /dev/null
+      fi
+      echo ""
+    fi
+
     # Docker Registry Stuff
     echo "...Updating the docker config file with insecure-registry"
     $SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
@@ -1272,9 +1294,10 @@ else
     then
       # Removing existing docker if it exists
       $SUDO yum remove docker -y> /dev/null
+      $SUDO rm -rf /usr/bin/docker
 
       echo "...Installing Docker"
-      if [ "$DOCKERVER" == "" ]
+      if [ "$DOCKERVER" == "" || "$DOCKERVER" == "default" || "$DOCKERVER" == "yum" ]
       then
         $SUDO yum install docker -y> /dev/null
       else
