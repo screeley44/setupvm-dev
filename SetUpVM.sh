@@ -907,7 +907,7 @@ echo "   - OpenShift Origin"
 echo ""
 echo "This will install all prereqs including: "
 echo "   -all RHEL prereq software from yum"
-echo "   -golang1.4 or 1.6 and configure GOPATH"
+echo "   -golang and configure GOPATH"
 echo "   -github source repos"
 echo "   -if cloud - aws cli and configurations or gce sdk"
 echo "   -working directory structures"
@@ -969,30 +969,18 @@ else
     echo ""
 
     # Install Go and do other config
-
-
-    if [ "$GOVERSION" == "1.6" ]
-    then
-      echo "Installing go1.6..."
-      cd ~
-      $SUDO wget https://storage.googleapis.com/golang/go1.6.1.linux-amd64.tar.gz
-      $SUDO rm -rf /usr/local/go
-      $SUDO rm -rf /bin/go		
-      $SUDO tar -C /usr/local -xzf go1.6.1.linux-amd64.tar.gz
-    fi
-    if [ "$GOVERSION" == "1.7" ]
-    then
-      echo "Installing go1.7..."
-      cd ~
-      $SUDO wget https://storage.googleapis.com/golang/go1.7.3.linux-amd64.tar.gz
-      $SUDO rm -rf /usr/local/go
-      $SUDO rm -rf /bin/go
-      $SUDO tar -C /usr/local -xzf go1.7.3.linux-amd64.tar.gz
-    fi
-    if [ "$GOVERSION" == "yum" ]
+    # 1.6.1, 1.7.3, etc...
+    if [ "$GOVERSION" == "yum" || "$GOVERSION" == "" ]
     then
       echo "Installing go1.X whatever version yum installs..."
       $SUDO yum install go -y> /dev/null
+    else
+      echo "Installing go$GOVERSION ..."
+      cd ~
+      $SUDO wget https://storage.googleapis.com/golang/go$GOVERSION.linux-amd64.tar.gz
+      $SUDO rm -rf /usr/local/go
+      $SUDO rm -rf /bin/go		
+      $SUDO tar -C /usr/local -xzf go$GOVERSION.linux-amd64.tar.gz
     fi
     echo ""
   else
@@ -1004,17 +992,47 @@ else
     echo ""  
   fi
 
-  # TODO: Install etcd 3.0.4
-  if [ "$ETCD_VER" == "3" ]
+  # Install etcd
+  if rpm -qa | grep etcd >/dev/null 2>&1
   then
-    echo "installing etcd 3.0.4..."
-    $SUDO wget https://github.com/coreos/etcd/releases/download/v3.0.4/etcd-v3.0.4-linux-amd64.tar.gz
-    $SUDO rm -rf /usr/bin/etcd
-    $SUDO tar -zxvf etcd-v3.0.4-linux-amd64.tar.gz
-    $SUDO cp etcd-v3.0.4-linux-amd64/etcd /usr/bin
+    echo ""
+    echo " --- etcd version info ---"
+    etcd --version
+    echo " -------------------------"
+    echo ""
+    echo "etcd is already installed...do you want to fresh install anyway with your specified version from setupvm.config? (y/n)"
+    echo 
+    read isaccepted
+    if [ "$isaccepted" == "$yval1" ] || [ "$isaccepted" == "$yval2" ]
+    then
+      if [ "$ETCD_VER" == "default" || "$ETCD_VER" == "" ]
+      then
+        echo "installing default etcd per rhel repo configuration..."
+        $SUDO yum remove etcd -y> /dev/null
+        $SUDO rm -rf /usr/bin/etcd
+        $SUDO yum install etcd -y> /dev/null
+      else
+        echo "installing specific etcd version - etcd-v$ETCD_VER..."
+        $SUDO wget https://github.com/coreos/etcd/releases/download/v$ETCD_VER/etcd-v$ETCD_VER-linux-amd64.tar.gz
+        $SUDO rm -rf /usr/bin/etcd
+        $SUDO tar -zxvf etcd-v$ETCD_VER-linux-amd64.tar.gz
+        $SUDO cp etcd-vETCD_VER-linux-amd64/etcd /usr/bin
+      fi
+    fi
   else
-    echo "installing default etcd per rhel repo configuration..."
-    $SUDO yum install etcd -y> /dev/null
+    if [ "$ETCD_VER" == "default" || "$ETCD_VER" == "" ]
+    then
+      echo "installing default etcd per rhel repo configuration..."
+      $SUDO yum remove etcd -y> /dev/null
+      $SUDO rm -rf /usr/bin/etcd
+      $SUDO yum install etcd -y> /dev/null
+    else
+      echo "installing specific etcd version - etcd-v$ETCD_VER..."
+      $SUDO wget https://github.com/coreos/etcd/releases/download/v$ETCD_VER/etcd-v$ETCD_VER-linux-amd64.tar.gz
+      $SUDO rm -rf /usr/bin/etcd
+      $SUDO tar -zxvf etcd-v$ETCD_VER-linux-amd64.tar.gz
+      $SUDO cp etcd-v$ETCD_VER-linux-amd64/etcd /usr/bin
+    fi
   fi
 
   echo "DIDRUN" > $GOLANGPATH/didrun
@@ -1221,10 +1239,34 @@ then
   echo ""
 else
   # TODO: determine if someone is using an AMI with docker already installed and skip
-  DOCKER_INSTALLED = rpm -qa | grep docker
-
   if rpm -qa | grep docker >/dev/null 2>&1
   then
+    echo "Docker Already Installed...going to check docker-storage-setup..."
+    
+    # Docker Registry Stuff
+    echo "...Updating the docker config file with insecure-registry"
+    $SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
+    echo ""
+
+    # Update the docker-storage-setup
+      
+    DoBlock
+    echo ""
+
+    $SUDO cat /etc/sysconfig/docker-storage-setup
+    echo "...Running docker-storage-setup"
+    $SUDO docker-storage-setup
+    $SUDO lvs
+    echo ""
+
+    # Restart Docker
+    echo "...Restarting Docker"
+    $SUDO groupadd docker
+    $SUDO gpasswd -a ${USER} docker
+    $SUDO systemctl stop docker
+    $SUDO rm -rf /var/lib/docker/*
+    $SUDO systemctl restart docker
+  else
     # Install Docker yum version
     if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "aplo" ] 
     then
