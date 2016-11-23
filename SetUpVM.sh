@@ -1241,13 +1241,11 @@ else
   # TODO: determine if someone is using an AMI with docker already installed and skip
   if rpm -qa | grep docker >/dev/null 2>&1
   then
-    echo "Docker Already Installed...going to check docker-storage-setup..."
     echo " --- docker version info ---"
     docker version
     echo " -------------------------"
     echo ""
     echo "docker is already installed...do you want to fresh install anyway with your specified version from setupvm.config? (y/n)"
-    echo 
     read isaccepted
     if [ "$isaccepted" == "$yval1" ] || [ "$isaccepted" == "$yval2" ]
     then    
