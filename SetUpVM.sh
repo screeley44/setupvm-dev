@@ -977,6 +977,7 @@ else
       cd ~
       $SUDO wget https://storage.googleapis.com/golang/go1.6.1.linux-amd64.tar.gz
       $SUDO rm -rf /usr/local/go
+      $SUDO rm -rf /bin/go		
       $SUDO tar -C /usr/local -xzf go1.6.1.linux-amd64.tar.gz
     fi
     if [ "$GOVERSION" == "1.7" ]
@@ -985,6 +986,7 @@ else
       cd ~
       $SUDO wget https://storage.googleapis.com/golang/go1.7.3.linux-amd64.tar.gz
       $SUDO rm -rf /usr/local/go
+      $SUDO rm -rf /bin/go
       $SUDO tar -C /usr/local -xzf go1.7.3.linux-amd64.tar.gz
     fi
     if [ "$GOVERSION" == "yum" ]
@@ -1218,40 +1220,50 @@ then
   echo " Skipping docker install and config as this script was run once already..."
   echo ""
 else
-  # Install Docker yum version
-  if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "aplo" ] 
+  # TODO: determine if someone is using an AMI with docker already installed and skip
+  DOCKER_INSTALLED = rpm -qa | grep docker
+
+  if rpm -qa | grep docker >/dev/null 2>&1
   then
-    echo "...Installing Docker"
-    if [ "$DOCKERVER" == "" ]
+    # Install Docker yum version
+    if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "aplo" ] 
     then
-      $SUDO yum install docker -y> /dev/null
-    else
-      $SUDO yum install docker-$DOCKERVER -y> /dev/null
-    fi
-    echo ""
+      # Removing existing docker if it exists
+      $SUDO yum remove docker -y> /dev/null
+
+      echo "...Installing Docker"
+      if [ "$DOCKERVER" == "" ]
+      then
+        $SUDO yum install docker -y> /dev/null
+      else
+        $SUDO yum install docker-$DOCKERVER -y> /dev/null
+      fi
+      echo ""
   
-    # Docker Registry Stuff
-    echo "...Updating the docker config file with insecure-registry"
-    $SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
-    echo ""
+      # Docker Registry Stuff
+      echo "...Updating the docker config file with insecure-registry"
+      $SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
+      echo ""
 
-    # Update the docker-storage-setup
-    DoBlock
-    echo ""
+      # Update the docker-storage-setup
+      
+      DoBlock
+      echo ""
 
-    $SUDO cat /etc/sysconfig/docker-storage-setup
-    echo "...Running docker-storage-setup"
-    $SUDO docker-storage-setup
-    $SUDO lvs
-    echo ""
+      $SUDO cat /etc/sysconfig/docker-storage-setup
+      echo "...Running docker-storage-setup"
+      $SUDO docker-storage-setup
+      $SUDO lvs
+      echo ""
 
-    # Restart Docker
-    echo "...Restarting Docker"
-    $SUDO groupadd docker
-    $SUDO gpasswd -a ${USER} docker
-    $SUDO systemctl stop docker
-    $SUDO rm -rf /var/lib/docker/*
-    $SUDO systemctl restart docker
+      # Restart Docker
+      echo "...Restarting Docker"
+      $SUDO groupadd docker
+      $SUDO gpasswd -a ${USER} docker
+      $SUDO systemctl stop docker
+      $SUDO rm -rf /var/lib/docker/*
+      $SUDO systemctl restart docker
+    fi
   fi
 fi
 
