@@ -1406,6 +1406,7 @@ then
 
   echo "downloading flannel CNI network overlay for kube-dns..."
   $SUDO wget https://github.com/coreos/flannel/blob/master/Documentation/kube-flannel.yml
+  $SUDO wget https://git.io/weave-kube
   echo ""
 
   echo " Starting kubelet"
