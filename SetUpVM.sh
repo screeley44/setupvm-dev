@@ -934,7 +934,7 @@ else
   $SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS
 
   # FOR DEV
-  if [ "$SETUP_TYPE" == "dev" ]
+  if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "kubeadm" ]
   then
     $SUDO subscription-manager list --available | sed -n '/OpenShift Employee Subscription/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
     $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
@@ -984,12 +984,54 @@ else
     fi
     echo ""
   else
-    echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip for CLIENT setup type  ... this will take several minutes"
-    $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip -y> /dev/null
-    $SUDO yum update -y> /dev/null
-    $SUDO yum install atomic-openshift-utils atomic-openshift-clients atomic-openshift -y> /dev/null
-    $SUDO yum install heketi-client heketi-templates -y> /dev/null
-    echo ""  
+    if [ "$SETUP_TYPE" == "kubeadm" ]
+    then
+      echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip for KUBEADM setup type  ... this will take several minutes"
+      $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip -y> /dev/null
+      $SUDO yum update -y> /dev/null
+
+      # Install Go and do other config
+      # 1.6.1, 1.7.3, etc...
+      if [ "$GOVERSION" == "yum" ] || [ "$GOVERSION" == "" ]
+      then
+        echo "Installing go1.X whatever version yum installs..."
+        $SUDO yum install go -y> /dev/null
+      else
+        echo "Installing go$GOVERSION ..."
+        cd ~
+        $SUDO wget https://storage.googleapis.com/golang/go$GOVERSION.linux-amd64.tar.gz
+        $SUDO rm -rf /usr/local/go
+        $SUDO rm -rf /bin/go		
+        $SUDO tar -C /usr/local -xzf go$GOVERSION.linux-amd64.tar.gz
+      fi
+      echo ""
+
+      echo "...creating Kube Repo..."
+      $SUDO echo "[kubernetes]" > /etc/yum.repos.d/kubernetes.repo
+      $SUDO echo "name=Kubernetes" >> /etc/yum.repos.d/kubernetes.repo
+      $SUDO echo "baseurl=http://yum.kubernetes.io/repos/kubernetes-el7-x86_64" >> /etc/yum.repos.d/kubernetes.repo
+      $SUDO echo "enabled=1" >> /etc/yum.repos.d/kubernetes.repo
+      $SUDO echo "gpgcheck=1" >> /etc/yum.repos.d/kubernetes.repo
+      $SUDO echo "repo_gpgcheck=1" >> /etc/yum.repos.d/kubernetes.repo
+      $SUDO echo "gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg" >> /etc/yum.repos.d/kubernetes.repo
+      $SUDO echo "       https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg" >> /etc/yum.repos.d/kubernetes.repo
+
+      echo ""
+      echo "Disabling SELinux for now..."
+      $SUDO setenforce 0
+
+      echo ""
+      echo "Installing kubelet, kubeadm, kubectl and kubernetes-cni..."
+      $SUDO yum install kubelet kubeadm kubectl kubernetes-cni -y> /dev/null
+
+    else
+      echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip for CLIENT setup type  ... this will take several minutes"
+      $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip -y> /dev/null
+      $SUDO yum update -y> /dev/null
+      $SUDO yum install atomic-openshift-utils atomic-openshift-clients atomic-openshift -y> /dev/null
+      $SUDO yum install heketi-client heketi-templates -y> /dev/null
+      echo ""
+    fi  
   fi
 
   # Install etcd
@@ -1001,9 +1043,8 @@ else
     echo " -------------------------"
     echo ""
     echo "etcd is already installed...do you want to fresh install anyway with your specified version from setupvm.config? (y/n)"
-    echo 
-    read isaccepted
-    if [ "$isaccepted" == "$yval1" ] || [ "$isaccepted" == "$yval2" ]
+    read isaccepted3
+    if [ "$isaccepted3" == "$yval1" ] || [ "$isaccepted3" == "$yval2" ]
     then
       if [ "$ETCD_VER" == "default" ] || [ "$ETCD_VER" == "" ]
       then
@@ -1210,8 +1251,8 @@ echo ""
 
 # TODO: don't need to do this, just a precaution at this point
 echo "disabling SELinux and Firewalls for now..."
-sudo setenforce 0
-sudo iptables -F
+$SUDO setenforce 0
+$SUDO iptables -F
 echo "...Creating some K8 yaml file directory ~/dev-configs"
 cd $GOLANGPATH/dev-configs
 CreateTestYamlEC2
@@ -1232,84 +1273,47 @@ then
 
 fi
 
-
+#TODO: I might have broken this, need to test at some point
 if [ -f "$GOLANGPATH/didcomplete" ]
 then
   echo " Skipping docker install and config as this script was run once already..."
   echo ""
 else
-  # TODO: determine if someone is using an AMI with docker already installed and skip
-  if rpm -qa | grep docker >/dev/null 2>&1
+  if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "aplo" ]
   then
-    echo " --- docker version info ---"
-    docker version
-    echo " -------------------------"
-    echo ""
-    echo "docker is already installed...do you want to fresh install anyway with your specified version from setupvm.config? (y/n)"
-    read isaccepted
-    if [ "$isaccepted" == "$yval1" ] || [ "$isaccepted" == "$yval2" ]
-    then    
-      # Removing existing docker if it exists
-      $SUDO yum remove docker -y> /dev/null
-      $SUDO rm -rf /usr/bin/docker
-
-      echo "...Installing Docker"
-      if [ "$DOCKERVER" == "" ] || [ "$DOCKERVER" == "default" ] || [ "$DOCKERVER" == "yum" ]
-      then
-        $SUDO yum install docker -y> /dev/null
-      else
-        $SUDO yum install docker-$DOCKERVER -y> /dev/null
-      fi
-      echo ""
-    fi
-
-    # Docker Registry Stuff
-    echo "...Updating the docker config file with insecure-registry"
-    $SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
-    echo ""
-
-    # Update the docker-storage-setup
-      
-    DoBlock
-    echo ""
-
-    $SUDO cat /etc/sysconfig/docker-storage-setup
-    echo "...Running docker-storage-setup"
-    $SUDO docker-storage-setup
-    $SUDO lvs
-    echo ""
-
-    # Restart Docker
-    echo "...Restarting Docker"
-    $SUDO groupadd docker
-    $SUDO gpasswd -a ${USER} docker
-    $SUDO systemctl stop docker
-    $SUDO rm -rf /var/lib/docker/*
-    $SUDO systemctl restart docker
-  else
-    # Install Docker yum version
-    if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "aplo" ] 
+    echo "DOCKER Setup for DEV or APLO...checking if docker was already installed..."
+    # TODO: determine if someone is using an AMI with docker already installed and skip
+    if rpm -qa | grep docker >/dev/null 2>&1
     then
-      # Removing existing docker if it exists
-      $SUDO yum remove docker -y> /dev/null
-      $SUDO rm -rf /usr/bin/docker
-
-      echo "...Installing Docker"
-      if [ "$DOCKERVER" == "" ] || [ "$DOCKERVER" == "default" ] || [ "$DOCKERVER" == "yum" ]
-      then
-        $SUDO yum install docker -y> /dev/null
-      else
-        $SUDO yum install docker-$DOCKERVER -y> /dev/null
-      fi
+      echo "docker previously installed..."
+      echo " --- docker version info ---"
+      docker version
+      echo " -------------------------"
       echo ""
-  
+      echo "docker is already installed...do you want to fresh install anyway with your specified version from setupvm.config? (y/n)"
+      read isaccepted2
+      if [ "$isaccepted2" == "$yval1" ] || [ "$isaccepted2" == "$yval2" ]
+      then    
+        # Removing existing docker if it exists
+        $SUDO yum remove docker -y> /dev/null
+        $SUDO rm -rf /usr/bin/docker
+
+        echo "...Installing Docker"
+        if [ "$DOCKERVER" == "" ] || [ "$DOCKERVER" == "default" ] || [ "$DOCKERVER" == "yum" ]
+        then
+          $SUDO yum install docker -y> /dev/null
+        else
+          $SUDO yum install docker-$DOCKERVER -y> /dev/null
+        fi
+        echo ""
+      fi
+
       # Docker Registry Stuff
       echo "...Updating the docker config file with insecure-registry"
       $SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
       echo ""
 
       # Update the docker-storage-setup
-      
       DoBlock
       echo ""
 
@@ -1326,107 +1330,137 @@ else
       $SUDO systemctl stop docker
       $SUDO rm -rf /var/lib/docker/*
       $SUDO systemctl restart docker
+      $SUDO systemctl enable docker
+    else
+      # Install Docker
+      if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "aplo" ]
+      then
+        echo "Docker not installed...will install now..."
+        # Removing existing docker if it exists
+        $SUDO yum remove docker -y> /dev/null
+        $SUDO rm -rf /usr/bin/docker
+
+        echo "...Installing Docker"
+        if [ "$DOCKERVER" == "" ] || [ "$DOCKERVER" == "default" ] || [ "$DOCKERVER" == "yum" ]
+        then
+          $SUDO yum install docker -y> /dev/null
+        else
+          $SUDO yum install docker-$DOCKERVER -y> /dev/null
+        fi
+        echo ""
+  
+        # Docker Registry Stuff
+        echo "...Updating the docker config file with insecure-registry"
+        $SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
+        echo ""
+
+        # Update the docker-storage-setup
+        DoBlock
+        echo ""
+
+        $SUDO cat /etc/sysconfig/docker-storage-setup
+        echo "...Running docker-storage-setup"
+        $SUDO docker-storage-setup
+        $SUDO lvs
+        echo ""
+
+        # Restart Docker
+        echo "...Restarting Docker"
+        $SUDO groupadd docker
+        $SUDO gpasswd -a ${USER} docker
+        $SUDO systemctl stop docker
+        $SUDO rm -rf /var/lib/docker/*
+        $SUDO systemctl restart docker
+        $SUDO systemctl enable docker
+      fi
     fi
   fi
 fi
 
-if [ "$FORSCOTT" == "Y" ]
-then  
-  echo "" >> /etc/hosts
-  echo "192.168.122.120 dev1.rhs" >> /etc/hosts
-  echo "192.168.122.121 dev2.rhs" >> /etc/hosts
-  echo "192.168.122.122 dev3.rhs" >> /etc/hosts
-  echo "192.168.122.250 openshift1.rhs" >> /etc/hosts
-  echo "192.168.122.251 ose1.rhs" >> /etc/hosts
-  echo "192.168.122.252 ose2.rhs" >> /etc/hosts
-  echo "192.168.122.253 ose3.rhs" >> /etc/hosts
-  echo "192.168.122.161 ose11.rhs" >> /etc/hosts
-  echo "192.168.122.162 ose12.rhs" >> /etc/hosts
-  echo "192.168.122.163 ose13.rhs" >> /etc/hosts
-  echo "192.168.122.248 kminion2.rhs" >> /etc/hosts
-  echo "192.168.122.247 kminion1.rhs" >> /etc/hosts
-  echo "192.168.122.246 kminion.rhs" >> /etc/hosts
-  echo "192.168.122.245 k8node2.rhs" >> /etc/hosts
-  echo "192.168.122.244 k8node1.rhs" >> /etc/hosts
-  echo "192.168.122.243 k8master.rhs" >> /etc/hosts
-  echo "192.168.122.210 aplomaster.rhs" >> /etc/hosts
-  echo "192.168.122.211 aplo1.rhs" >> /etc/hosts
-  echo "192.168.122.212 aplo2.rhs" >> /etc/hosts
-  echo "192.168.122.213 aplo3.rhs" >> /etc/hosts
-  echo "192.168.122.221 gluster1.rhs" >> /etc/hosts
-  echo "192.168.122.222 gluster2.rhs" >> /etc/hosts
-  echo "192.168.122.111 ceph1.rhs" >> /etc/hosts
-  echo "192.168.122.101 nfs1.rhs" >> /etc/hosts
-  echo "192.168.122.102 k8dev.rhs" >> /etc/hosts
-
-  if [[ -z "$SSHPASS" ]]
+# SETUP DOCKER FOR KUBEADM SETUP
+if [ -f "$GOLANGPATH/didcomplete" ]
+then
+  echo " Skipping docker install and config as this script was run once already..."
+  echo ""
+else
+  if [ "$SETUP_TYPE" == "kubeadm" ]
   then
-    # do nothing
-    # echo "not copying ssh keys...as this is not the master or was not configured"
-    echo ""
-  else
-    # short cut for me, secret param, assumes this is only run from master
-    echo "copying ssh keys..."
-    sshpass -p "$SSHPASS" ssh-copy-id -i /root/.ssh/id_rsa.pub root@aplo1.rhs
-    sshpass -p "$SSHPASS" ssh-copy-id -i /root/.ssh/id_rsa.pub root@aplo2.rhs
-    sshpass -p "$SSHPASS" ssh-copy-id -i /root/.ssh/id_rsa.pub root@aplo3.rhs
-    sshpass -p "$SSHPASS" ssh-copy-id -i /root/.ssh/id_rsa.pub root@aplomaster.rhs
-  fi 
+    echo "Installing docker for KUBEADM setup..."
+    $SUDO yum install docker -y> /dev/null
+  fi
 fi
 
+
 #TODO: temp fix for the gobindata
-cd $GOLANGPATH/go/src/k8s.io/kubernetes/
-export GOPATH=$GOLANGPATH/go
-$SUDO go get -u github.com/jteeuwen/go-bindata/go-bindata
+#cd $GOLANGPATH/go/src/k8s.io/kubernetes/
+#export GOPATH=$GOLANGPATH/go
+#$SUDO go get -u github.com/jteeuwen/go-bindata/go-bindata
 
 echo "DIDRUN" > $GOLANGPATH/didcomplete
 
-echo ""
-echo " *******************************************"
-echo ""
-echo "PreReq SetUp Complete!!!!"
-echo ""
-echo "At this point we should be ready to run our build"
-echo " BUT A FEW STEPS NEEDED "
-echo " 1. you must logout of ssh and log back or 'sudo -s' "
-echo "    this will pick up your .bash_profile and all your paths"
-echo " 2. Now you can build and run K8 or Origin"
-echo ""
-echo "        K8 "
-echo "       -------- "
-echo "       cd $GOLANGPATH/go/src/k8s.io/kubernetes/"
-echo "       ./hack/local-up-cluster.sh (I typically run kube as root - from cloud sudo -s before building, etc...)"
-echo ""
-echo "        Origin"
-echo "       --------"
-echo "       cd $GOLANGPATH/go/src/github.com/openshift/origin"
-echo "       make clean build (to build source)"
-echo "       then run $OSEPATH/start-ose.sh  (to start the openshift process)"
-echo "       to stop OSE:  $OSEPATH/stop-ose.sh"
-echo ""
-echo " 3. If running local VM , you may need to update your /etc/hosts file as normal"
-echo ""
-echo " 4. Finally, open a 2nd terminal and run: "
-echo "        K8 "
-echo "       -------- "
-echo "       $KUBEPATH/config-k8.sh" 
-echo ""
-echo "        Origin"
-echo "       --------"
-echo "       $OSEPATH/config-ose.sh"
-echo ""
-echo " 5. Now you should be able to interact and use kubectl or openshift as usual"
-echo ""
-echo "Environment Recap: "
-echo "  dev dir (gopath and source): $GOLANGPATH/go/src/k8s.io/kubernetes $GOLANGPATH/go/src/github.com/openshift/origin"
-echo ""
-echo "  Origin Working Dir: $OSEPATH (configs are in openshift.local.config, log is openshift.log)"
-echo "      scripts (start-ose.sh, stop-ose.sh, config-ose.sh)"
-echo ""
-echo "  Kube Working Dir: $KUBEPATH "
-echo "      scripts (config-k8.sh)"
-echo ""
-echo "  yaml dir (copied to multiple locations): $OSEPATH/dev-configs  $KUBEPATH/dev-configs  /home/$USER/dev-configs or /root/dev-configs"
-echo "  need sudo to interact with docker i.e. sudo docker ps unless you have already 'sudo -s'"
+if [ "$SETUP_TYPE" == "kubeadm" ]
+then
+  echo "removing /etc/kubernetes contents if they exist..."
+  $SUDO rm -rf /etc/kubernetes/*
 
+  echo " Starting kubelet"
+  $SUDO systemctl enable kubelet
+  $SUDO systemctl start kubelet
+  echo ""
+
+  echo "Now proceed to this link: http://kubernetes.io/docs/getting-started-guides/kubeadm/ and follow steps 2 through 4"
+  echo "HaVE FUN!!!"
+
+
+else
+
+  echo ""
+  echo " *******************************************"
+  echo ""
+  echo "PreReq SetUp Complete!!!!"
+  echo ""
+  echo "At this point we should be ready to run our build"
+  echo " BUT A FEW STEPS NEEDED "
+  echo " 1. you must logout of ssh and log back or 'sudo -s' "
+  echo "    this will pick up your .bash_profile and all your paths"
+  echo " 2. Now you can build and run K8 or Origin"
+  echo ""
+  echo "        K8 "
+  echo "       -------- "
+  echo "       cd $GOLANGPATH/go/src/k8s.io/kubernetes/"
+  echo "       ./hack/local-up-cluster.sh (I typically run kube as root - from cloud sudo -s before building, etc...)"
+  echo ""
+  echo "        Origin"
+  echo "       --------"
+  echo "       cd $GOLANGPATH/go/src/github.com/openshift/origin"
+  echo "       make clean build (to build source)"
+  echo "       then run $OSEPATH/start-ose.sh  (to start the openshift process)"
+  echo "       to stop OSE:  $OSEPATH/stop-ose.sh"
+  echo ""
+  echo " 3. If running local VM , you may need to update your /etc/hosts file as normal"
+  echo ""
+  echo " 4. Finally, open a 2nd terminal and run: "
+  echo "        K8 "
+  echo "       -------- "
+  echo "       $KUBEPATH/config-k8.sh" 
+  echo ""
+  echo "        Origin"
+  echo "       --------"
+  echo "       $OSEPATH/config-ose.sh"
+  echo ""
+  echo " 5. Now you should be able to interact and use kubectl or openshift as usual"
+  echo ""
+  echo "Environment Recap: "
+  echo "  dev dir (gopath and source): $GOLANGPATH/go/src/k8s.io/kubernetes $GOLANGPATH/go/src/github.com/openshift/origin"
+  echo ""
+  echo "  Origin Working Dir: $OSEPATH (configs are in openshift.local.config, log is openshift.log)"
+  echo "      scripts (start-ose.sh, stop-ose.sh, config-ose.sh)"
+  echo ""
+  echo "  Kube Working Dir: $KUBEPATH "
+  echo "      scripts (config-k8.sh)"
+  echo ""
+  echo "  yaml dir (copied to multiple locations): $OSEPATH/dev-configs  $KUBEPATH/dev-configs  /home/$USER/dev-configs or /root/dev-configs"
+  echo "  need sudo to interact with docker i.e. sudo docker ps unless you have already 'sudo -s'"
+  
+fi
 
