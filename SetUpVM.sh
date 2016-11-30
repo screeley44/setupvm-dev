@@ -1402,14 +1402,21 @@ if [ "$SETUP_TYPE" == "kubeadm" ]
 then
   echo "removing /etc/kubernetes contents if they exist..."
   $SUDO rm -rf /etc/kubernetes/*
+  echo ""
+
+  echo "downloading flannel CNI network overlay for kube-dns..."
+  $SUDO wget https://github.com/coreos/flannel/blob/master/Documentation/kube-flannel.yml
+  echo ""
 
   echo " Starting kubelet"
   $SUDO systemctl enable kubelet
   $SUDO systemctl start kubelet
   echo ""
-
+  echo ""
   echo "Now proceed to this link: http://kubernetes.io/docs/getting-started-guides/kubeadm/ and follow steps 2 through 4"
   echo "HaVE FUN!!!"
+  echo ""
+  echo "Note: do not join the nodes before you have kube-dns up and running...the instructions are a little jumpy..."
 
 
 else
