@@ -1303,7 +1303,11 @@ else
         then
           $SUDO yum install docker -y> /dev/null
         else
-          $SUDO yum install docker-$DOCKERVER -y> /dev/null
+          cd ~
+          $SUDO wget https://yum.dockerproject.org/repo/main/centos/7/Packages/docker-engine-$DOCKERVER-1.el7.centos.x86_64.rpm
+          $SUDO wget https://yum.dockerproject.org/repo/main/centos/7/Packages/docker-engine-selinux-$DOCKERVER-1.el7.centos.noarch.rpm
+          $SUDO yum install docker-engine-selinux-$DOCKERVER-1.el7.centos.noarch.rpm -y> /dev/null
+          $SUDO yum install docker-engine-$DOCKERVER-1.el7.centos.x86_64.rpm -y> /dev/null
         fi
         echo ""
       fi
@@ -1345,7 +1349,11 @@ else
         then
           $SUDO yum install docker -y> /dev/null
         else
-          $SUDO yum install docker-$DOCKERVER -y> /dev/null
+          cd ~
+          $SUDO wget https://yum.dockerproject.org/repo/main/centos/7/Packages/docker-engine-$DOCKERVER-1.el7.centos.x86_64.rpm
+          $SUDO wget https://yum.dockerproject.org/repo/main/centos/7/Packages/docker-engine-selinux-$DOCKERVER-1.el7.centos.noarch.rpm
+          $SUDO yum install docker-engine-selinux-$DOCKERVER-1.el7.centos.noarch.rpm -y> /dev/null
+          $SUDO yum install docker-engine-$DOCKERVER-1.el7.centos.x86_64.rpm -y> /dev/null
         fi
         echo ""
   
