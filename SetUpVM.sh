@@ -171,6 +171,8 @@ else
   $SUDO chmod -R 777 $KUBEPATH
 fi
 
+GCENODEPATH="c.openshift-gce-devel.internal"
+
 CreateProfiles()
 {
 
@@ -378,11 +380,11 @@ CreateConfigs()
     echo "sed -i '/apiServerArguments: null/,+2d' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"gce\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"gce\"' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "sed -i 's/\ \ ingressIPNetworkCIDR:.*/\ \ ingressIPNetworkCIDR: ""/' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
-    echo "echo \"kubeletArguments:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-    echo "echo \"  cloud-provider:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
-    echo "echo \"    - \\\"gce\\\"\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
+    echo "echo \"kubeletArguments:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST.$GCENODEPATH/node-config.yaml" >> start-ose.sh
+    echo "echo \"  cloud-provider:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST.$GCENODEPATH/node-config.yaml" >> start-ose.sh
+    echo "echo \"    - \\\"gce\\\"\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST.$GCENODEPATH/node-config.yaml" >> start-ose.sh
     echo "" >> start-ose.sh
-    echo "openshift start --master-config=$OSEPATH/openshift.local.config/master/master-config.yaml --node-config=$OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml --loglevel=5 &> openshift.log" >> start-ose.sh    
+    echo "openshift start --master-config=$OSEPATH/openshift.local.config/master/master-config.yaml --node-config=$OSEPATH/openshift.local.config/node-$INTERNALHOST.$GCENODEPATH/node-config.yaml --loglevel=5 &> openshift.log" >> start-ose.sh    
   elif [ "$ISCLOUD" == "vsphere" ]
   then
     echo "openshift start --write-config=$OSEPATH/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
@@ -1323,9 +1325,17 @@ else
 
       $SUDO cat /etc/sysconfig/docker-storage-setup
       echo "...Running docker-storage-setup"
-      $SUDO docker-storage-setup
-      $SUDO lvs
-      echo ""
+      if [ "$DOCKERVER" == "" ] || [ "$DOCKERVER" == "default" ] || [ "$DOCKERVER" == "yum" ]
+      then
+        $SUDO docker-storage-setup
+        $SUDO lvs
+        echo ""
+      else
+        $SUDO chmod +x /etc/sysconfig/docker-storage-setup
+        $SUDO ./etc/sysconfig/docker-storage-setup
+        $SUDO lvs
+        echo ""
+      fi
 
       # Restart Docker
       echo "...Restarting Docker"
@@ -1368,9 +1378,17 @@ else
 
         $SUDO cat /etc/sysconfig/docker-storage-setup
         echo "...Running docker-storage-setup"
-        $SUDO docker-storage-setup
-        $SUDO lvs
-        echo ""
+        if [ "$DOCKERVER" == "" ] || [ "$DOCKERVER" == "default" ] || [ "$DOCKERVER" == "yum" ]
+        then
+          $SUDO docker-storage-setup
+          $SUDO lvs
+          echo ""
+        else
+          $SUDO chmod +x /etc/sysconfig/docker-storage-setup
+          $SUDO ./etc/sysconfig/docker-storage-setup
+          $SUDO lvs
+          echo ""
+        fi
 
         # Restart Docker
         echo "...Restarting Docker"
