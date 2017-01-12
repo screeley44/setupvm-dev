@@ -315,6 +315,12 @@ CreateConfigs()
   echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-cluster local --server=http://127.0.0.1:8080 --insecure-skip-tls-verify=true" >> config-k8.sh
   echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-context local --cluster=local" >> config-k8.sh
   echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
+  echo "" >> config-k8.sh
+  echo "/opt/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-cluster local --server=https://localhost:6443 --certificate-authority=/var/run/kubernetes/apiserver.crt" >> config-k8.sh
+  echo "/opt/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-credentials myself --username=admin --password=admin" >> config-k8.sh
+  echo "/opt/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-context local --cluster=local --user=myself" >> config-k8.sh
+  echo "/opt/go/src/k8s.io/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
+
   chmod +x config-k8.sh
 
   echo ""
@@ -366,7 +372,7 @@ CreateConfigs()
     echo "openshift start --write-config=$OSEPATH/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
     echo "sed -i '/apiServerArguments: null/,+2d' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
-    # echo "sed -i 's/\ \ ingressIPNetworkCIDR:.*/\ \ ingressIPNetworkCIDR: ""/' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    echo "sed -i 's/\ \ ingressIPNetworkCIDR:.*/\ \ ingressIPNetworkCIDR: ""/' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "echo \"kubeletArguments:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "echo \"  cloud-provider:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "echo \"    - \\\"aws\\\"\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
@@ -1205,7 +1211,7 @@ then
   $SUDO chmod -R 777 /etc/aws  
   cd /etc/aws
   echo "[Global]" > aws.conf
-  echo "multizone = $MULTIZONE" >> aws.conf
+  # echo "multizone = $MULTIZONE" >> aws.conf
   echo "Zone = $ZONE" >> aws.conf
   cd $GOLANGPATH
   echo ""
