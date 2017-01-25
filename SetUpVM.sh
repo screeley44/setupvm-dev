@@ -751,12 +751,12 @@ CreateTestYamlEC2()
   echo " name: glusterfs-cluster" >> glusterfs-endpoints.yaml
   echo "subsets:" >> glusterfs-endpoints.yaml
   echo " - addresses:" >> glusterfs-endpoints.yaml
-  echo "   - ip: 192.168.122.221" >> glusterfs-endpoints.yaml
+  echo "   - ip: 192.168.1.200" >> glusterfs-endpoints.yaml
   echo "   ports:" >> glusterfs-endpoints.yaml
   echo "   - port: 1" >> glusterfs-endpoints.yaml
   echo "     protocol: TCP" >> glusterfs-endpoints.yaml
   echo " - addresses:" >> glusterfs-endpoints.yaml
-  echo "   - ip: 192.168.122.222" >> glusterfs-endpoints.yaml
+  echo "   - ip: 192.168.1.201" >> glusterfs-endpoints.yaml
   echo "   ports:" >> glusterfs-endpoints.yaml
   echo "   - port: 1" >> glusterfs-endpoints.yaml
   echo "     protocol: TCP" >> glusterfs-endpoints.yaml
@@ -876,6 +876,52 @@ CreateTestYamlEC2()
   echo "        path: myVol1" >> nginx-glusterfs-pod1.yaml
   echo "        readOnly: false" >> nginx-glusterfs-pod1.yaml
 
+  echo "kind: StorageClass" > glusterfs-storageclass-v34.yaml
+  echo "apiVersion: storage.k8s.io/v1beta1" >> glusterfs-storageclass-v34.yaml
+  echo "metadata:" >> glusterfs-storageclass-v34.yaml
+  echo "  name: gluster34" >> glusterfs-storageclass-v34.yaml
+  echo "provisioner: kubernetes.io/glusterfs" >> glusterfs-storageclass-v34.yaml
+  echo "parameters:" >> glusterfs-storageclass-v34.yaml
+  echo "  endpoint: \"glusterfs-cluster\"" >> glusterfs-storageclass-v34.yaml  
+  echo "  resturl: \"http://glusterclient2.rhs:8080\"" >> glusterfs-storageclass-v34.yaml  
+  echo "  restauthenabled: \"false\"" >> glusterfs-storageclass-v34.yaml  
+  echo "  restuser: \"admin\"" >> glusterfs-storageclass-v34.yaml  
+  echo "  restuserkey: \"My Secret\"" >> glusterfs-storageclass-v34.yaml
+
+  echo "kind: StorageClass" > glusterfs-storageclass-v35.yaml
+  echo "apiVersion: storage.k8s.io/v1beta1" >> glusterfs-storageclass-v35.yaml
+  echo "metadata:" >> glusterfs-storageclass-v35.yaml
+  echo "  name: gluster35" >> glusterfs-storageclass-v35.yaml
+  echo "provisioner: kubernetes.io/glusterfs" >> glusterfs-storageclass-v35.yaml
+  echo "parameters:" >> glusterfs-storageclass-v35.yaml
+  echo "  resturl: \"http://glusterclient2:8080\"" >> glusterfs-storageclass-v35.yaml  
+  echo "  restauthenabled: \"false\"" >> glusterfs-storageclass-v35.yaml  
+  echo "  # volumetype: \"replicate:2\"" >> glusterfs-storageclass-v35.yaml  
+
+  echo "kind: StorageClass" > glusterfs-storageclass-v36.yaml
+  echo "apiVersion: storage.k8s.io/v1beta1" >> glusterfs-storageclass-v36.yaml
+  echo "metadata:" >> glusterfs-storageclass-v36.yaml
+  echo "  name: slow" >> glusterfs-storageclass-v36.yaml
+  echo "provisioner: kubernetes.io/glusterfs" >> glusterfs-storageclass-v36.yaml
+  echo "parameters:" >> glusterfs-storageclass-v36.yaml  
+  echo "  resturl: \"http://glusterclient2:8080\"" >> glusterfs-storageclass-v36.yaml  
+  echo "  restauthenabled: \"false\"" >> glusterfs-storageclass-v36.yaml  
+  echo "  volumetype: \"replicate:2\"" >> glusterfs-storageclass-v36.yaml
+
+  echo "apiVersion: v1" > glusterfs-pvc-storageclass.yaml
+  echo "kind: PersistentVolumeClaim" >> glusterfs-pvc-storageclass.yaml
+  echo "metadata:" >> glusterfs-pvc-storageclass.yaml
+  echo " name: gluster-dyn-pvc" >> glusterfs-pvc-storageclass.yaml
+  echo " annotations:" >> glusterfs-pvc-storageclass.yaml
+  echo "   volume.beta.kubernetes.io/storage-class: gluster35" >> glusterfs-pvc-storageclass.yaml
+  echo "spec:" >> glusterfs-pvc-storageclass.yaml
+  echo " accessModes:" >> glusterfs-pvc-storageclass.yaml
+  echo "  - ReadWriteOnce" >> glusterfs-pvc-storageclass.yaml
+  echo " resources:" >> glusterfs-pvc-storageclass.yaml
+  echo "   requests:" >> glusterfs-pvc-storageclass.yaml
+  echo "     storage: 30Gi" >> glusterfs-pvc-storageclass.yaml
+
+
   cp -R $GOLANGPATH/dev-configs/* $OSEPATH/dev-configs
   cp -R $GOLANGPATH/dev-configs/* $KUBEPATH/dev-configs
 
@@ -932,32 +978,47 @@ then
 else
   if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "aws" ]
   then
-    # Installing subscription manager on CLOUD INSTANCE
-    echo "...Checking to make sure subscription manager is installed..."
-    $SUDO yum install subscription-manager -y> /dev/null
+    if [ "$HOSTENV" == "rhel" ]
+    then
+      # Installing subscription manager on CLOUD INSTANCE
+      echo "...Checking to make sure subscription manager is installed..."
+      $SUDO yum install subscription-manager -y> /dev/null
+    fi
   fi
 
-  # Subscription Manager Stuffs - for RHEL 7.X devices
-  echo "Setting up subscription services from RHEL..."
-  $SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS
-
-  # FOR DEV
-  if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "kubeadm" ]
+  if [ "$HOSTENV" == "rhel" ]
   then
-    $SUDO subscription-manager list --available | sed -n '/OpenShift Employee Subscription/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
-    $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+    # Subscription Manager Stuffs - for RHEL 7.X devices
+    echo "Setting up subscription services from RHEL..."
+    $SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS
+  fi
+
+  if [ "$HOSTENV" == "rhel" ]
+  then
+    # FOR DEV
+    if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "kubeadm" ]
+    then
+      $SUDO subscription-manager list --available | sed -n '/OpenShift Employee Subscription/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+      $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+    fi
   fi
   
-  # FOR APLO
-  if [ "$SETUP_TYPE" == "aplo" ]
+  if [ "$HOSTENV" == "rhel" ]
   then
-    $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+    # FOR APLO
+    if [ "$SETUP_TYPE" == "aplo" ]
+    then
+      $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+    fi
   fi
 
-  # FOR ALL
-  $SUDO subscription-manager repos --disable="*"> /dev/null
-  $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.3-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
-  echo ""
+  if [ "$HOSTENV" == "rhel" ]
+  then
+    # FOR ALL
+    $SUDO subscription-manager repos --disable="*"> /dev/null
+    $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.4-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
+    echo ""
+  fi
 
   # Install software
   if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "aplo" ]
@@ -965,14 +1026,17 @@ else
     echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet unzip ... this will take several minutes"
     $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet unzip -y> /dev/null
     $SUDO yum update -y> /dev/null
-    if [ "$SETUP_TYPE" == "aplo" ]
+    if [ "$HOSTENV" == "rhel" ]
     then
-      echo "...Installing openshift utils, clients and atomic-openshift for APLO setup type..."
-      $SUDO yum install atomic-openshift-utils atomic-openshift-clients atomic-openshift -y> /dev/null
-      $SUDO yum install heketi-client heketi-templates -y> /dev/null
-    else
-      echo "...Installing openshift utils for DEV setup type..."
-      $SUDO yum install atomic-openshift-utils -y> /dev/null
+      if [ "$SETUP_TYPE" == "aplo" ]
+      then
+        echo "...Installing openshift utils, clients and atomic-openshift for APLO setup type..."
+        $SUDO yum install atomic-openshift-utils atomic-openshift-clients atomic-openshift -y> /dev/null
+        $SUDO yum install heketi-client heketi-templates -y> /dev/null
+      else
+        echo "...Installing openshift utils for DEV setup type..."
+        $SUDO yum install atomic-openshift-utils -y> /dev/null
+      fi
     fi
     echo ""
 
@@ -1036,8 +1100,11 @@ else
       echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip for CLIENT setup type  ... this will take several minutes"
       $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip -y> /dev/null
       $SUDO yum update -y> /dev/null
-      $SUDO yum install atomic-openshift-utils atomic-openshift-clients atomic-openshift -y> /dev/null
-      $SUDO yum install heketi-client heketi-templates -y> /dev/null
+      if [ "$HOSTENV" == "rhel" ]
+      then
+        $SUDO yum install atomic-openshift-utils atomic-openshift-clients atomic-openshift -y> /dev/null
+        $SUDO yum install heketi-client heketi-templates -y> /dev/null
+      fi
       echo ""
     fi  
   fi
@@ -1309,7 +1376,27 @@ else
         echo "...Installing Docker"
         if [ "$DOCKERVER" == "" ] || [ "$DOCKERVER" == "default" ] || [ "$DOCKERVER" == "yum" ]
         then
-          $SUDO yum install docker -y> /dev/null
+          if [ "$HOSTENV" == "rhel" ]
+          then
+            $SUDO yum install docker -y> /dev/null
+          elif [ "$HOSTENV" == "centos" ]
+          then
+            # set up a docker repo
+            # echo "[virt7-docker-common-release]" > virt7-docker-common-release
+            # echo "name=virt7-docker-common-release" >> virt7-docker-common-release
+            # echo "baseurl=http://cbs.centos.org/repos/virt7-docker-common-release/x86_64/os/" >> virt7-docker-common-release
+            # echo "gpgcheck=0" >> virt7-docker-common-release
+
+            echo "[docker]" > /etc/yum.repos.d/docker.repo
+            echo "name=Docker Repository" >> /etc/yum.repos.d/docker.repo
+            echo "baseurl=https://yum.dockerproject.org/repo/main/centos/7/" >> /etc/yum.repos.d/docker.repo
+            echo "enabled=1" >> /etc/yum.repos.d/docker.repo
+            echo "gpgcheck=1" >> /etc/yum.repos.d/docker.repo
+            echo "gpgkey=https://yum.dockerproject.org/gpg" >> /etc/yum.repos.d/docker.repo
+            
+            # $SUDO yum install --enablerepo=virt7-docker-common-release docker flannel -y> /dev/null
+            $SUDO yum install docker-engine docker-engine-selinux -y> /dev/null
+          fi
         else
           cd ~
           $SUDO wget https://yum.dockerproject.org/repo/main/centos/7/Packages/docker-engine-$DOCKERVER-1.el7.centos.x86_64.rpm
@@ -1324,6 +1411,14 @@ else
       echo "...Updating the docker config file with insecure-registry"
       $SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
       echo ""
+
+      if [ "$HOSTENV" == "centos" ] || [ "$HOSTENV" == "fedora" ]
+      then
+         cd ~
+         $SUDO wget https://github.com/projectatomic/docker-storage-setup/blob/master/docker-storage-setup.sh
+         $SUDO cp docker-storage-setup.sh /etc/sysconfig/
+         $SUDO chmod +x /etc/sysconfig/docker-storage-setup.sh
+      fi
 
       # Update the docker-storage-setup
       DoBlock
@@ -1363,7 +1458,20 @@ else
         echo "...Installing Docker"
         if [ "$DOCKERVER" == "" ] || [ "$DOCKERVER" == "default" ] || [ "$DOCKERVER" == "yum" ]
         then
-          $SUDO yum install docker -y> /dev/null
+          if [ "$HOSTENV" == "rhel" ]
+          then
+            $SUDO yum install docker -y> /dev/null
+          elif [ "$HOSTENV" == "centos" ]
+          then
+            # set up a docker repo
+            echo "[docker]" > /etc/yum.repos.d/docker.repo
+            echo "name=Docker Repository" >> /etc/yum.repos.d/docker.repo
+            echo "baseurl=https://yum.dockerproject.org/repo/main/centos/7/" >> /etc/yum.repos.d/docker.repo
+            echo "enabled=1" >> /etc/yum.repos.d/docker.repo
+            echo "gpgcheck=1" >> /etc/yum.repos.d/docker.repo
+            echo "gpgkey=https://yum.dockerproject.org/gpg" >> /etc/yum.repos.d/docker.repo
+            $SUDO yum install docker-engine-selinux docker-engine -y> /dev/null
+          fi
         else
           cd ~
           $SUDO wget https://yum.dockerproject.org/repo/main/centos/7/Packages/docker-engine-$DOCKERVER-1.el7.centos.x86_64.rpm
@@ -1377,6 +1485,14 @@ else
         echo "...Updating the docker config file with insecure-registry"
         $SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
         echo ""
+
+        if [ "$HOSTENV" == "centos" ] || [ "$HOSTENV" == "fedora" ]
+        then
+          cd ~
+          $SUDO wget https://github.com/projectatomic/docker-storage-setup/blob/master/docker-storage-setup.sh
+          $SUDO cp docker-storage-setup.sh /etc/sysconfig/
+          $SUDO chmod +x /etc/sysconfig/docker-storage-setup.sh
+        fi
 
         # Update the docker-storage-setup
         DoBlock
