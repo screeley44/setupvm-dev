@@ -312,14 +312,14 @@ CreateConfigs()
   echo "$SUDO cp $GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64/kube*  /usr/bin" > config-k8.sh
   echo "" >> config-k8.sh
   echo ""
-  echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-cluster local --server=http://127.0.0.1:8080 --insecure-skip-tls-verify=true" >> config-k8.sh
-  echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-context local --cluster=local" >> config-k8.sh
-  echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
+  echo "# $GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-cluster local --server=http://127.0.0.1:8080 --insecure-skip-tls-verify=true" >> config-k8.sh
+  echo "# $GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-context local --cluster=local" >> config-k8.sh
+  echo "# $GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
   echo "" >> config-k8.sh
-  echo "/opt/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-cluster local --server=https://localhost:6443 --certificate-authority=/var/run/kubernetes/apiserver.crt" >> config-k8.sh
-  echo "/opt/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-credentials myself --username=admin --password=admin" >> config-k8.sh
-  echo "/opt/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-context local --cluster=local --user=myself" >> config-k8.sh
-  echo "/opt/go/src/k8s.io/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
+  echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-cluster local --server=https://localhost:6443 --certificate-authority=/var/run/kubernetes/apiserver.crt" >> config-k8.sh
+  echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-credentials myself --username=admin --password=admin" >> config-k8.sh
+  echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-context local --cluster=local --user=myself" >> config-k8.sh
+  echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
 
   chmod +x config-k8.sh
 
@@ -993,7 +993,7 @@ else
     $SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS
   fi
 
-  if [ "$HOSTENV" == "rhel" ]
+  if [ "$HOSTENV" == "rhel" ] && [ "$POOLID" == "" ]
   then
     # FOR DEV
     if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "kubeadm" ]
@@ -1001,9 +1001,27 @@ else
       $SUDO subscription-manager list --available | sed -n '/OpenShift Employee Subscription/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
       $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
     fi
+  elif [ "$HOSTENV" == "rhel" ]
+    $SUDO subscription-manager attach --pool=$POOLID
+  else
+    echo "NON RHEL SYSTEM..." 
   fi
   
-  if [ "$HOSTENV" == "rhel" ]
+  if [ "$HOSTENV" == "rhel" ] && [ "$POOLID" == "" ]
+  then
+    # FOR DEV
+    if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "kubeadm" ]
+    then
+      $SUDO subscription-manager list --available | sed -n '/OpenShift Employee Subscription/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+      $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+    fi
+  elif [ "$HOSTENV" == "rhel" ]
+    $SUDO subscription-manager attach --pool=$POOLID
+  else
+    echo "NON RHEL SYSTEM..."
+  fi
+
+  if [ "$HOSTENV" == "rhel" ] && [ "$POOLID" == "" ]
   then
     # FOR APLO
     if [ "$SETUP_TYPE" == "aplo" ]
