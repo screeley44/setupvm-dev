@@ -2,7 +2,7 @@
 Simple, quick and dirty shell script to provision/configure local or cloud based instance of VM to run single node development cluster from source code for OpenShift/Kubernetes.  This
 script will setup/automate and configure a complete dev environment based on the normal prereqs (i.e. subscription manager, yum installs, go install, etc...) and allow developers to change/update source and switch between K8 and Origin.
 
-Use this for RHEL 7.x instances using normal dev type setup (i.e. hack/local-up-cluster.sh for K8 and openshift start for origin). 
+Use this for RHEL 7.x or Centos instances using normal dev type setup (i.e. hack/local-up-cluster.sh for K8 and openshift start for origin). 
 
 # How To Run
 
