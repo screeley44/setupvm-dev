@@ -993,43 +993,32 @@ else
     $SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS
   fi
 
-  if [ "$HOSTENV" == "rhel" ] && [ "$POOLID" == "" ]
+  if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "kubeadm" ]
   then
-    # FOR DEV
-    if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "kubeadm" ]
+    if [ "$HOSTENV" == "rhel" ] && [ "$POOLID" == "" ]
     then
-      $SUDO subscription-manager list --available | sed -n '/OpenShift Employee Subscription/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
-      $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
-    fi
-  elif [ "$HOSTENV" == "rhel" ]
-  then
-    echo "Using Predefined POOLID..."
-    $SUDO subscription-manager attach --pool=$POOLID
-  else
-    echo "NON RHEL SYSTEM..." 
-  fi
-  
-  if [ "$HOSTENV" == "rhel" ] && [ "$POOLID" == "" ]
-  then
-    # FOR DEV
-    if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "kubeadm" ]
+        $SUDO subscription-manager list --available | sed -n '/OpenShift Employee Subscription/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+        $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+    elif [ "$HOSTENV" == "rhel" ]
     then
-      $SUDO subscription-manager list --available | sed -n '/OpenShift Employee Subscription/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
-      $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
-    fi
-  elif [ "$HOSTENV" == "rhel" ]
-  then
-    $SUDO subscription-manager attach --pool=$POOLID
-  else
-    echo "NON RHEL SYSTEM..."
+      echo "Using Predefined POOLID..."
+      $SUDO subscription-manager attach --pool=$POOLID
+    else
+      echo "..."
+    fi 
   fi
 
-  if [ "$HOSTENV" == "rhel" ] && [ "$POOLID" == "" ]
+  if [ "$SETUP_TYPE" == "aplo" ]
   then
-    # FOR APLO
-    if [ "$SETUP_TYPE" == "aplo" ]
+    if [ "$HOSTENV" == "rhel" ] && [ "$POOLID" == "" ]
     then
+      # FOR APLO
       $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+    elif [ "$HOSTENV" == "rhel" ]
+    then
+      $SUDO subscription-manager attach --pool=$POOLID
+    else
+      echo "..."
     fi
   fi
 
@@ -1586,14 +1575,49 @@ then
   $SUDO systemctl start kubelet
   echo ""
   echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
   echo "Now proceed to this link: http://kubernetes.io/docs/getting-started-guides/kubeadm/ and follow steps 2 through 4"
   echo "HaVE FUN!!!"
   echo ""
   echo "Note: do not join the nodes before you have kube-dns up and running...the instructions are a little jumpy..."
 
-
 else
 
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
   echo ""
   echo " *******************************************"
   echo ""
@@ -1642,8 +1666,10 @@ else
   echo "  yaml dir (copied to multiple locations): $OSEPATH/dev-configs  $KUBEPATH/dev-configs  /home/$USER/dev-configs or /root/dev-configs"
   echo "  need sudo to interact with docker i.e. sudo docker ps unless you have already 'sudo -s'"
   echo ""
+  echo ""
+  echo ""
   echo "*** OTHER NOTES ***"
   echo " Dirty Kube 1.6 - issue with local-up-cluster.sh  see https://github.com/kubernetes/kubernetes/issues/40459 - should be fixed now"
-  
+
 fi
 
