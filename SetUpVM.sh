@@ -1202,30 +1202,33 @@ fi
 
 if [ "$SETUP_TYPE" == "dev" ]
 then
-  cd $GOLANGPATH/go/src/k8s.io
-  rm -rf kubernetes
-  echo "...Cloning Kubernetes, OpenShift Origin, Openshift Ansible and gluster-kubernetes"
-  echo ""
-  git clone https://github.com/kubernetes/kubernetes.git
-
-  if [ "$GODEFAULT" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
+  if [ "$SKIPSOURCECLONE" == "no" ]
   then
-    mkdir -p $GOLANGPATH/go/src/github.com/openshift
-  else
-    $SUDO mkdir -p $GOLANGPATH/go/src/github.com/openshift
-    $SUDO chmod -R 777 $GOLANGPATH
+    cd $GOLANGPATH/go/src/k8s.io
+    rm -rf kubernetes
+    echo "...Cloning Kubernetes, OpenShift Origin, Openshift Ansible and gluster-kubernetes"
+    echo ""
+    git clone https://github.com/kubernetes/kubernetes.git
+
+    if [ "$GODEFAULT" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
+    then
+      mkdir -p $GOLANGPATH/go/src/github.com/openshift
+    else
+      $SUDO mkdir -p $GOLANGPATH/go/src/github.com/openshift
+      $SUDO chmod -R 777 $GOLANGPATH
+    fi
+
+    cd $GOLANGPATH/go/src/github.com/openshift
+    rm -rf origin
+    git clone https://github.com/openshift/origin.git
+    cd $GOLANGPATH
+    rm -rf openshift-ansible
+    git clone https://github.com/openshift/openshift-ansible
+
+    cd $GOLANGPATH
+    rm -rf gluster-kubernetes
+    https://github.com/gluster/gluster-kubernetes.git
   fi
-
-  cd $GOLANGPATH/go/src/github.com/openshift
-  rm -rf origin
-  git clone https://github.com/openshift/origin.git
-  cd $GOLANGPATH
-  rm -rf openshift-ansible
-  git clone https://github.com/openshift/openshift-ansible
-
-  cd $GOLANGPATH
-  rm -rf gluster-kubernetes
-  https://github.com/gluster/gluster-kubernetes.git
 fi
   
 echo ""
