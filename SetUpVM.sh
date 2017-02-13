@@ -1002,6 +1002,8 @@ else
       $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
     fi
   elif [ "$HOSTENV" == "rhel" ]
+  then
+    echo "Using Predefined POOLID..."
     $SUDO subscription-manager attach --pool=$POOLID
   else
     echo "NON RHEL SYSTEM..." 
@@ -1016,6 +1018,7 @@ else
       $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
     fi
   elif [ "$HOSTENV" == "rhel" ]
+  then
     $SUDO subscription-manager attach --pool=$POOLID
   else
     echo "NON RHEL SYSTEM..."
