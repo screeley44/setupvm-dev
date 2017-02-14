@@ -316,8 +316,13 @@ CreateConfigs()
   echo "# $GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-context local --cluster=local" >> config-k8.sh
   echo "# $GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
   echo "" >> config-k8.sh
+  echo "# $GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-cluster local --server=https://localhost:6443 --certificate-authority=/var/run/kubernetes/apiserver.crt" >> config-k8.sh
+  echo "# $GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-credentials myself --username=admin --password=admin" >> config-k8.sh
+  echo "# $GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-context local --cluster=local --user=myself" >> config-k8.sh
+  echo "# $GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
+  echo "" >> config-k8.sh
   echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-cluster local --server=https://localhost:6443 --certificate-authority=/var/run/kubernetes/apiserver.crt" >> config-k8.sh
-  echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-credentials myself --username=admin --password=admin" >> config-k8.sh
+  echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-credentials myself --client-key=/var/run/kubernetes/client-admin.key --client-certificate=/var/run/kubernetes/client-admin.crt" >> config-k8.sh
   echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-context local --cluster=local --user=myself" >> config-k8.sh
   echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
 
@@ -361,6 +366,22 @@ CreateConfigs()
   chmod +x config-ose.sh
   echo ""
 
+  echo "creating config-ose-prod.sh..."
+  echo "# create groups" > config-ose-prod.sh
+  echo "oadm groups new myclusteradmingroup admin" >> config-ose-prod.sh
+  echo "oadm groups new mystorageadmingroup screeley" >> config-ose-prod.sh
+  echo "" >> config-ose-prod.sh
+  echo "# add policy roles to groups" >> config-ose-prod.sh
+  echo "oadm policy add-cluster-role-to-group cluster-admin myclusteradmingroup" >> config-ose-prod.sh
+  echo "oadm policy add-cluster-role-to-group storage-admin mystorageadmingroup" >> config-ose-prod.sh
+  echo "oadm policy add-role-to-user basic-user jdoe -n default" >> config-ose-prod.sh
+  echo "oadm policy add-role-to-user view jdoe -n default" >> config-ose-prod.sh
+  echo "oadm policy add-role-to-user edit jdoe -n default" >> config-ose-prod.sh
+  echo "" >> config-ose-prod.sh
+  echo "# add some scc policy as well" >> config-ose-prod.sh
+  echo "oadm policy add-scc-to-group privileged myclusteradmingroup" >> config-ose-prod.sh
+  chmod +x config-ose-prod.sh
+  echo ""
 
   echo "...creating start-ose.sh"
   mkdir -p $OSEPATH/data
