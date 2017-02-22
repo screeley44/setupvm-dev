@@ -1046,6 +1046,7 @@ else
   if [ "$HOSTENV" == "rhel" ]
   then
     # FOR ALL
+    echo "Enabling rhel 7 rpms..."
     $SUDO subscription-manager repos --disable="*"> /dev/null
     $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.4-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
     echo ""
@@ -1443,7 +1444,9 @@ else
 
       # Docker Registry Stuff
       echo "...Updating the docker config file with insecure-registry"
-      $SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
+      # $SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
+      # $SUDO sed -i "s/OPTIONS='--selinux-enabled/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16 /" /etc/sysconfig/docker
+      $SUDO sed -i '/OPTIONS=.*/c\OPTIONS="--selinux-enabled --insecure-registry 172.30.0.0/16"' /etc/sysconfig/docker
       echo ""
 
       if [ "$HOSTENV" == "centos" ] || [ "$HOSTENV" == "fedora" ]
@@ -1517,7 +1520,8 @@ else
   
         # Docker Registry Stuff
         echo "...Updating the docker config file with insecure-registry"
-        $SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
+        # $SUDO sed -i "s/OPTIONS='--selinux-enabled'/OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0\/16'/" /etc/sysconfig/docker
+        $SUDO sed -i '/OPTIONS=.*/c\OPTIONS="--selinux-enabled --insecure-registry 172.30.0.0/16"' /etc/sysconfig/docker
         echo ""
 
         if [ "$HOSTENV" == "centos" ] || [ "$HOSTENV" == "fedora" ]
