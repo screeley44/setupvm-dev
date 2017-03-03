@@ -417,7 +417,7 @@ CreateConfigs()
     echo "openshift start --write-config=$OSEPATH/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
     echo "sed -i '/apiServerArguments: null/,+2d' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"vsphere\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/vsphere/vsphere.conf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"vsphere\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/vsphere/vsphere.conf\"' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
-    # echo "sed -i 's/\ \ ingressIPNetworkCIDR:.*/\ \ ingressIPNetworkCIDR: ""/' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    echo "sed -i 's/\ \ ingressIPNetworkCIDR:.*/\ \ ingressIPNetworkCIDR: ""/' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "echo \"kubeletArguments:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     # echo "echo \"  max-pods:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     # echo "echo \"    - \\\'100\\\'\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
@@ -1341,6 +1341,19 @@ then
   $SUDO mkdir vsphere
   $SUDO chmod -R 777 /etc/vsphere
   cd /etc/vsphere
+
+#TODO: change to this format
+#[Global]
+#  user = administrator@vsphere.local
+#  password = 100Root-
+#  server = 10.19.114.25
+#  port = 443
+#  insecure-flag = true
+#  datacenter = Boston
+#  datastore = ose3-vmware
+#  working-dir = /Boston/vm/ocp
+#[Disk]
+#  scsicontrollertype = pvscsi
   
   echo "[Global]" > vsphere.conf
   echo "  user = administrator@vsphere.local" >> vsphere.conf
