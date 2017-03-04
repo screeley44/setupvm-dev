@@ -391,8 +391,8 @@ CreateConfigs()
   if [ "$ISCLOUD" == "aws" ]
   then
     echo "openshift start --write-config=$OSEPATH/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
-    echo "sed -i '/apiServerArguments: null/,+2d' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
-    echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    echo "sed -i '/apiServerArguments:/,+5d' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"\n\ \ \ \ storage-backend:\n\ \ \ \ \ - \"etcd3\"\n\ \ \ \ storage-media-type:\n\ \ \ \ \ - \"application/vnd.kubernetes.protobuf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ \ - \"/etc/aws/aws.conf\"' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "sed -i 's/\ \ ingressIPNetworkCIDR:.*/\ \ ingressIPNetworkCIDR: ""/' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "echo \"kubeletArguments:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     echo "echo \"  cloud-provider:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
@@ -415,8 +415,8 @@ CreateConfigs()
   elif [ "$ISCLOUD" == "vsphere" ]
   then
     echo "openshift start --write-config=$OSEPATH/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
-    echo "sed -i '/apiServerArguments: null/,+2d' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
-    echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"vsphere\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/vsphere/vsphere.conf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"vsphere\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/vsphere/vsphere.conf\"' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    echo "sed -i '/apiServerArguments:/,+5d' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"vsphere\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/vsphere/vsphere.conf\"\n\ \ \ \ storage-backend:\n\ \ \ \ \ - \"etcd3\"\n\ \ \ \ storage-media-type:\n\ \ \ \ \ - \"application/vnd.kubernetes.protobuf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"vsphere\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ \ - \"/etc/vsphere/vsphere.conf\"' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "sed -i 's/\ \ ingressIPNetworkCIDR:.*/\ \ ingressIPNetworkCIDR: ""/' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "echo \"kubeletArguments:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
     # echo "echo \"  max-pods:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST/node-config.yaml" >> start-ose.sh
@@ -1360,13 +1360,12 @@ then
   echo "  password = mypassword" >> vsphere.conf
   echo "  server = myipaddr" >> vsphere.conf
   echo "  port = 443" >> vsphere.conf
-  echo "  insecure-flag = 1" >> vsphere.conf
+  echo "  insecure-flag = true" >> vsphere.conf
   echo "  datacenter = mydatacenter" >> vsphere.conf
   echo "  datastore = mydatastore" >> vsphere.conf
-  echo "  resource_pool=\"myresourcepool\"" >> vsphere.conf
-  echo "  public-network=\"mynetwork\"" >> vsphere.conf
+  echo "  working-dir=/mypath/vm/ocp" >> vsphere.conf
   echo "[Disk]" >> vsphere.conf
-  echo "  scsicontrollertype = pvscsidawad" >> vsphere.conf
+  echo "  scsicontrollertype = pvscsi" >> vsphere.conf
   cd $GOLANGPATH
   echo ""
 fi
