@@ -218,6 +218,12 @@ CreateProfiles()
     echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> .bash_profile 
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> .bash_profile
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> .bash_profile
+
+    if [ "$ISCLOUD" == "vsphere" ]
+    then
+      echo "export CLOUD_PROVIDER=/etc/vsphere/vsphere.conf" >> .bash_profile
+    fi
+
     if [ "$MULTIZONE" == "true" ]
     then
       if [ "$ISCLOUD" == "aws" ]
@@ -405,7 +411,7 @@ CreateConfigs()
   then
     echo "openshift start --write-config=$OSEPATH/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
     echo "sed -i '/apiServerArguments: null/,+2d' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
-    echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"gce\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"gce\"' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
+    echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"gce\"\n\ \ \ \ storage-backend:\n\ \ \ \ \ - \"etcd3\"\n\ \ \ \ storage-media-type:\n\ \ \ \ \ - \"application/vnd.kubernetes.protobuf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"gce\"' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "sed -i 's/\ \ ingressIPNetworkCIDR:.*/\ \ ingressIPNetworkCIDR: ""/' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "echo \"kubeletArguments:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST.$GCENODEPATH/node-config.yaml" >> start-ose.sh
     echo "echo \"  cloud-provider:\" >> $OSEPATH/openshift.local.config/node-$INTERNALHOST.$GCENODEPATH/node-config.yaml" >> start-ose.sh
