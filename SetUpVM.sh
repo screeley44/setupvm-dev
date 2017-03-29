@@ -243,6 +243,8 @@ CreateProfiles()
     if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "vsphere" ]
     then
       echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> .bash_profile
+    else
+      echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> .bash_profile
     fi
     echo "source '/home/$USER/Downloads/google-cloud-sdk/path.bash.inc'" >> .bash_profile
     echo "source '/home/$USER/Downloads/google-cloud-sdk/completion.bash.inc'" >> .bash_profile
@@ -268,6 +270,8 @@ CreateProfiles()
     echo "export ZONE=$ZONE" >> newbashrc
     if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "vsphere" ]
     then
+      echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> newbashrc
+    else
       echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> newbashrc
     fi
     echo "source '/home/$USER/Downloads/google-cloud-sdk/path.bash.inc'" >> newbashrc
@@ -1323,6 +1327,11 @@ then
   echo "Zone = $ZONE" >> aws.conf
   cd $GOLANGPATH
   echo ""
+  # TODO: create the /etc/sysconfig/atomic-openshift-master files with the keys
+  #  AWS_ACCESS_KEY_ID=key
+  #  AWS_SECRET_ACCESS_KEY=key
+
+
 
   echo "...creating gce.conf file"  
   cd /etc
