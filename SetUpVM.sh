@@ -243,8 +243,6 @@ CreateProfiles()
     if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "vsphere" ]
     then
       echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> .bash_profile
-    else
-      echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> .bash_profile
     fi
     echo "source '/home/$USER/Downloads/google-cloud-sdk/path.bash.inc'" >> .bash_profile
     echo "source '/home/$USER/Downloads/google-cloud-sdk/completion.bash.inc'" >> .bash_profile
@@ -271,11 +269,14 @@ CreateProfiles()
     if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "vsphere" ]
     then
       echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> newbashrc
-    else
-      echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> newbashrc
     fi
     echo "source '/home/$USER/Downloads/google-cloud-sdk/path.bash.inc'" >> newbashrc
     echo "source '/home/$USER/Downloads/google-cloud-sdk/completion.bash.inc'" >> newbashrc
+  else
+    echo "export INTERNALDNSHOST=$INTERNALHOST" >> newbashrc
+    echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> newbashrc
+    echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> .bash_profile
+    echo "export INTERNALDNSHOST=$INTERNALHOST" >> .bash_profile
   fi
 
     
