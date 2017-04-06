@@ -244,8 +244,11 @@ CreateProfiles()
     then
       echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> .bash_profile
     fi
-    echo "source '/home/$USER/Downloads/google-cloud-sdk/path.bash.inc'" >> .bash_profile
-    echo "source '/home/$USER/Downloads/google-cloud-sdk/completion.bash.inc'" >> .bash_profile
+    if [ "$ISCLOUD" == "gce" ]
+    then
+      echo "source '/home/$USER/Downloads/google-cloud-sdk/path.bash.inc'" >> .bash_profile
+      echo "source '/home/$USER/Downloads/google-cloud-sdk/completion.bash.inc'" >> .bash_profile
+    fi
 
     $SUDO echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> newbashrc 
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> newbashrc
@@ -270,8 +273,11 @@ CreateProfiles()
     then
       echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> newbashrc
     fi
-    echo "source '/home/$USER/Downloads/google-cloud-sdk/path.bash.inc'" >> newbashrc
-    echo "source '/home/$USER/Downloads/google-cloud-sdk/completion.bash.inc'" >> newbashrc
+    if [ "$ISCLOUD" == "gce" ]
+    then
+      echo "source '/home/$USER/Downloads/google-cloud-sdk/path.bash.inc'" >> newbashrc
+      echo "source '/home/$USER/Downloads/google-cloud-sdk/completion.bash.inc'" >> newbashrc
+    fi
   else
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> newbashrc
     echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> newbashrc
@@ -391,6 +397,14 @@ CreateConfigs()
   echo "" >> config-ose-prod.sh
   echo "# add some scc policy as well" >> config-ose-prod.sh
   echo "oadm policy add-scc-to-group privileged myclusteradmingroup" >> config-ose-prod.sh
+  # if [ "$ISCLOUD" == "aws" ]
+  # then
+  #   echo "" >> config-ose-prod.sh
+  #   echo "echo AWS_ACCESS_KEY_ID=$AWSKEY >> /etc/sysconfig/atomic-openshift-master" >> config-ose-prod.sh
+  #   echo "echo AWS_SECRET_ACCESS_KEY=$AWSSECRET >> /etc/sysconfig/atomic-openshift-master" >> config-ose-prod.sh
+  #   echo "echo AWS_ACCESS_KEY_ID=$AWSKEY >> /etc/sysconfig/atomic-openshift-node" >> config-ose-prod.sh
+  #   echo "echo AWS_SECRET_ACCESS_KEY=$AWSSECRET >> /etc/sysconfig/atomic-openshift-node" >> config-ose-prod.sh
+  # fi
   chmod +x config-ose-prod.sh
   echo ""
 
