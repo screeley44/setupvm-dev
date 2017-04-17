@@ -1071,10 +1071,24 @@ else
   if [ "$HOSTENV" == "rhel" ]
   then
     # FOR ALL
-    echo "Enabling rhel 7 rpms..."
-    $SUDO subscription-manager repos --disable="*"> /dev/null
-    $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.4-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
-    echo ""
+    if [ "$OCPVERSION" == "3.5" ]
+    then
+      echo "Enabling rhel 7 rpms..."
+      $SUDO subscription-manager repos --disable="*"> /dev/null
+      $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.5-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
+      echo ""
+    elif [ "$OCPVERSION" == "3.4" ]
+    then
+      echo "Enabling rhel 7 rpms..."
+      $SUDO subscription-manager repos --disable="*"> /dev/null
+      $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.4-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
+      echo ""
+    else
+      echo "Enabling rhel 7 rpms..."
+      $SUDO subscription-manager repos --disable="*"> /dev/null
+      $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.5-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
+      echo ""
+    fi
   fi
 
   # Install software
