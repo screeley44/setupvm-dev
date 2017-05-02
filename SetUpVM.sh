@@ -281,10 +281,17 @@ CreateProfiles()
   else
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> newbashrc
     echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> newbashrc
+    echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> newbashrc
+    echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> .bash_profile
     echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> .bash_profile
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> .bash_profile
   fi
 
+  if [ "$SETUP_TYPE" == "kubeadm" ]
+  then
+    echo "export KUBECONFIG=$HOME/admin.conf" >> newbashrc
+    echo "export KUBECONFIG=$HOME/admin.conf" >> .bash_profile
+  fi     
     
   echo "" >> newbashrc
   # echo "export DIDRUN=yes" >> newbashrc
@@ -338,10 +345,18 @@ CreateConfigs()
   echo "# $GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-context local --cluster=local --user=myself" >> config-k8.sh
   echo "# $GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
   echo "" >> config-k8.sh
-  echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-cluster local --server=https://localhost:6443 --certificate-authority=/var/run/kubernetes/apiserver.crt" >> config-k8.sh
-  echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-credentials myself --client-key=/var/run/kubernetes/client-admin.key --client-certificate=/var/run/kubernetes/client-admin.crt" >> config-k8.sh
-  echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-context local --cluster=local --user=myself" >> config-k8.sh
-  echo "$GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
+  echo "# $GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-cluster local --server=https://localhost:6443 --certificate-authority=/var/run/kubernetes/apiserver.crt" >> config-k8.sh
+  echo "# $GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-credentials myself --client-key=/var/run/kubernetes/client-admin.key --client-certificate=/var/run/kubernetes/client-admin.crt" >> config-k8.sh
+  echo "# $GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config set-context local --cluster=local --user=myself" >> config-k8.sh
+  echo "# $GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
+  echo "# export KUBECONFIG=/var/run/kubernetes/admin.kubeconfig" >> config-k8.sh  
+  echo "" >> config-k8.sh
+  echo "kubectl config set-cluster local --server=https://localhost:6443 --certificate-authority=/var/run/kubernetes/server-ca.crt" >> config-k8.sh
+  echo "kubectl config set-credentials myself --client-key=/var/run/kubernetes/client-admin.key --client-certificate=/var/run/kubernetes/client-admin.crt" >> config-k8.sh
+  echo "kubectl config set-context local --cluster=local --user=myself" >> config-k8.sh
+  echo "kubectl config use-context local" >> config-k8.sh
+
+
 
   chmod +x config-k8.sh
 
