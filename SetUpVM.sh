@@ -287,7 +287,7 @@ CreateProfiles()
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> .bash_profile
   fi
 
-  if [ "$SETUP_TYPE" == "kubeadm" ]
+  if [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ]
   then
     echo "export KUBECONFIG=$HOME/admin.conf" >> newbashrc
     echo "export KUBECONFIG=$HOME/admin.conf" >> .bash_profile
@@ -1054,7 +1054,7 @@ else
     $SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS
   fi
 
-  if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "kubeadm" ]
+  if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ]
   then
     if [ "$HOSTENV" == "rhel" ] && [ "$POOLID" == "" ]
     then
@@ -1142,7 +1142,7 @@ else
     fi
     echo ""
   else
-    if [ "$SETUP_TYPE" == "kubeadm" ]
+    if [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ]
     then
       echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip for KUBEADM setup type  ... this will take several minutes"
       $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip -y> /dev/null
@@ -1164,24 +1164,44 @@ else
       fi
       echo ""
 
-      echo "...creating Kube Repo..."
-      $SUDO echo "[kubernetes]" > /etc/yum.repos.d/kubernetes.repo
-      $SUDO echo "name=Kubernetes" >> /etc/yum.repos.d/kubernetes.repo
-      $SUDO echo "baseurl=http://yum.kubernetes.io/repos/kubernetes-el7-x86_64" >> /etc/yum.repos.d/kubernetes.repo
-      $SUDO echo "enabled=1" >> /etc/yum.repos.d/kubernetes.repo
-      $SUDO echo "gpgcheck=1" >> /etc/yum.repos.d/kubernetes.repo
-      $SUDO echo "repo_gpgcheck=1" >> /etc/yum.repos.d/kubernetes.repo
-      $SUDO echo "gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg" >> /etc/yum.repos.d/kubernetes.repo
-      $SUDO echo "       https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg" >> /etc/yum.repos.d/kubernetes.repo
+      if [ "$SETUP_TYPE" == "kubeadm15" ]
+      then
+        echo "...creating Kube 1.5 Repo..."
+        $SUDO echo "[kubernetes]" > /etc/yum.repos.d/kubernetes.repo
+        $SUDO echo "name=Kubernetes" >> /etc/yum.repos.d/kubernetes.repo
+        $SUDO echo "baseurl=http://yum.kubernetes.io/repos/kubernetes-el7-x86_64" >> /etc/yum.repos.d/kubernetes.repo
+        $SUDO echo "enabled=1" >> /etc/yum.repos.d/kubernetes.repo
+        $SUDO echo "gpgcheck=1" >> /etc/yum.repos.d/kubernetes.repo
+        $SUDO echo "repo_gpgcheck=1" >> /etc/yum.repos.d/kubernetes.repo
+        $SUDO echo "gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg" >> /etc/yum.repos.d/kubernetes.repo
+        $SUDO echo "       https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg" >> /etc/yum.repos.d/kubernetes.repo
+      else      
+        echo "...creating Kube 1.6 Repo..."
+        $SUDO echo "[kubernetes]" > /etc/yum.repos.d/kubernetes.repo
+        $SUDO echo "name=Kubernetes" >> /etc/yum.repos.d/kubernetes.repo
+        $SUDO echo "baseurl=http://yum.kubernetes.io/repos/kubernetes-el7-x86_64" >> /etc/yum.repos.d/kubernetes.repo
+        $SUDO echo "enabled=1" >> /etc/yum.repos.d/kubernetes.repo
+        $SUDO echo "gpgcheck=1" >> /etc/yum.repos.d/kubernetes.repo
+        $SUDO echo "repo_gpgcheck=1" >> /etc/yum.repos.d/kubernetes.repo
+        $SUDO echo "gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg" >> /etc/yum.repos.d/kubernetes.repo
+        $SUDO echo "       https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg" >> /etc/yum.repos.d/kubernetes.repo
+      fi
 
       echo ""
       echo "Disabling SELinux for now..."
       $SUDO setenforce 0
 
       echo ""
-      echo "Installing kubelet, kubeadm, kubectl and kubernetes-cni..."
-      $SUDO yum install kubelet kubeadm kubectl kubernetes-cni -y> /dev/null
-
+      if [ "$SETUP_TYPE" == "kubeadm15" ]
+      then
+        echo "Installing version 1.5 of kubelet, kubeadm, kubectl and kubernetes-cni..."    
+        $SUDO yum install yum-versionlock kubectl-1.5.4-0 kubelet-1.5.4-0 kubernetes-cni-0.3.0.1-0.07a8a2 -y> /dev/null
+        $SUDO yum install http://yum.kubernetes.io/pool/082436e6e6cad1852864438b8f98ee6fa3b86b597554720b631876db39b8ef04-kubeadm-1.6.0-0.alpha.0.2074.a092d8e0f95f52.x86_64.rpm -y> /dev/null
+        $SUDO yum versionlock add kubectl kubelet kubernetes-cni kubeadm -y> /dev/null
+      else
+        echo "Installing latest (1.6) version of kubelet, kubeadm, kubectl and kubernetes-cni..."
+        $SUDO yum install kubelet kubeadm kubectl kubernetes-cni -y> /dev/null
+      fi
     else
       echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip for CLIENT setup type  ... this will take several minutes"
       $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip -y> /dev/null
@@ -1640,7 +1660,7 @@ then
   echo " Skipping docker install and config as this script was run once already..."
   echo ""
 else
-  if [ "$SETUP_TYPE" == "kubeadm" ]
+  if [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ]
   then
     echo "Installing docker for KUBEADM setup..."
     $SUDO yum install docker -y> /dev/null
@@ -1655,20 +1675,36 @@ fi
 
 echo "DIDRUN" > $GOLANGPATH/didcomplete
 
-if [ "$SETUP_TYPE" == "kubeadm" ]
+if [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ]
 then
   echo "removing /etc/kubernetes contents if they exist..."
   $SUDO rm -rf /etc/kubernetes/*
+  cd /etc/kubernetes
   echo ""
 
-  echo "downloading flannel CNI network overlay for kube-dns..."
-  $SUDO wget https://github.com/coreos/flannel/blob/master/Documentation/kube-flannel.yml
-  $SUDO wget https://git.io/weave-kube
+  if [ "$SETUP_TYPE" == "kubeadm15" ]
+  then
+    echo "downloading flannel and weave CNI network overlay for kube-dns..."
+    $SUDO wget https://github.com/coreos/flannel/blob/master/Documentation/kube-flannel.yml
+    $SUDO wget https://git.io/weave-kube
+  else
+    echo "downloading flannel and weave CNI network overlay for kube-dns..."
+    $SUDO wget https://github.com/coreos/flannel/blob/master/Documentation/kube-flannel.yml
+    $SUDO wget https://git.io/weave-kube-1.6
+  fi
   echo ""
 
-  echo " Starting kubelet"
+  echo " Starting kubelet and docker"
   $SUDO systemctl enable kubelet
   $SUDO systemctl start kubelet
+  $SUDO systemctl enable docker
+  $SUDO systemctl start docker
+
+  echo " Permanently disabling firewall/iptables..."
+  $SUDO systemctl stop firewalld
+  $SUDO systemctl stop iptables
+  $SUDO iptables -F
+  $SUDO chkconfig iptables off
   echo ""
   echo ""
   echo ""
@@ -1693,7 +1729,14 @@ then
   echo "HaVE FUN!!!"
   echo ""
   echo "Note: do not join the nodes before you have kube-dns up and running...the instructions are a little jumpy..."
-
+  if [ "$SETUP_TYPE" == "kubeadm15" ]
+  then  
+     echo ""
+     echo "kubeadm15 is version (1.5.6), must specifiy   kubeadm init --use-kubernetes-version=v1.5.6"  
+  else
+     echo ""
+     echo "latest version (1.6)  kubeadm init"
+  fi
 else
 
   echo ""
