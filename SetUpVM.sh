@@ -1712,6 +1712,14 @@ then
   echo ""
   echo ""
   echo ""
+  if [ "$SETUP_TYPE" == "kubeadm15" ]
+  then  
+     echo ""
+     echo "kubeadm15 is version (1.5.6), must specifiy   kubeadm init --use-kubernetes-version=v1.5.6"  
+  else
+     echo ""
+     echo "latest version (1.6)  kubeadm init"
+  fi  
   echo ""
   echo ""
   echo ""
@@ -1729,16 +1737,13 @@ then
   echo "HaVE FUN!!!"
   echo ""
   echo "Note: do not join the nodes before you have kube-dns up and running...the instructions are a little jumpy..."
-  if [ "$SETUP_TYPE" == "kubeadm15" ]
-  then  
-     echo ""
-     echo "kubeadm15 is version (1.5.6), must specifiy   kubeadm init --use-kubernetes-version=v1.5.6"  
-  else
-     echo ""
-     echo "latest version (1.6)  kubeadm init"
-  fi
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
 else
-
   echo ""
   echo ""
   echo ""
