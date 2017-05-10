@@ -1149,7 +1149,7 @@ else
       $SUDO yum update -y> /dev/null
 
       # Install Go and do other config
-      # 1.6.1, 1.7.3, etc...
+      # 1.6.1, 1.7.3, 1.8.1, etc...
       if [ "$GOVERSION" == "yum" ] || [ "$GOVERSION" == "" ]
       then
         echo "Installing go1.X whatever version yum installs..."
