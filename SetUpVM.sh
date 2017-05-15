@@ -1141,6 +1141,13 @@ else
       $SUDO tar -C /usr/local -xzf go$GOVERSION.linux-amd64.tar.gz
     fi
     echo ""
+    echo "Installing latest ansible..."
+    $SUDO rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    $SUDO yum install ansible -y> /dev/null
+
+    $SUDO rm -rf /usr/share/ansible
+    $SUDO rm -rf /usr/share/ansible_plugins
+    echo ""
   else
     if [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ]
     then
@@ -1162,6 +1169,10 @@ else
         $SUDO rm -rf /bin/go		
         $SUDO tar -C /usr/local -xzf go$GOVERSION.linux-amd64.tar.gz
       fi
+      echo ""
+      echo "Installing latest ansible..."
+      $SUDO rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+      $SUDO yum install ansible -y> /dev/null
       echo ""
 
       if [ "$SETUP_TYPE" == "kubeadm15" ]
@@ -1185,6 +1196,14 @@ else
         $SUDO echo "repo_gpgcheck=1" >> /etc/yum.repos.d/kubernetes.repo
         $SUDO echo "gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg" >> /etc/yum.repos.d/kubernetes.repo
         $SUDO echo "       https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg" >> /etc/yum.repos.d/kubernetes.repo
+      fi
+
+      if [ "$HOSTENV" == "centos" ] || [ "$HOSTENV" == "fedora" ]
+      then
+        echo ""
+        echo "Installing glusterfs-client..."
+        $SUDO yum install glusterfs-client -y> /dev/null
+        $SUDO modprobe fuse
       fi
 
       echo ""
