@@ -1121,7 +1121,7 @@ else
         $SUDO yum install heketi-client heketi-templates -y> /dev/null
       else
         echo "...Installing openshift utils for DEV setup type..."
-        $SUDO yum install atomic-openshift-utils -y> /dev/null
+        # $SUDO yum install atomic-openshift-utils -y> /dev/null
       fi
     fi
     echo ""
@@ -1145,8 +1145,8 @@ else
     $SUDO rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
     $SUDO yum install ansible -y> /dev/null
 
-    $SUDO rm -rf /usr/share/ansible
-    $SUDO rm -rf /usr/share/ansible_plugins
+    if [ -d "/usr/share/ansible" ]; then $SUDO rm -rf /usr/share/ansible; fi
+    if [ -d "/usr/share/ansible_plugins" ]; then $SUDO rm -rf /usr/share/ansible_plugins; fi
     echo ""
   else
     if [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ]
