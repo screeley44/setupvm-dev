@@ -985,7 +985,9 @@ CreateTestYamlEC2()
 
   cp -R $GOLANGPATH/dev-configs/* $OSEPATH/dev-configs
   cp -R $GOLANGPATH/dev-configs/* $KUBEPATH/dev-configs
-
+  $SUDO mkdir -p /usr/share/ocp3.6/rpms
+  $SUDO mkdir -p /usr/share/ocp3.7/rpms
+  $SUDO mkdir -p /usr/share/ocp/rpms
 
 }
 
@@ -1763,6 +1765,17 @@ then
   echo ""
   echo ""
 else
+  $SUDO yum install createrepo -y> /dev/null
+  echo "[origin-local-release]" > /etc/yum.repos.d/local.repo
+  echo "baseurl = file:///usr/share/ocp3.6/rpms/" >> /etc/yum.repos.d/local.repo
+  echo "gpgcheck = 0" >> /etc/yum.repos.d/local.repo
+  echo "name = OpenShift Origin Release from Local Source" >> /etc/yum.repos.d/local.repo
+  if [ "$SETUP_TYPE" == "prod" ]
+  then
+    echo "enabled = 0" >> /etc/yum.repos.d/local.repo
+  else
+    echo "enabled = 1" >> /etc/yum.repos.d/local.repo
+  fi
   echo ""
   echo ""
   echo ""
