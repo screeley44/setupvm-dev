@@ -215,6 +215,7 @@ CreateProfiles()
   if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "vsphere" ]
   then
     echo "...Creating Cloud bash profiles"
+    PUBLICHOST=$SUDO curl -s http://169.254.169.254/latest/meta-data/public-hostname
     echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> .bash_profile 
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> .bash_profile
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> .bash_profile
@@ -266,6 +267,7 @@ CreateProfiles()
       echo "export MULTIZONE=$MULTIZONE" >> newbashrc
     fi
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> newbashrc
+    echo "export PUBLICDNSHOST=$PUBLICHOST" >> newbashrc
     echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> newbashrc
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> newbashrc
     echo "export ZONE=$ZONE" >> newbashrc
@@ -280,6 +282,7 @@ CreateProfiles()
     fi
   else
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> newbashrc
+    echo "export PUBLICDNSHOST=$PUBLICHOST" >> newbashrc
     echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> newbashrc
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> newbashrc
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> .bash_profile
@@ -430,7 +433,7 @@ CreateConfigs()
 
   if [ "$ISCLOUD" == "aws" ]
   then
-    echo "openshift start --write-config=$OSEPATH/openshift.local.config --public-master=$INTERNALHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
+    echo "openshift start --write-config=$OSEPATH/openshift.local.config --public-master=$PUBLICHOST --volume-dir=~/data --loglevel=4  &> openshift.log" >> start-ose.sh
     echo "sed -i '/apiServerArguments:/,+5d' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "sed -i '/  apiLevels: null/a \ \ apiServerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ - \"/etc/aws/aws.conf\"\n\ \ \ \ storage-backend:\n\ \ \ \ \ - \"etcd3\"\n\ \ \ \ storage-media-type:\n\ \ \ \ \ - \"application/vnd.kubernetes.protobuf\"\n\ \ controllerArguments:\n\ \ \ \ cloud-provider:\n\ \ \ \ \ \ - \"aws\"\n\ \ \ \ cloud-config:\n\ \ \ \ \ \ - \"/etc/aws/aws.conf\"' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
     echo "sed -i 's/\ \ ingressIPNetworkCIDR:.*/\ \ ingressIPNetworkCIDR: ""/' $OSEPATH/openshift.local.config/master/master-config.yaml> /dev/null" >> start-ose.sh
