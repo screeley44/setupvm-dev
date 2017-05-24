@@ -215,7 +215,8 @@ CreateProfiles()
   if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "vsphere" ]
   then
     echo "...Creating Cloud bash profiles"
-    PUBLICHOST=$SUDO curl -s http://169.254.169.254/latest/meta-data/public-hostname
+    PUBLICHOST=$($SUDO curl -s http://169.254.169.254/latest/meta-data/public-hostname)
+    echo "      Setting PUBLICHOST for AWS...$PUBLICHOST"
     echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> .bash_profile 
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> .bash_profile
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> .bash_profile
@@ -238,6 +239,7 @@ CreateProfiles()
       echo "export MULTIZONE=$MULTIZONE" >> .bash_profile    
     fi
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> .bash_profile
+    echo "export PUBLICDNSHOST=$PUBLICHOST" >> .bash_profile
     echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> .bash_profile
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> .bash_profile
     echo "export ZONE=$ZONE" >> .bash_profile
@@ -1393,8 +1395,10 @@ else
   $SUDO chmod -R 777 $KUBEPATH
 fi
 
+echo ""
 CreateProfiles
 CreateConfigs
+
 
 # Install ec2 api tools and ruby
 if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
