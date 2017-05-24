@@ -478,15 +478,17 @@ CreateConfigs()
   echo ""
   
   echo "...creating stop-ose.sh"
-  echo "pkill -x openshift" > stop-ose.sh
-  echo "$SUDO docker ps | awk 'index(\$NF,"k8s_")==1 { print \$1 }' | xargs -l -r $SUDO docker stop" >> stop-ose.sh
-  echo "mount | grep "openshift.local.volumes" | awk '{ print \$3}' | xargs -l -r sudo umount" >> stop-ose.sh
-  echo "mount | grep "nfs1.rhs" | awk '{ print $3}' | xargs -l -r sudo umount" >> stop-ose.sh
+  echo "cd $GOLANGPATH/go/src/github.com/openshift/origin"
+  echo "./hack/lib/cleanup.sh"
+  #echo "pkill -x openshift" > stop-ose.sh
+  #echo "$SUDO docker ps | awk 'index(\$NF,"k8s_")==1 { print \$1 }' | xargs -l -r $SUDO docker stop" >> stop-ose.sh
+  #echo "mount | grep "openshift.local.volumes" | awk '{ print \$3}' | xargs -l -r sudo umount" >> stop-ose.sh
+  #echo "mount | grep "nfs1.rhs" | awk '{ print $3}' | xargs -l -r sudo umount" >> stop-ose.sh
   echo "cd $GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64; sudo rm -rf openshift.local.*" >> stop-ose.sh
   echo "cd $GOLANGPATH; sudo rm -rf openshift.local.*" >> stop-ose.sh
   echo "cd $OSEPATH; sudo rm -rf openshift.local.*" >> stop-ose.sh
   echo "# remove the file below if you are switching between kube and ocp" >> stop-ose.sh
-  echo "# sudo rm -rf ~/.kube/" >> stop-ose.sh
+  echo "#$sudo rm -rf ~/.kube/" >> stop-ose.sh
   chmod +x stop-ose.sh
   echo ""
 
@@ -1818,7 +1820,7 @@ else
   echo "       cd $GOLANGPATH/go/src/github.com/openshift/origin"
   echo "       make clean build (to build source)"
   echo "       then run $OSEPATH/start-ose.sh  (to start the openshift process)"
-  echo "       to stop OSE:  $OSEPATH/stop-ose.sh"
+  echo "       to stop OSE:  $OSEPATH/stop-ose.sh or run $GOLANGPATH/go/src/github.com/openshift/origin/hack/lib/cleanup.sh"
   echo ""
   echo " 3. If running local VM , you may need to update your /etc/hosts file as normal"
   echo ""
