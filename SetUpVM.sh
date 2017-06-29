@@ -296,7 +296,17 @@ CreateProfiles()
   then
     echo "export KUBECONFIG=$HOME/admin.conf" >> newbashrc
     echo "export KUBECONFIG=$HOME/admin.conf" >> .bash_profile
-  fi     
+  fi
+ 
+  if [ "$CONTAINER_ENGINE" == "rkt" ]
+  then
+    echo "export CONTAINER_RUNTIME=rkt" >> newbashrc
+    echo "export RKT_PATH=<rkt_binary_path>" >> newbashrc
+    echo "export RKT_STAGE1_IMAGE=<stage1-name>" >> newbashrc
+    echo "export CONTAINER_RUNTIME=rkt" >> .bash_profile
+    echo "export RKT_PATH=<rkt_binary_path>" >> .bash_profile
+    echo "export RKT_STAGE1_IMAGE=<stage1-name>" >> .bash_profile
+  fi    
     
   echo "" >> newbashrc
   # echo "export DIDRUN=yes" >> newbashrc
@@ -310,7 +320,7 @@ CreateProfiles()
   # export KPATH=$GOPATH/src/k8s.io/kubernetes
   # export PATH=$KPATH/_output/local/bin/linux/amd64:/home/tsclair/scripts/:$GOPATH/bin:$PATH
 
-  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:$GOLANGPATH/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
+  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:/usr/local/sbin:$GOLANGPATH/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
   echo "" >> newbashrc
   echo "export PATH" >> newbashrc
 
@@ -325,7 +335,7 @@ CreateProfiles()
   # export KPATH=$GOPATH/src/k8s.io/kubernetes
   # export PATH=$KPATH/_output/local/bin/linux/amd64:/home/tsclair/scripts/:$GOPATH/bin:$PATH
   echo "" >> .bash_profile
-  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:$GOLANGPATH/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
+  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:/usr/local/sbin:$GOLANGPATH/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
   echo "" >> .bash_profile
   echo "export PATH" >> .bash_profile
 
@@ -992,9 +1002,12 @@ CreateTestYamlEC2()
 
   cp -R $GOLANGPATH/dev-configs/* $OSEPATH/dev-configs
   cp -R $GOLANGPATH/dev-configs/* $KUBEPATH/dev-configs
-  $SUDO mkdir -p /usr/share/ocp3.6/rpms
-  $SUDO mkdir -p /usr/share/ocp3.7/rpms
-  $SUDO mkdir -p /usr/share/ocp/rpms
+  if [ "$OCP_LOCAL_REPO" == "yes" ]
+  then
+    $SUDO mkdir -p /usr/share/ocp3.6/rpms
+    $SUDO mkdir -p /usr/share/ocp3.7/rpms
+    $SUDO mkdir -p /usr/share/ocp/rpms
+  fi
 
 }
 
@@ -1334,13 +1347,26 @@ then
     cd $GOLANGPATH/go/src/github.com/openshift
     rm -rf origin
     git clone https://github.com/openshift/origin.git
+
     cd $GOLANGPATH
     rm -rf openshift-ansible
     git clone https://github.com/openshift/openshift-ansible
 
     cd $GOLANGPATH
     rm -rf gluster-kubernetes
-    https://github.com/gluster/gluster-kubernetes.git
+    git clone https://github.com/gluster/gluster-kubernetes.git
+
+    if [ "$CONTAINER_ENGINE" == "runc" ]
+    then
+      cd $GOLANGPATH/go/src/github.com
+      mkdir opencontainers
+      cd opencontainers
+      rm -rf runc
+      git clone https://github.com/opencontainers/runc
+      $SUDO yum install libseccomp-devel -y
+
+      mkdir -p /etc/runc/dev-configs
+    fi
   fi
 fi
   
@@ -1504,10 +1530,23 @@ then
 
 fi
 
-#TODO: I might have broken this, need to test at some point
-if [ -f "$GOLANGPATH/didcomplete" ]
+
+# RKT
+if [ "$CONTAINER_ENGINE" == "rkt" ]
 then
-  echo " Skipping docker install and config as this script was run once already..."
+  $SUDO wget https://github.com/rkt/rkt/releases/download/v1.27.0/rkt-v1.27.0.tar.gz
+  $SUDO tar xzvf rkt-v1.27.0.tar.gz
+fi
+
+
+#runC
+
+
+
+#TODO: I might have broken this, need to test at some point
+if [ -f "$GOLANGPATH/didcomplete" ] || [ "$CONTAINER_ENGINE" == "none" ] || [ "$CONTAINER_ENGINE" == "rkt" ] || [ "$CONTAINER_ENGINE" == "" ]
+then
+  echo " Skipping docker install and config as this script was run once already...or docker is not needed"
   echo ""
 else
   if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "aplo" ]
@@ -1685,7 +1724,7 @@ else
 fi
 
 # SETUP DOCKER FOR KUBEADM SETUP
-if [ -f "$GOLANGPATH/didcomplete" ]
+if [ -f "$GOLANGPATH/didcomplete" ] || [ "$CONTAINER_ENGINE" == "none" ] || [ "$CONTAINER_ENGINE" == "rkt" ] || [ "$CONTAINER_ENGINE" == "runc" ] || [ "$CONTAINER_ENGINE" == "" ]
 then
   echo " Skipping docker install and config as this script was run once already..."
   echo ""
@@ -1774,16 +1813,19 @@ then
   echo ""
   echo ""
 else
-  $SUDO yum install createrepo -y> /dev/null
-  echo "[origin-local-release]" > /etc/yum.repos.d/local.repo
-  echo "baseurl = file:///usr/share/ocp3.6/rpms/" >> /etc/yum.repos.d/local.repo
-  echo "gpgcheck = 0" >> /etc/yum.repos.d/local.repo
-  echo "name = OpenShift Origin Release from Local Source" >> /etc/yum.repos.d/local.repo
-  if [ "$SETUP_TYPE" == "prod" ]
+  if [ "$OCP_LOCAL_REPO" == "yes" ]
   then
-    echo "enabled = 0" >> /etc/yum.repos.d/local.repo
-  else
-    echo "enabled = 1" >> /etc/yum.repos.d/local.repo
+    $SUDO yum install createrepo -y> /dev/null
+    echo "[origin-local-release]" > /etc/yum.repos.d/local.repo
+    echo "baseurl = file:///usr/share/ocp3.6/rpms/" >> /etc/yum.repos.d/local.repo
+    echo "gpgcheck = 0" >> /etc/yum.repos.d/local.repo
+    echo "name = OpenShift Origin Release from Local Source" >> /etc/yum.repos.d/local.repo
+    if [ "$SETUP_TYPE" == "prod" ]
+    then
+      echo "enabled = 0" >> /etc/yum.repos.d/local.repo
+    else
+      echo "enabled = 1" >> /etc/yum.repos.d/local.repo
+    fi
   fi
   echo ""
   echo ""
