@@ -11,6 +11,7 @@
 #   HOSTENV=rhel
 #   RHNUSER=rhn-support-account
 #   RHNPASS=rhn-password
+#   POOLID=just take the default
 #   SETUP_TYPE="gluster"
 #   GFS_LIST="glusterfs1.rhs:glusterfs2.rhs:glusterfs.rhs3"
 #
@@ -123,7 +124,7 @@ echo "    Installation complete..."
 echo "================================================="
 echo ""
 echo "Do not forget (if using heketi and heketi-client) to perform any additional"
-echo "configurations (modifying heketi.json, etc...)"
+echo "configurations (modifying heketi.json, etc...) and restart after you make changes"
 echo "    executor: ssh"
 echo ""
 echo "    sshexec: {"
@@ -132,6 +133,7 @@ echo "      user: \"root\","
 echo "      port: \"22\","
 echo "      fstab: \"/etc/fstab\""
 echo ""
+echo " To Verify - curl $HEKETI_CLI_SERVER/hello"
 echo ""
 echo "If you want to manually create your gluster volumes and such here are some examples:"
 echo "  lsblk - to show available devices"
@@ -144,7 +146,10 @@ echo ""
 echo "  mkdir -p /data/gluster/gv0"
 echo "  gluster volume create gv0 replica 3 ip-172-18-15-138.ec2.internal:/data/gluster/gv0 ip-172-18-13-134.ec2.internal:/data/gluster/gv0 ip-172-18-0-125.ec2.internal:/data/gluster/gv0"
 echo "  gluster volume start gv0"
-echo "" 
+echo ""
+echo " Alternatively you can use heketi-cli after loading topology file to define your cluster (see Heketi docs for that)"
+echo "   heketi-cli volume create --size=10 --replica=3"
+echo "
 
 
 

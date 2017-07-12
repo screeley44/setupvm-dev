@@ -45,7 +45,7 @@ Use this for RHEL 7.x or Centos instances using normal dev type setup (i.e. hack
 
 # Additional Supported Functionality
 
-1.  GlusterFS cluster support - run the SetUpGFS.sh script from a single `master` node (only supported RHEL at the moment) with the following variables defined in setupvm.config (everything else can be ignored)
+1.  GlusterFS cluster support - run the SetUpGFS.sh script from a single `master` node (only supported RHEL at the moment) with the following variables defined in `setupvm.config` (everything else in `setupvm.config` can be ignored)
       - HOSTENV=rhel
       - RHNUSER=rhn-support-account
       - RHNPASS=rhn-password
