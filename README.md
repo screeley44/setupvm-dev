@@ -41,3 +41,22 @@ Use this for RHEL 7.x or Centos instances using normal dev type setup (i.e. hack
     All tasks, scripts and configurations (openshift in particular) will be located there.
 
 2.  If you will be switching frequently between K8 and Origin, uncomment the last line in the stop-ose.sh script, that removes the /etc/.kube dir (prevents crossing wires between Origin and Kube)
+
+
+# Additional Supported Functionality
+
+1.  GlusterFS cluster support - run the SetUpGFS.sh script from a single `master` node (only supported RHEL at the moment) with the following variables defined in setupvm.config (everything else can be ignored)
+      - HOSTENV=rhel
+      - RHNUSER=rhn-support-account
+      - RHNPASS=rhn-password
+      - POOLID=The Default Should be fine
+      - SETUP_TYPE="gluster"
+      - GFS_LIST="glusterfs1.rhs:glusterfs2.rhs:glusterfs.rhs3:..."
+
+    Prereqs:
+      - passwordless ssh between master/heketi/heketi-client to each node
+      - Run as Root
+
+    This will setup a basic GlusterFS cluster (no volumes or anything, that is manual), Heketi Server and Heketi-Client.  Additional config will be required
+      - configure /etc/heketi/heketi.json (script will give you values to configure), restart heketi
+

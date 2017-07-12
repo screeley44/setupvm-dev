@@ -49,6 +49,11 @@ then
       systemctl start glusterd
       systemctl status glusterd
       systemctl enable glusterd
+
+      # some heketi key stuff
+      ssh-keygen -f /etc/heketi/heketi_key -t rsa -N ''> /dev/null
+      chown heketi:heketi /etc/heketi/heketi_key*
+      export HEKETI_CLI_SERVER=http://"${gfs[index]}":8080
     else
       # Subscription Manager Stuffs - for RHEL 7.X devices
       echo ""
@@ -64,7 +69,7 @@ then
       echo "subscription-manager attach --pool=$POOLID> /dev/null" >> rmt-cmds.sh
       echo "subscription-manager repos --disable="*"> /dev/null" >> rmt-cmds.sh
       echo "subscription-manager repos --enable=\"rhel-7-server-rpms\" --enable=\"rhel-7-server-extras-rpms\" --enable=\"rhel-7-server-optional-rpms\" --enable=\"rhel-7-server-ose-3.5-rpms\" --enable=\"rhel-7-fast-datapath-rpms\" --enable=\"rh-gluster-3-for-rhel-7-server-rpms\"> /dev/null" >> rmt-cmds.sh
-      echo "yum install -y glusterfs-server heketi heketi-client> /dev/null" >> rmt-cmds.sh
+      echo "yum install -y glusterfs-server> /dev/null" >> rmt-cmds.sh
       echo "systemctl start glusterd> /dev/null" >> rmt-cmds.sh
       echo "systemctl enable glusterd> /dev/null" >> rmt-cmds.sh
        
@@ -118,7 +123,15 @@ echo "    Installation complete..."
 echo "================================================="
 echo ""
 echo "Do not forget (if using heketi and heketi-client) to perform any additional"
-echo "configurations (ssh keys, modifying heketi.json, etc...)"
+echo "configurations (modifying heketi.json, etc...)"
+echo "    executor: ssh"
+echo ""
+echo "    sshexec: {"
+echo "      keyfile: \"/etc/heketi/heketi_key\","
+echo "      user: \"root\","
+echo "      port: \"22\","
+echo "      fstab: \"/etc/fstab\""
+echo ""
 echo ""
 echo "If you want to manually create your gluster volumes and such here are some examples:"
 echo "  lsblk - to show available devices"
