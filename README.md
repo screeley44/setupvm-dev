@@ -57,6 +57,6 @@ Use this for RHEL 7.x or Centos instances using normal dev type setup (i.e. hack
       - passwordless ssh between master/heketi/heketi-client to each node
       - Run as Root
 
-    This will setup a basic GlusterFS cluster (no volumes or anything, that is manual), Heketi Server and Heketi-Client.  Additional config will be required
+    This will setup a basic GlusterFS cluster (no partitions or volumes will be created, that is manual or can be done by Heketi, just vanilla cluster), Heketi Server and Heketi-Client.  Additional config will be required
       - configure /etc/heketi/heketi.json (script will give you values to configure), restart heketi
 
