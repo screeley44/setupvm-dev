@@ -39,6 +39,20 @@ then
   exit 1
 fi
 
+if [ "$SETUP_TYPE" == "gluster" ]
+then
+  chmod +x SetUpGFS.sh
+  ./SetUpGFS.sh
+  exit 1
+fi
+
+if [ "$SETUP_TYPE" == "gluster-dev" ]
+then
+  chmod +x SetUpGFS.sh
+  ./SetUpGFS.sh
+fi
+
+
 echo ""
 
 if [ "$ISCLOUD" == "aws" ]
