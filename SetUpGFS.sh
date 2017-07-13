@@ -18,7 +18,7 @@
 
 source setupvm.config
 
-
+HCLI=""
 
 if [ "$HOSTENV" == "rhel" ]
 then
@@ -55,7 +55,8 @@ then
       ssh-keygen -f /etc/heketi/heketi_key -t rsa -N ''> /dev/null
       chown heketi:heketi /etc/heketi/heketi_key*
 
-      export HEKETI_CLI_SERVER=http://"${gfs[index]}":8080
+      HCLI=http://"${gfs[index]}":8080
+      
     else
       # Subscription Manager Stuffs - for RHEL 7.X devices
       echo ""
@@ -76,6 +77,12 @@ then
       echo "systemctl enable glusterd> /dev/null" >> rmt-cmds.sh
        
       chmod +x rmt-cmds.sh
+
+      echo ""
+      echo " Testing Connection to Remote Node..."
+      echo "hostname" | ssh -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      echo ""
+
       scp rmt-cmds.sh root@"${gfs[index]}":~
 
       echo "chmod +x rmt-cmds.sh;./rmt-cmds.sh" | ssh -o StrictHostKeyChecking=no root@"${gfs[index]}"
@@ -136,7 +143,12 @@ echo "      user: \"root\","
 echo "      port: \"22\","
 echo "      fstab: \"/etc/fstab\""
 echo ""
-echo " To Verify - curl $HEKETI_CLI_SERVER/hello"
+echo ""
+echo " export the HEKETI_CLI_SERVER: "
+echo ""
+echo "     export HEKETI_CLI_SERVER=$HCLI"
+echo ""
+echo " To Verify - curl $HCLI/hello"
 echo ""
 echo "If you want to manually create your gluster volumes and such here are some examples:"
 echo "  lsblk - to show available devices"
@@ -144,7 +156,7 @@ echo "  fdisk /dev/xvdb  - this will create partition and prompt you for some st
 echo "  mkfs.ext4 /dev/xvdb1"
 echo ""
 echo "  mkdir -p /data/gluster"
-echo "  mount /dev/xvdb1 /data/gluster"
+echo "  mount \/dev\/xvdb1 \/data/gluster"
 echo ""
 echo "  mkdir -p /data/gluster/gv0"
 echo "  gluster volume create gv0 replica 3 ip-172-18-15-138.ec2.internal:/data/gluster/gv0 ip-172-18-13-134.ec2.internal:/data/gluster/gv0 ip-172-18-0-125.ec2.internal:/data/gluster/gv0"
@@ -152,7 +164,4 @@ echo "  gluster volume start gv0"
 echo ""
 echo " Alternatively you can use heketi-cli after loading topology file to define your cluster (see Heketi docs for that)"
 echo "   heketi-cli volume create --size=10 --replica=3"
-echo "
-
-
-
+echo ""
