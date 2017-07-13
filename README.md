@@ -62,7 +62,7 @@ Use this for RHEL 7.x or Centos instances using normal dev type setup (i.e. hack
       - RHNUSER=rhn-support-account
       - RHNPASS=rhn-password
       - POOLID=The Default Should be fine
-      - SETUP_TYPE="gluster"
+      - SETUP_TYPE="gluster"  (If co-locating dev instance and `master` gluster node use `gluster-dev` for this value)
       - GFS_LIST="glusterfs1.rhs:glusterfs2.rhs:glusterfs.rhs3:..." (Make sure `master` designated node is first in list)
 
 
