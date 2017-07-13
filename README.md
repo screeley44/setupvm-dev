@@ -60,6 +60,11 @@ Use this for RHEL 7.x or Centos instances using normal dev type setup (i.e. hack
           - on AWS copy /root/.ssh/id_rsa.pub into hosts /root/.ssh/authorized_keys file
           - on non AWS ssh-copy-id -i /root/.ssh/id_rsa.pub root@server (you will get prompted for password)
 
+2. Execute either SetUpVM.sh or SetUpGFS.sh (SetUpVM.sh will call and execute SetUpGFS.sh is above parameters are set)
+
     This will setup a basic GlusterFS cluster (no partitions or volumes will be created, that is manual or can be done by Heketi, just vanilla cluster), Heketi Server and Heketi-Client.  Additional config will be required
+
       - configure /etc/heketi/heketi.json (script will give you values to configure), restart heketi
+
+
 
