@@ -63,7 +63,7 @@ Use this for RHEL 7.x or Centos instances using normal dev type setup (i.e. hack
       - RHNPASS=rhn-password
       - POOLID=The Default Should be fine
       - SETUP_TYPE="gluster"
-      - GFS_LIST="glusterfs1.rhs:glusterfs2.rhs:glusterfs.rhs3:..."
+      - GFS_LIST="glusterfs1.rhs:glusterfs2.rhs:glusterfs.rhs3:..." (Make sure `master` designated node is first in list)
 
 
 4. Execute either SetUpVM.sh or SetUpGFS.sh (SetUpVM.sh will call and execute SetUpGFS.sh is above parameters are set)
