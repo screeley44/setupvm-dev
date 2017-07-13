@@ -48,8 +48,9 @@ Use this for RHEL 7.x or Centos instances using normal dev type setup (i.e. hack
 ## GlusterFS Cluster Setup (RHEL only):
 
 1.  Prereqs:
+      - Choose a single server as your Gluster Master and Heketi-Client Server (where you will run the scripts from)
       - Run as root (sudo -s on AWS after logging in as ec2-user)
-      - passwordless ssh between master/heketi/heketi-client to each node
+      - Setup passwordless ssh between the designated `master/heketi-client` to each node
           - generate public key on master gluster server  ```ssh-keygen -t rsa``` 
           - on AWS copy /root/.ssh/id_rsa.pub into hosts /root/.ssh/authorized_keys file
           - on non AWS ssh-copy-id -i /root/.ssh/id_rsa.pub root@server (you will get prompted for password)
