@@ -54,6 +54,7 @@ then
       # some heketi key stuff
       ssh-keygen -f /etc/heketi/heketi_key -t rsa -N ''> /dev/null
       chown heketi:heketi /etc/heketi/heketi_key*
+
       export HEKETI_CLI_SERVER=http://"${gfs[index]}":8080
     else
       # Subscription Manager Stuffs - for RHEL 7.X devices
@@ -78,6 +79,8 @@ then
       scp rmt-cmds.sh root@"${gfs[index]}":~
 
       echo "chmod +x rmt-cmds.sh;./rmt-cmds.sh" | ssh -o StrictHostKeyChecking=no root@"${gfs[index]}"
+
+      ssh-copy-id -i /etc/heketi/heketi_key.pub root@"${gfs[index]}"
 
       echo ""
       echo "   ...Remote RHEL System attached and repo'd and Software Installed!!!"

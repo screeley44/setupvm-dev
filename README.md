@@ -55,6 +55,9 @@ Use this for RHEL 7.x or Centos instances using normal dev type setup (i.e. hack
 
     Prereqs:
       - passwordless ssh between master/heketi/heketi-client to each node
+          - generate public key on master gluster server  ```ssh-keygen -t rsa``` 
+          - on AWS copy /root/.ssh/id_rsa.pub into hosts /root/.ssh/authorized_keys file
+          - on non AWS ssh-copy-id -i /root/.ssh/id_rsa.pub root@<server>  (you will get prompted for password)
       - Run as Root
 
     This will setup a basic GlusterFS cluster (no partitions or volumes will be created, that is manual or can be done by Heketi, just vanilla cluster), Heketi Server and Heketi-Client.  Additional config will be required
