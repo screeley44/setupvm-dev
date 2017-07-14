@@ -38,7 +38,14 @@ then
       subscription-manager register --username=$RHNUSER --password=$RHNPASS
       subscription-manager attach --pool=$POOLID
       subscription-manager repos --disable="*"> /dev/null
-      subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.5-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
+
+
+      # subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.5-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
+
+
+      for i in {1..5}; do subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.5-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null && break || sleep 15; done
+
+
       echo ""
       echo " RHEL System attached and repo'd"
       echo ""
@@ -71,7 +78,8 @@ then
       echo "subscription-manager register --username=$RHNUSER --password=$RHNPASS> /dev/null" >> rmt-cmds.sh
       echo "subscription-manager attach --pool=$POOLID> /dev/null" >> rmt-cmds.sh
       echo "subscription-manager repos --disable="*"> /dev/null" >> rmt-cmds.sh
-      echo "subscription-manager repos --enable=\"rhel-7-server-rpms\" --enable=\"rhel-7-server-extras-rpms\" --enable=\"rhel-7-server-optional-rpms\" --enable=\"rhel-7-server-ose-3.5-rpms\" --enable=\"rhel-7-fast-datapath-rpms\" --enable=\"rh-gluster-3-for-rhel-7-server-rpms\"> /dev/null" >> rmt-cmds.sh
+      # echo "subscription-manager repos --enable=\"rhel-7-server-rpms\" --enable=\"rhel-7-server-extras-rpms\" --enable=\"rhel-7-server-optional-rpms\" --enable=\"rhel-7-server-ose-3.5-rpms\" --enable=\"rhel-7-fast-datapath-rpms\" --enable=\"rh-gluster-3-for-rhel-7-server-rpms\"> /dev/null" >> rmt-cmds.sh
+      echo "for i in {1..5}; do subscription-manager repos --enable=\"rhel-7-server-rpms\" --enable=\"rhel-7-server-extras-rpms\" --enable=\"rhel-7-server-optional-rpms\" --enable=\"rhel-7-server-ose-3.5-rpms\" --enable=\"rhel-7-fast-datapath-rpms\" --enable=\"rh-gluster-3-for-rhel-7-server-rpms\"> /dev/null && break || sleep 15; done" >> rmt-cmds.sh
       echo "yum install -y glusterfs-server> /dev/null" >> rmt-cmds.sh
       echo "systemctl start glusterd> /dev/null" >> rmt-cmds.sh
       echo "systemctl enable glusterd> /dev/null" >> rmt-cmds.sh
