@@ -973,12 +973,23 @@ CreateTestYamlEC2()
   echo "metadata:" >> glusterfs-storageclass-v34.yaml
   echo "  name: gluster34" >> glusterfs-storageclass-v34.yaml
   echo "provisioner: kubernetes.io/glusterfs" >> glusterfs-storageclass-v34.yaml
-  echo "parameters:" >> glusterfs-storageclass-v34.yaml
-  echo "  endpoint: \"glusterfs-cluster\"" >> glusterfs-storageclass-v34.yaml  
+  echo "parameters:" >> glusterfs-storageclass-v34.yaml 
   echo "  resturl: \"http://glusterclient2.rhs:8080\"" >> glusterfs-storageclass-v34.yaml  
   echo "  restauthenabled: \"false\"" >> glusterfs-storageclass-v34.yaml  
   echo "  restuser: \"admin\"" >> glusterfs-storageclass-v34.yaml  
   echo "  restuserkey: \"My Secret\"" >> glusterfs-storageclass-v34.yaml
+
+  echo "kind: StorageClass" > glusterfs-storageclass-v341.yaml
+  echo "apiVersion: storage.k8s.io/v1beta1" >> glusterfs-storageclass-v341.yaml
+  echo "metadata:" >> glusterfs-storageclass-v341.yaml
+  echo "  name: gluster341" >> glusterfs-storageclass-v341.yaml
+  echo "provisioner: kubernetes.io/glusterfs" >> glusterfs-storageclass-v341.yaml
+  echo "parameters:" >> glusterfs-storageclass-v341.yaml 
+  echo "  resturl: \"http://glusterclient2.rhs:8080\"" >> glusterfs-storageclass-v341.yaml  
+  echo "  restauthenabled: \"true\"" >> glusterfs-storageclass-v341.yaml  
+  echo "  restuser: \"admin\"" >> glusterfs-storageclass-v341.yaml  
+  echo "  secretname: \"heketi-secret\"" >> glusterfs-storageclass-v341.yaml
+  echo "  secretnamespace: \"default\"" >> glusterfs-storageclass-v341.yaml
 
   echo "kind: StorageClass" > glusterfs-storageclass-v35.yaml
   echo "apiVersion: storage.k8s.io/v1beta1" >> glusterfs-storageclass-v35.yaml
@@ -1012,6 +1023,16 @@ CreateTestYamlEC2()
   echo " resources:" >> glusterfs-pvc-storageclass.yaml
   echo "   requests:" >> glusterfs-pvc-storageclass.yaml
   echo "     storage: 30Gi" >> glusterfs-pvc-storageclass.yaml
+
+  echo "apiVersion: v1" > glusterfs-heketi-secret.yaml
+  echo "kind: Secret" >> glusterfs-heketi-secret.yaml
+  echo "metadata:" >> glusterfs-heketi-secret.yaml
+  echo "  name: heketi-secret" >> glusterfs-heketi-secret.yaml
+  echo "  namespace: default" >> glusterfs-heketi-secret.yaml
+  echo "type: kubernetes.io/glusterfs" >> glusterfs-heketi-secret.yaml
+  echo "data:" >> glusterfs-heketi-secret.yaml
+  echo "  # echo -n 'PASSWORD' | base64" >> glusterfs-heketi-secret.yaml
+  echo "  key: PASSWORD_BASE64_ENCODED" >> glusterfs-heketi-secret.yaml
 
 
   cp -R $GOLANGPATH/dev-configs/* $OSEPATH/dev-configs
@@ -1124,13 +1145,13 @@ else
     # FOR ALL
     if [ "$OCPVERSION" == "3.5" ]
     then
-      echo "Enabling rhel 7 rpms..."
+      echo "Enabling rhel 7 rpms for OCP 3.5..."
       $SUDO subscription-manager repos --disable="*"> /dev/null
       $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.5-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
       echo ""
     elif [ "$OCPVERSION" == "3.4" ]
     then
-      echo "Enabling rhel 7 rpms..."
+      echo "Enabling rhel 7 rpms for OCP 3.4..."
       $SUDO subscription-manager repos --disable="*"> /dev/null
       $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.4-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
       echo ""
@@ -1361,6 +1382,10 @@ then
     cd $GOLANGPATH/go/src/github.com/openshift
     rm -rf origin
     git clone https://github.com/openshift/origin.git
+
+    # cd $GOLANGPATH/go/src/github.com/
+    # rm -rf service-catalog
+    # git clone https://github.com/kubernetes-incubator/service-catalog.git
 
     cd $GOLANGPATH
     rm -rf openshift-ansible
