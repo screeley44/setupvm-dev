@@ -9,6 +9,7 @@
 # Fill out the following from the setupvm.config
 #
 #   HOSTENV=rhel
+#   OCPVERSION=3.6 or 3.5 or 3.4 (default is 3.6)
 #   RHNUSER=rhn-support-account
 #   RHNPASS=rhn-password
 #   POOLID=just take the default
