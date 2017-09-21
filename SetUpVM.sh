@@ -1147,6 +1147,7 @@ else
     then
       echo "Enabling rhel 7 rpms for OCP 3.5..."
       $SUDO subscription-manager repos --disable="*"> /dev/null
+      # $SUDO yum-config-manager --disable \*> /dev/null
       $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.5-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
       echo ""
     elif [ "$OCPVERSION" == "3.4" ]
@@ -1155,10 +1156,16 @@ else
       $SUDO subscription-manager repos --disable="*"> /dev/null
       $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.4-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
       echo ""
-    else
-      echo "Enabling rhel 7 rpms..."
+    elif [ "$OCPVERSION" == "3.6" ]
+    then
+      echo "Enabling rhel 7 rpms for OCP 3.6..."
       $SUDO subscription-manager repos --disable="*"> /dev/null
-      $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.5-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
+      $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.6-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
+      echo ""
+    else
+      echo "Enabling rhel 7 rpms defaulting to OCP 3.6 as latest..."
+      $SUDO subscription-manager repos --disable="*"> /dev/null
+      $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.6-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
       echo ""
     fi
   fi
@@ -1166,19 +1173,19 @@ else
   # Install software
   if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "aplo" ]
   then  
-    echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet unzip ... this will take several minutes"
-    $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet unzip -y> /dev/null
+    echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet unzip kexec-tools sos psacct ... this will take several minutes"
+    $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct -y> /dev/null
     $SUDO yum update -y> /dev/null
     if [ "$HOSTENV" == "rhel" ]
     then
       if [ "$SETUP_TYPE" == "aplo" ]
       then
         echo "...Installing openshift utils, clients and atomic-openshift for APLO setup type..."
-        $SUDO yum install atomic-openshift-utils atomic-openshift-clients atomic-openshift -y> /dev/null
+        $SUDO yum install atomic-openshift-utils atomic-openshift-clients atomic-openshift kexec-tools sos psacct -y> /dev/null
         $SUDO yum install heketi-client heketi-templates -y> /dev/null
       else
         echo "...Installing openshift utils for DEV setup type..."
-        # $SUDO yum install atomic-openshift-utils -y> /dev/null
+        $SUDO yum install atomic-openshift-utils -y> /dev/null
       fi
     fi
     echo ""
@@ -1208,8 +1215,8 @@ else
   else
     if [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ]
     then
-      echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip for KUBEADM setup type  ... this will take several minutes"
-      $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip -y> /dev/null
+      echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip kexec-tools sos psacct for KUBEADM setup type  ... this will take several minutes"
+      $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct -y> /dev/null
       $SUDO yum update -y> /dev/null
 
       # Install Go and do other config
@@ -1279,8 +1286,8 @@ else
         $SUDO yum install kubelet kubeadm kubectl kubernetes-cni -y> /dev/null
       fi
     else
-      echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip for CLIENT setup type  ... this will take several minutes"
-      $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip -y> /dev/null
+      echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip kexec-tools sos psacctfor CLIENT setup type  ... this will take several minutes"
+      $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct -y> /dev/null
       $SUDO yum update -y> /dev/null
       if [ "$HOSTENV" == "rhel" ]
       then
