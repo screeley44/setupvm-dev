@@ -1187,9 +1187,11 @@ else
         echo "...Installing openshift utils, clients and atomic-openshift for APLO setup type..."
         $SUDO yum install atomic-openshift-utils atomic-openshift-clients atomic-openshift kexec-tools sos psacct -y> /dev/null
         $SUDO yum install heketi-client heketi-templates -y> /dev/null
+        $SUDO openshift_clock_enabled=true
       else
         echo "...Installing openshift utils for DEV setup type..."
         $SUDO yum install atomic-openshift-utils -y> /dev/null
+        $SUDO openshift_clock_enabled=true
       fi
     fi
     echo ""
@@ -1209,13 +1211,18 @@ else
       $SUDO tar -C /usr/local -xzf go$GOVERSION.linux-amd64.tar.gz
     fi
     echo ""
-    echo "Installing latest ansible..."
-    $SUDO rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-    $SUDO yum install ansible -y> /dev/null
 
-    if [ -d "/usr/share/ansible" ]; then $SUDO rm -rf /usr/share/ansible; fi
-    if [ -d "/usr/share/ansible_plugins" ]; then $SUDO rm -rf /usr/share/ansible_plugins; fi
-    echo ""
+    
+    if [ "$INSTALL_ANSIBLE" == "yes" ]
+    then
+      echo "Installing latest ansible..."
+      if [ -d "/usr/share/ansible" ]; then $SUDO rm -rf /usr/share/ansible; fi
+      if [ -d "/usr/share/ansible_plugins" ]; then $SUDO rm -rf /usr/share/ansible_plugins; fi
+      echo ""
+      $SUDO rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+      $SUDO yum install ansible -y> /dev/null
+    fi
+
   else
     if [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ]
     then
