@@ -257,6 +257,12 @@ CreateProfiles()
     echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> .bash_profile
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> .bash_profile
     echo "export ZONE=$ZONE" >> .bash_profile
+    if [ "$FEATURE_GATES" == "" ]
+    then
+      echo "No Alpha Features Enabled..."
+    else
+      echo "export FEATURE_GATES=$FEATURE_GATES" >> .bash_profile  
+    fi
     if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "vsphere" ]
     then
       echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> .bash_profile
@@ -287,6 +293,12 @@ CreateProfiles()
     echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> newbashrc
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> newbashrc
     echo "export ZONE=$ZONE" >> newbashrc
+    if [ "$FEATURE_GATES" == "" ]
+    then
+      echo "No Alpha Features Enabled..."
+    else
+      echo "export FEATURE_GATES=$FEATURE_GATES" >> newbashrc  
+    fi
     if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "vsphere" ]
     then
       echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> newbashrc
@@ -304,6 +316,12 @@ CreateProfiles()
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> .bash_profile
     echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> .bash_profile
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> .bash_profile
+    if [ "$FEATURE_GATES" == "" ]
+    then
+      echo "No Alpha Features Enabled..."
+    else
+      echo "export FEATURE_GATES=$FEATURE_GATES" >> .bash_profile  
+    fi
   fi
 
   if [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ]
@@ -380,12 +398,19 @@ CreateConfigs()
   echo "# $GOLANGPATH/go/src/k8s.io/kubernetes/cluster/kubectl.sh config use-context local" >> config-k8.sh
   echo "# export KUBECONFIG=/var/run/kubernetes/admin.kubeconfig" >> config-k8.sh  
   echo "" >> config-k8.sh
-  echo "kubectl config set-cluster local --server=https://localhost:6443 --certificate-authority=/var/run/kubernetes/server-ca.crt" >> config-k8.sh
-  echo "kubectl config set-credentials myself --client-key=/var/run/kubernetes/client-admin.key --client-certificate=/var/run/kubernetes/client-admin.crt" >> config-k8.sh
-  echo "kubectl config set-context local --cluster=local --user=myself" >> config-k8.sh
-  echo "kubectl config use-context local" >> config-k8.sh
-
-
+  echo "# kubectl config set-cluster local --server=https://localhost:6443 --certificate-authority=/var/run/kubernetes/server-ca.crt" >> config-k8.sh
+  echo "# kubectl config set-credentials myself --client-key=/var/run/kubernetes/client-admin.key --client-certificate=/var/run/kubernetes/client-admin.crt" >> config-k8.sh
+  echo "# kubectl config set-context local --cluster=local --user=myself" >> config-k8.sh
+  echo "# kubectl config use-context local" >> config-k8.sh
+  echo "" >> config-k8.sh
+  echo "export KUBERNETES_PROVIDER=local" >> config-k8.sh
+  echo "cluster/kubectl.sh config set-cluster local --server=https://localhost:6443 --certificate-authority=/var/run/kubernetes/server-ca.crt" >> config-k8.sh
+  echo "cluster/kubectl.sh config set-credentials myself --client-key=/var/run/kubernetes/client-admin.key --client-certificate=/var/run/kubernetes/client-admin.crt" >> config-k8.sh
+  echo "cluster/kubectl.sh config set-context local --cluster=local --user=myself" >> config-k8.sh
+  echo "cluster/kubectl.sh config use-context local" >> config-k8.sh
+  echo "" >> config-k8.sh
+  echo "# ** NOTE ** There have been some issues, I typically run the single export command like this, if the above script does not work ** " >> config-k8.sh
+  echo "#   export KUBECONFIG=/var/run/kubernetes/admin.kubeconfig   " >> config-k8.sh
 
   chmod +x config-k8.sh
 
@@ -563,6 +588,61 @@ CreateConfigs()
 CreateTestYamlEC2()
 {
   cd $GOLANGPATH/dev-configs/aws
+  echo "kind: PersistentVolume" > local-pv.yaml
+  echo "apiVersion: v1" >> local-pv.yaml
+  echo "metadata:" >> local-pv.yaml
+  echo "  name: local-raw-pv" >> local-pv.yaml
+  echo "   annotations:" >> local-pv.yaml
+  echo "         \"volume.alpha.kubernetes.io/node-affinity\": '{" >> local-pv.yaml
+  echo "             \"requiredDuringSchedulingIgnoredDuringExecution\": {" >> local-pv.yaml
+  echo "                \"nodeSelectorTerms\": [" >> local-pv.yaml
+  echo "                    { \"matchExpressions\": [" >> local-pv.yaml
+  echo "                        { \"key\": \"kubernetes.io/hostname\"," >> local-pv.yaml
+  echo "                          \"operator\": \"In\"," >> local-pv.yaml
+  echo "                          \"values\": [\"ip-172-18-11-174.ec2.internal\"]" >> local-pv.yaml
+  echo "                        }" >> local-pv.yaml
+  echo "                    ]}" >> local-pv.yaml
+  echo "                 ]}" >> local-pv.yaml
+  echo "              }'" >> local-pv.yaml
+  echo "spec:" >> local-pv.yaml
+  echo "  volumeMode: Block" >> local-pv.yaml
+  echo "  capacity:" >> local-pv.yaml
+  echo "    storage: 10Gi" >> local-pv.yaml
+  echo "  local:" >> local-pv.yaml
+  echo "    path: /dev/xvdf" >> local-pv.yaml
+  echo "  accessModes:" >> local-pv.yaml
+  echo "    - ReadWriteOnce" >> local-pv.yaml
+  echo "  persistentVolumeReclaimPolicy: Retain" >> local-pv.yaml
+
+  echo "kind: PersistentVolumeClaim" > local-pvc.yaml
+  echo "apiVersion: v1" >> local-pvc.yaml
+  echo "metadata:" >> local-pvc.yaml
+  echo "  name: local-claim" >> local-pvc.yaml
+  echo "spec:" >> local-pvc.yaml
+  echo "  volumeMode: Block" >> local-pvc.yaml
+  echo "  accessModes:" >> local-pvc.yaml
+  echo "    - ReadWriteOnce" >> local-pvc.yaml
+  echo "  resources:" >> local-pvc.yaml
+  echo "    requests:" >> local-pvc.yaml
+  echo "      storage: 5Gi" >> local-pvc.yaml
+
+  echo "apiVersion: v1" > local-pod.yaml
+  echo "kind: Pod" >> local-pod.yaml
+  echo "metadata:" >> local-pod.yaml
+  echo "  name: local-busybox" >> local-pod.yaml
+  echo "spec:" >> local-pod.yaml
+  echo "    containers:" >> local-pod.yaml
+  echo "    - name: local-busybox" >> local-pod.yaml
+  echo "      image: busybox" >> local-pod.yaml
+  echo "      command: [\"sleep\", \"600000\"]" >> local-pod.yaml
+  echo "      volumeDevices:" >> local-pod.yaml
+  echo "      - name: localdev" >> local-pod.yaml
+  echo "        devicePath: /dev/xvdf" >> local-pod.yaml
+  echo "    volumes:" >> local-pod.yaml
+  echo "    - name: localdev" >> local-pod.yaml
+  echo "      persistentVolumeClaim:" >> local-pod.yaml
+  echo "        claimName: local-claim" >> local-pod.yaml
+
   echo "apiVersion: v1" > busybox-ebs.yaml
   echo "kind: Pod" >> busybox-ebs.yaml
   echo "metadata:"  >> busybox-ebs.yaml
@@ -673,6 +753,23 @@ CreateTestYamlEC2()
   echo "   requests:" >> aws-pvc-storageclass.yaml
   echo "     storage: 10Gi" >> aws-pvc-storageclass.yaml
 
+  echo "apiVersion: v1" > default-service-account.yaml
+  echo "kind: ServiceAccount" >> default-service-account.yaml
+  echo "metadata:" >> default-service-account.yaml
+  echo "  name: default" >> default-service-account.yaml
+  echo "  namespace: default" >> default-service-account.yaml
+  echo "secrets:" >> default-service-account.yaml
+  echo "- name: default-secret" >> default-service-account.yaml
+
+  echo "kind: Secret" > service-account-secret.yaml
+  echo "apiVersion: v1" >> service-account-secret.yaml
+  echo "metadata:" >> service-account-secret.yaml
+  echo "  name: default-secret" >> service-account-secret.yaml
+  echo "  annotations:" >> service-account-secret.yaml
+  echo "    kubernetes.io/service-account.name: default" >> service-account-secret.yaml
+  echo "type: kubernetes.io/service-account-token" >> service-account-secret.yaml
+
+
 
   cd $GOLANGPATH/dev-configs/gce
   echo "apiVersion: v1" > busybox-gce.yaml
@@ -759,6 +856,22 @@ CreateTestYamlEC2()
   echo "   requests:" >> gce-pvc-storage-class.yaml
   echo "     storage: 5Gi" >> gce-pvc-storage-class.yaml
 
+  echo "apiVersion: v1" > default-service-account.yaml
+  echo "kind: ServiceAccount" >> default-service-account.yaml
+  echo "metadata:" >> default-service-account.yaml
+  echo "  name: default" >> default-service-account.yaml
+  echo "  namespace: default" >> default-service-account.yaml
+  echo "secrets:" >> default-service-account.yaml
+  echo "- name: default-secret" >> default-service-account.yaml
+
+  echo "kind: Secret" > service-account-secret.yaml
+  echo "apiVersion: v1" >> service-account-secret.yaml
+  echo "metadata:" >> service-account-secret.yaml
+  echo "  name: default-secret" >> service-account-secret.yaml
+  echo "  annotations:" >> service-account-secret.yaml
+  echo "    kubernetes.io/service-account.name: default" >> service-account-secret.yaml
+  echo "type: kubernetes.io/service-account-token" >> service-account-secret.yaml
+
   cd $GOLANGPATH/dev-configs/nfs
   echo "apiVersion: v1" > busybox-nfs.yaml
   echo "kind: Pod" >> busybox-nfs.yaml
@@ -835,6 +948,22 @@ CreateTestYamlEC2()
   echo "    - name: nfsvol" >> busybox-nfs-pvc.yaml
   echo "      persistentVolumeClaim:" >> busybox-nfs-pvc.yaml
   echo "        claimName: nfs-claim" >> busybox-nfs-pvc.yaml
+
+  echo "apiVersion: v1" > default-service-account.yaml
+  echo "kind: ServiceAccount" >> default-service-account.yaml
+  echo "metadata:" >> default-service-account.yaml
+  echo "  name: default" >> default-service-account.yaml
+  echo "  namespace: default" >> default-service-account.yaml
+  echo "secrets:" >> default-service-account.yaml
+  echo "- name: default-secret" >> default-service-account.yaml
+
+  echo "kind: Secret" > service-account-secret.yaml
+  echo "apiVersion: v1" >> service-account-secret.yaml
+  echo "metadata:" >> service-account-secret.yaml
+  echo "  name: default-secret" >> service-account-secret.yaml
+  echo "  annotations:" >> service-account-secret.yaml
+  echo "    kubernetes.io/service-account.name: default" >> service-account-secret.yaml
+  echo "type: kubernetes.io/service-account-token" >> service-account-secret.yaml
 
   cd $GOLANGPATH/dev-configs/glusterfs
   echo "apiVersion: v1" > glusterfs-endpoints.yaml
@@ -1033,6 +1162,22 @@ CreateTestYamlEC2()
   echo "data:" >> glusterfs-heketi-secret.yaml
   echo "  # echo -n 'PASSWORD' | base64" >> glusterfs-heketi-secret.yaml
   echo "  key: PASSWORD_BASE64_ENCODED" >> glusterfs-heketi-secret.yaml
+
+  echo "apiVersion: v1" > default-service-account.yaml
+  echo "kind: ServiceAccount" >> default-service-account.yaml
+  echo "metadata:" >> default-service-account.yaml
+  echo "  name: default" >> default-service-account.yaml
+  echo "  namespace: default" >> default-service-account.yaml
+  echo "secrets:" >> default-service-account.yaml
+  echo "- name: default-secret" >> default-service-account.yaml
+
+  echo "kind: Secret" > service-account-secret.yaml
+  echo "apiVersion: v1" >> service-account-secret.yaml
+  echo "metadata:" >> service-account-secret.yaml
+  echo "  name: default-secret" >> service-account-secret.yaml
+  echo "  annotations:" >> service-account-secret.yaml
+  echo "    kubernetes.io/service-account.name: default" >> service-account-secret.yaml
+  echo "type: kubernetes.io/service-account-token" >> service-account-secret.yaml
 
 
   cp -R $GOLANGPATH/dev-configs/* $OSEPATH/dev-configs
@@ -1930,6 +2075,10 @@ else
   echo " 4. Finally, open a 2nd terminal and run: "
   echo "        K8 "
   echo "       -------- "
+  echo "       Follow the instructions on the running server/cluster terminal - I typically just run the single export command"
+  echo "                export KUBECONFIG=/var/run/kubernetes/admin.kubeconfig"
+  echo "       OR"
+  echo "       run the config-k8.sh script" 
   echo "       $KUBEPATH/config-k8.sh" 
   echo ""
   echo "        Origin"
@@ -1937,6 +2086,10 @@ else
   echo "       $OSEPATH/config-ose.sh"
   echo ""
   echo " 5. Now you should be able to interact and use kubectl or openshift as usual"
+  echo ""
+  echo " 6. (you might need to do this for K8) Create default service account and secret"
+  echo "       kubectl create -f $KUBEPATH/dev-configs/<directory>/service-account-secret.yaml"
+  echo "       kubectl create -f $KUBEPATH/dev-configs/<directory>/default-service-account.yaml"
   echo ""
   echo "Environment Recap: "
   echo "  dev dir (gopath and source): $GOLANGPATH/go/src/k8s.io/kubernetes $GOLANGPATH/go/src/github.com/openshift/origin"
