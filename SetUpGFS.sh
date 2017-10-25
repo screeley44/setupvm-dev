@@ -8,7 +8,7 @@
 #
 # Fill out the following from the setupvm.config
 #
-#   HOSTENV=rhel
+#   HOSTENV=rhel or centos(not tested)
 #   OCPVERSION=3.6 or 3.5 or 3.4 (default is 3.6)
 #   RHNUSER=rhn-support-account
 #   RHNPASS=rhn-password
@@ -23,7 +23,9 @@ HCLI=""
 
 if [ "$HOSTENV" == "rhel" ]
 then
-
+  echo " *** INSTALLING GLUSTERFS CLUSTER ON RHEL ***"
+  echo ""
+  echo ""
 
   IFS=':' read -r -a gfs <<< "$GFS_LIST"
   for index in "${!gfs[@]}"
@@ -101,6 +103,92 @@ then
       echo ""
     fi
   done
+else
+  echo " *** INSTALLING GLUSTERFS CLUSTER ON RHEL ***"
+  echo ""
+  echo ""
+
+  IFS=':' read -r -a gfs <<< "$GFS_LIST"
+  for index in "${!gfs[@]}"
+  do
+    if [ "$index" == 0 ]
+    then
+
+      echo "Installing GlusterFS Server and Heketi..."
+      yum install -y wget telnet> /dev/null
+      yum install -y centos-release-gluster> /dev/null    
+      yum install epel-release -y> /dev/null
+      yum install glusterfs-server -y> /dev/null
+      yum install heketi -y> /dev/null
+      yum install heketi-client -y> /dev/null
+
+      echo ""
+      echo "Enabling and starting GlusterFS..."
+      systemctl start glusterd
+      systemctl status glusterd
+      systemctl enable glusterd
+
+      echo ""
+      echo "Installing heketi-client 5..."
+      wget https://github.com/heketi/heketi/releases/download/v5.0.0/heketi-client-v5.0.0.linux.amd64.tar.gz
+      mkdir -p /etc/heketi && tar xzvf heketi-client-v5.0.0.linux.amd64.tar.gz -C /etc/heketi
+
+      echo ""
+      echo "Adding Firewall Rules..."
+      firewall-cmd --permanent --zone=public --add-port=8080/tcp
+      firewall-cmd --zone=public --add-service=glusterfs --permanent
+      firewall-cmd --reload
+
+      # some heketi key stuff
+      ssh-keygen -f /etc/heketi/heketi_key -t rsa -N ''> /dev/null
+      chown heketi:heketi /etc/heketi/heketi_key*
+
+      HCLI=http://"${gfs[index]}":8080
+      
+    else
+      # Subscription Manager Stuffs - for RHEL 7.X devices
+      echo ""
+      echo "****************"
+      echo ""
+      echo "Setting Up Host... ${gfs[index]}"
+
+      
+      echo "#! /bin/bash" > rmt-cmds.sh
+      echo "" >> rmt-cmds.sh
+
+      echo "yum install -y wget telnet> /dev/null" >> rmt-cmds.sh
+      echo "yum install -y centos-release-gluster> /dev/null" >> rmt-cmds.sh    
+      echo "yum install epel-release -y> /dev/null" >> rmt-cmds.sh
+      echo "yum install glusterfs-server -y> /dev/null" >> rmt-cmds.sh
+      echo "yum install heketi -y> /dev/null" >> rmt-cmds.sh
+      echo "yum install heketi-client -y> /dev/null" >> rmt-cmds.sh
+      echo "systemctl start glusterd" >> rmt-cmds.sh
+      echo "systemctl status glusterd" >> rmt-cmds.sh
+      echo "systemctl enable glusterd" >> rmt-cmds.sh
+      echo "firewall-cmd --permanent --zone=public --add-port=8080/tcp" >> rmt-cmds.sh
+      echo "firewall-cmd --zone=public --add-service=glusterfs --permanent" >> rmt-cmds.sh
+      echo "firewall-cmd --reload" >> rmt-cmds.sh
+       
+      chmod +x rmt-cmds.sh
+
+      echo ""
+      echo " Testing Connection to Remote Node..."
+      echo "hostname" | ssh -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      echo ""
+
+      scp rmt-cmds.sh root@"${gfs[index]}":~
+
+      echo "chmod +x rmt-cmds.sh;./rmt-cmds.sh" | ssh -o StrictHostKeyChecking=no root@"${gfs[index]}"
+
+      ssh-copy-id -i /etc/heketi/heketi_key.pub root@"${gfs[index]}"
+
+      echo ""
+      echo "   ...Remote CentOS System attached and Software Installed!!!"
+      echo ""
+    fi
+  done
+  
+
 fi
 
 if [ "$SETUP_TYPE" == "gluster" ] && [ "$GFS_LIST" != "" ]
@@ -139,6 +227,8 @@ echo ""
 echo "================================================="
 echo "    Installation complete..."
 echo "================================================="
+echo ""
+echo " Should have a functioning cluster now, just setup your Trusted Storage Pool manually or using heketi"
 echo ""
 echo "Do not forget (if using heketi and heketi-client) to perform any additional"
 echo "configurations (modifying heketi.json, etc...) and restart after you make changes"

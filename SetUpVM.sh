@@ -1477,7 +1477,7 @@ else
         $SUDO wget https://github.com/coreos/etcd/releases/download/v$ETCD_VER/etcd-v$ETCD_VER-linux-amd64.tar.gz
         $SUDO rm -rf /usr/bin/etcd
         $SUDO tar -zxvf etcd-v$ETCD_VER-linux-amd64.tar.gz
-        $SUDO cp etcd-vETCD_VER-linux-amd64/etcd /usr/bin
+        $SUDO cp etcd-v$ETCD_VER-linux-amd64/etcd /usr/bin
       fi
     fi
   else

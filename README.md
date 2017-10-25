@@ -58,15 +58,15 @@ Use this for RHEL 7.x or Centos instances using normal dev type setup (i.e. hack
 2.  scp the `setupvm.config` , `SetUpGFS.sh`, and `SetUpVM.sh` or clone this repo on the `master` GlusterFS node (pick a single node)
 
 3.  Edit the `setupvm.config` with the following variables defined in `setupvm.config` (everything else in `setupvm.config` can be ignored)
-      - HOSTENV=rhel
-      - RHNUSER=rhn-support-account
-      - RHNPASS=rhn-password
+      - HOSTENV=rhel or centos (however-have not tested yet on centos)
+      - RHNUSER=rhn-support-account (only needed for rhel)
+      - RHNPASS=rhn-password (only needed for rhel)
       - POOLID=The Default Should be fine
       - SETUP_TYPE="gluster"  (If co-locating dev instance and `master` gluster node use `gluster-dev` for this value)
       - GFS_LIST="glusterfs1.rhs:glusterfs2.rhs:glusterfs.rhs3:..." (Make sure `master` designated node is first in list)
 
 
-4. Execute either SetUpVM.sh or SetUpGFS.sh (SetUpVM.sh will call and execute SetUpGFS.sh is above parameters are set)
+4. Execute SetUpGFS.sh (SetUpVM.sh should call and execute SetUpGFS.sh as well, but again, not tested yet)
 
     This will setup a basic GlusterFS cluster (no partitions or volumes will be created, that is manual or can be done by Heketi, just vanilla cluster), Heketi Server and Heketi-Client.  Additional config will be required
 
