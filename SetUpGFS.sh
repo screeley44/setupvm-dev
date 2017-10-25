@@ -104,7 +104,7 @@ then
     fi
   done
 else
-  echo " *** INSTALLING GLUSTERFS CLUSTER ON RHEL ***"
+  echo " *** INSTALLING GLUSTERFS CLUSTER ON CentOS ***"
   echo ""
   echo ""
 
@@ -146,7 +146,7 @@ else
       HCLI=http://"${gfs[index]}":8080
       
     else
-      # Subscription Manager Stuffs - for RHEL 7.X devices
+      # Setting up CentOS
       echo ""
       echo "****************"
       echo ""
