@@ -45,7 +45,7 @@ Use this for RHEL 7.x or Centos instances using normal dev type setup (i.e. hack
 
 # Additional Supported Functionality
 
-## GlusterFS Cluster Setup (RHEL only):
+## GlusterFS Cluster Setup (RHEL or CentOS):
 
 1.  Prereqs:
       - Choose a single server as your Gluster Master and Heketi-Client Server (where you will run the scripts from)
@@ -61,7 +61,7 @@ Use this for RHEL 7.x or Centos instances using normal dev type setup (i.e. hack
       - HOSTENV=rhel or centos (however-have not tested yet on centos)
       - RHNUSER=rhn-support-account (only needed for rhel)
       - RHNPASS=rhn-password (only needed for rhel)
-      - POOLID=The Default Should be fine
+      - POOLID=The Default Should be fine  (only needed for rhel)
       - SETUP_TYPE="gluster"  (If co-locating dev instance and `master` gluster node use `gluster-dev` for this value)
       - GFS_LIST="glusterfs1.rhs:glusterfs2.rhs:glusterfs.rhs3:..." (Make sure `master` designated node is first in list)
 
