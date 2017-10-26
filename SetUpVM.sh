@@ -261,7 +261,10 @@ CreateProfiles()
     then
       echo "No Alpha Features Enabled..."
     else
-      echo "export FEATURE_GATES=$FEATURE_GATES" >> .bash_profile  
+      echo ""
+      echo "Enabled Alpha Feature Gates $FEATURE_GATES"
+      echo "export FEATURE_GATES=$FEATURE_GATES" >> .bash_profile
+      echo ""  
     fi
     if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "vsphere" ]
     then
@@ -320,6 +323,8 @@ CreateProfiles()
     then
       echo "No Alpha Features Enabled..."
     else
+      echo ""
+      echo "Enabled Alpha Feature Gates $FEATURE_GATES"
       echo "export FEATURE_GATES=$FEATURE_GATES" >> .bash_profile  
     fi
   fi
@@ -592,7 +597,7 @@ CreateTestYamlEC2()
   echo "apiVersion: v1" >> local-pv.yaml
   echo "metadata:" >> local-pv.yaml
   echo "  name: local-raw-pv" >> local-pv.yaml
-  echo "   annotations:" >> local-pv.yaml
+  echo "  annotations:" >> local-pv.yaml
   echo "         \"volume.alpha.kubernetes.io/node-affinity\": '{" >> local-pv.yaml
   echo "             \"requiredDuringSchedulingIgnoredDuringExecution\": {" >> local-pv.yaml
   echo "                \"nodeSelectorTerms\": [" >> local-pv.yaml
@@ -1253,7 +1258,7 @@ else
   then
     # Subscription Manager Stuffs - for RHEL 7.X devices
     echo "Setting up subscription services from RHEL..."
-    $SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS
+    until $SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS; do echo "Failure on subscription manager registration, retrying..."; sleep 5; done
   fi
 
   if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ]
@@ -1265,7 +1270,7 @@ else
     elif [ "$HOSTENV" == "rhel" ]
     then
       echo "Using Predefined POOLID..."
-      $SUDO subscription-manager attach --pool=$POOLID
+      until $SUDO subscription-manager attach --pool=$POOLID; do echo "Failure on attaching pool id, retrying..."; sleep 5; done
     else
       echo "..."
     fi 
@@ -1292,29 +1297,29 @@ else
     then
       echo "Enabling rhel 7 rpms for OCP 3.5..."
       # $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms" --enable="rhel-7-server-ose-3.5-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
-      $SUDO subscription-manager repos --disable="*"> /dev/null
-      $SUDO yum-config-manager --disable \*> /dev/null
-      $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.5-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
+      until $SUDO subscription-manager repos --disable="*"> /dev/null; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
+      until $SUDO yum-config-manager --disable \*> /dev/null; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
+      until $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.5-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
       echo ""
     elif [ "$OCPVERSION" == "3.4" ]
     then
       echo "Enabling rhel 7 rpms for OCP 3.4..."
-      $SUDO subscription-manager repos --disable="*"> /dev/null
-      $SUDO yum-config-manager --disable \*> /dev/null
-      $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.4-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
+      until $SUDO subscription-manager repos --disable="*"> /dev/null; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
+      until $SUDO yum-config-manager --disable \*> /dev/null; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
+      until $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.4-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
       echo ""
     elif [ "$OCPVERSION" == "3.6" ]
     then
       echo "Enabling rhel 7 rpms for OCP 3.6..."
-      $SUDO subscription-manager repos --disable="*"> /dev/null
-      $SUDO yum-config-manager --disable \*> /dev/null
-      $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.6-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
+      until $SUDO subscription-manager repos --disable="*"> /dev/null; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
+      until $SUDO yum-config-manager --disable \*> /dev/null; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
+      until $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.6-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
       echo ""
     else
       echo "Enabling rhel 7 rpms defaulting to OCP 3.6 as latest..."
-      $SUDO subscription-manager repos --disable="*"> /dev/null
-      $SUDO yum-config-manager --disable \*> /dev/null
-      $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.6-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"> /dev/null
+      until $SUDO subscription-manager repos --disable="*"> /dev/null; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
+      until $SUDO yum-config-manager --disable \*> /dev/null; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
+      until $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.6-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
       echo ""
     fi
   fi
@@ -1323,7 +1328,8 @@ else
   if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "aplo" ]
   then  
     echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet unzip kexec-tools sos psacct ... this will take several minutes"
-    $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct -y> /dev/null
+    until $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct -y> /dev/null; do echo "Failure installing utils Repos, retrying..."; sleep 8; done
+    echo "...performing yum update"
     $SUDO yum update -y> /dev/null
     if [ "$HOSTENV" == "rhel" ]
     then
@@ -1332,11 +1338,11 @@ else
         echo "...Installing openshift utils, clients and atomic-openshift for APLO setup type..."
         $SUDO yum install atomic-openshift-utils atomic-openshift-clients atomic-openshift kexec-tools sos psacct -y> /dev/null
         $SUDO yum install heketi-client heketi-templates -y> /dev/null
-        $SUDO openshift_clock_enabled=true
+        # $SUDO openshift_clock_enabled=true
       else
         echo "...Installing openshift utils for DEV setup type..."
         $SUDO yum install atomic-openshift-utils -y> /dev/null
-        $SUDO openshift_clock_enabled=true
+        # $SUDO openshift_clock_enabled=true
       fi
     fi
     echo ""
@@ -1372,7 +1378,8 @@ else
     if [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ]
     then
       echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip kexec-tools sos psacct for KUBEADM setup type  ... this will take several minutes"
-      $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct -y> /dev/null
+      until $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct -y> /dev/null; do echo "Failure installing utils, retrying..."; sleep 8; done
+      echo "...performing yum update"
       $SUDO yum update -y> /dev/null
 
       # Install Go and do other config
@@ -1444,6 +1451,7 @@ else
     else
       echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip kexec-tools sos psacctfor CLIENT setup type  ... this will take several minutes"
       $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct -y> /dev/null
+      echo "...performing yum update"
       $SUDO yum update -y> /dev/null
       if [ "$HOSTENV" == "rhel" ]
       then
