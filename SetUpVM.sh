@@ -234,10 +234,17 @@ CreateProfiles()
     echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> .bash_profile 
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> .bash_profile
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> .bash_profile
-
+    if [ "$ISCLOUD" == "aws" ]
+    then
+      echo "export CLOUD_CONFIG=/etc/aws/aws.conf" >> .bash_profile
+    fi
     if [ "$ISCLOUD" == "vsphere" ]
     then
       echo "export CLOUD_PROVIDER=/etc/vsphere/vsphere.conf" >> .bash_profile
+    fi
+    if [ "$ISCLOUD" == "gce" ]
+    then
+      echo "export CLOUD_CONFIG=/etc/gce/gce.conf" >> .bash_profile
     fi
 
     if [ "$MULTIZONE" == "true" ]
@@ -279,6 +286,15 @@ CreateProfiles()
     $SUDO echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> newbashrc 
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> newbashrc
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> newbashrc
+    if [ "$ISCLOUD" == "aws" ]
+    then
+      echo "export CLOUD_CONFIG=/etc/aws/aws.conf" >> .bash_profile
+    fi
+    if [ "$ISCLOUD" == "gce" ]
+    then
+      echo "export CLOUD_CONFIG=/etc/gce/gce.conf" >> .bash_profile
+    fi
+
     if [ "$MULTIZONE" == "true" ]
     then
       if [ "$ISCLOUD" == "aws" ]
@@ -1653,8 +1669,13 @@ then
   $SUDO chmod -R 777 /etc/aws  
   cd /etc/aws
   echo "[Global]" > aws.conf
+
+
   # echo "multizone = $MULTIZONE" >> aws.conf
   echo "Zone = $ZONE" >> aws.conf
+  echo "KubernetesClusterTag=my-cluster" >> aws.conf
+  echo "KubernetesClusterID=my-cluster" >> aws.conf
+  cp aws.conf /etc/kubernetes/cloud-config
   cd $GOLANGPATH
   echo ""
   # TODO: create the /etc/sysconfig/atomic-openshift-master files with the keys
