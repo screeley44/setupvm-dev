@@ -235,6 +235,7 @@ CreateProfiles()
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> .bash_profile
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> .bash_profile
     echo "export ALLOW_SECURITY_CONTEXT=true" >> .bash_profile
+    echo "export ALLOW_PRIVILEGED=true" >> .bash_profile
     if [ "$ISCLOUD" == "aws" ]
     then
       echo "export CLOUD_CONFIG=/etc/aws/aws.conf" >> .bash_profile
@@ -337,6 +338,7 @@ CreateProfiles()
     echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> .bash_profile
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> .bash_profile
     echo "export ALLOW_SECURITY_CONTEXT=true" >> .bash_profile
+    echo "export ALLOW_PRIVILEGED=true" >> .bash_profile
     if [ "$FEATURE_GATES" == "" ]
     then
       echo "No Alpha Features Enabled..."
