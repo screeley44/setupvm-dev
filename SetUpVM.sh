@@ -242,7 +242,7 @@ CreateProfiles()
     fi
     if [ "$ISCLOUD" == "vsphere" ]
     then
-      echo "export CLOUD_PROVIDER=/etc/vsphere/vsphere.conf" >> .bash_profile
+      echo "export CLOUD_CONFIG=/etc/vsphere/vsphere.conf" >> .bash_profile
     fi
     if [ "$ISCLOUD" == "gce" ]
     then
@@ -251,14 +251,6 @@ CreateProfiles()
 
     if [ "$MULTIZONE" == "true" ]
     then
-      if [ "$ISCLOUD" == "aws" ]
-      then
-        echo "export CLOUD_CONFIG=/etc/aws/aws.conf" >> .bash_profile
-      fi
-      if [ "$ISCLOUD" == "gce" ]
-      then
-        echo "export CLOUD_CONFIG=/etc/gce/gce.conf" >> .bash_profile
-      fi
       echo "export MULTIZONE=$MULTIZONE" >> .bash_profile    
     fi
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> .bash_profile
@@ -285,34 +277,33 @@ CreateProfiles()
       echo "source '/home/$USER/Downloads/google-cloud-sdk/completion.bash.inc'" >> .bash_profile
     fi
 
+    # BASHRC
     $SUDO echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> newbashrc 
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> newbashrc
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> newbashrc
-    if [ "$ISCLOUD" == "aws" ]
-    then
-      echo "export CLOUD_CONFIG=/etc/aws/aws.conf" >> .bash_profile
-    fi
-    if [ "$ISCLOUD" == "gce" ]
-    then
-      echo "export CLOUD_CONFIG=/etc/gce/gce.conf" >> .bash_profile
-    fi
 
     if [ "$MULTIZONE" == "true" ]
     then
-      if [ "$ISCLOUD" == "aws" ]
-      then
-        echo "export CLOUD_CONFIG=/etc/aws/aws.conf" >> newbashrc
-      fi
-      if [ "$ISCLOUD" == "gce" ]
-      then
-        echo "export CLOUD_CONFIG=/etc/gce/gce.conf" >> newbashrc
-      fi
       echo "export MULTIZONE=$MULTIZONE" >> newbashrc
+    fi
+    if [ "$ISCLOUD" == "aws" ]
+    then
+      echo "export CLOUD_CONFIG=/etc/aws/aws.conf" >> newbashrc
+    fi
+    if [ "$ISCLOUD" == "vsphere" ]
+    then
+      echo "export CLOUD_CONFIG=/etc/vsphere/vsphere.conf" >> newbashrc
+    fi
+    if [ "$ISCLOUD" == "gce" ]
+    then
+      echo "export CLOUD_CONFIG=/etc/gce/gce.conf" >> newbashrc
     fi
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> newbashrc
     echo "export PUBLICDNSHOST=$PUBLICHOST" >> newbashrc
     echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> newbashrc
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> newbashrc
+    echo "export ALLOW_SECURITY_CONTEXT=true" >> newbashrc
+    echo "export ALLOW_PRIVILEGED=true" >> newbashrc
     echo "export ZONE=$ZONE" >> newbashrc
     if [ "$FEATURE_GATES" == "" ]
     then
@@ -334,6 +325,8 @@ CreateProfiles()
     echo "export PUBLICDNSHOST=$PUBLICHOST" >> newbashrc
     echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> newbashrc
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> newbashrc
+    echo "export ALLOW_SECURITY_CONTEXT=true" >> newbashrc
+    echo "export ALLOW_PRIVILEGED=true" >> newbashrc
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> .bash_profile
     echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> .bash_profile
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> .bash_profile
