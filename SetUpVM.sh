@@ -338,7 +338,8 @@ CreateProfiles()
     else
       echo ""
       echo "Enabled Alpha Feature Gates $FEATURE_GATES"
-      echo "export FEATURE_GATES=$FEATURE_GATES" >> .bash_profile  
+      echo "export FEATURE_GATES=$FEATURE_GATES" >> .bash_profile 
+      echo "export FEATURE_GATES=$FEATURE_GATES" >> newbashrc 
     fi
   fi
 
