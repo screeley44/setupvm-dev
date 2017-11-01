@@ -1671,8 +1671,8 @@ then
 
   # echo "multizone = $MULTIZONE" >> aws.conf
   echo "Zone = $ZONE" >> aws.conf
-  echo "KubernetesClusterTag=my-cluster" >> aws.conf
-  echo "KubernetesClusterID=my-cluster" >> aws.conf
+  # echo "KubernetesClusterTag=my-cluster" >> aws.conf
+  echo "# KubernetesClusterID=my-cluster" >> aws.conf
   cp aws.conf /etc/kubernetes/cloud-config
   cd $GOLANGPATH
   echo ""
@@ -2083,6 +2083,9 @@ else
   echo " BUT A FEW STEPS NEEDED "
   echo " 1. you must logout of ssh and log back or 'sudo -s' "
   echo "    this will pick up your .bash_profile and all your paths"
+  echo ""
+  echo "IMPORTANT!!!!!  - if using on aws, you must tag your instance(s) with kubernetes.io/cluster/<your cluster name can be anything>"
+  echo ""
   echo " 2. Now you can build and run K8 or Origin"
   echo ""
   echo "        K8 "
