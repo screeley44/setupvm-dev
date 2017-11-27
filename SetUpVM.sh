@@ -33,7 +33,8 @@ then
   echo "       aplo - normal ose/k8 install minus the cloning of source repos"
   echo "       client - just base with openshift-utils and openshift-client - nothing else"
   echo "       ocp_only - No Kube source is installed, only OCP"
-  echo "       kube_only - No OCP source is installed, only Kube"        
+  echo "       kube_only - No OCP source is installed, only Kube"
+  echo "       base - just rhel sub-manager prereqs, golang, etcd - nothing else"    
   echo "   DOCKERVER= version # OR leave blank and it will get whatever is available/current for your repo sets"
   echo "   ETCD_VER= (3 or default) (default is what is available for repo sets, 3 will trigger version 3.0.4 which is now required with latest K8)"
   exit 1
@@ -485,6 +486,8 @@ CreateConfigs()
   echo "" >> config-ose-prod.sh
   echo "# add some scc policy as well" >> config-ose-prod.sh
   echo "oadm policy add-scc-to-group privileged myclusteradmingroup" >> config-ose-prod.sh
+  echo "# Add default service account to privileged" >> config-ose-prod.sh  
+  echo "oc adm policy add-scc-to-user privileged -n default -z default" >> config-ose-prod.sh
   # if [ "$ISCLOUD" == "aws" ]
   # then
   #   echo "" >> config-ose-prod.sh
@@ -1275,7 +1278,7 @@ else
     until $SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS; do echo "Failure on subscription manager registration, retrying..."; sleep 5; done
   fi
 
-  if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ]
+  if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ] || [ "$SETUP_TYPE" == "base" ]
   then
     if [ "$HOSTENV" == "rhel" ] && [ "$POOLID" == "" ]
     then
@@ -1339,7 +1342,7 @@ else
   fi
 
   # Install software
-  if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "aplo" ]
+  if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "aplo" ] || [ "$SETUP_TYPE" == "base" ]
   then  
     echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet unzip kexec-tools sos psacct ... this will take several minutes"
     until $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct -y> /dev/null; do echo "Failure installing utils Repos, retrying..."; sleep 8; done
