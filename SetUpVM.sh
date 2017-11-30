@@ -488,6 +488,10 @@ CreateConfigs()
   echo "oadm policy add-scc-to-group privileged myclusteradmingroup" >> config-ose-prod.sh
   echo "# Add default service account to privileged" >> config-ose-prod.sh  
   echo "oc adm policy add-scc-to-user privileged -n default -z default" >> config-ose-prod.sh
+  echo "oadm policy add-cluster-role-to-user cluster-reader system:serviceaccount:default:default" >> config-ose-prod.sh
+  echo "oadm policy add-scc-to-user privileged -z router" >> config-ose-prod.sh
+  echo "oadm policy add-scc-to-user privileged -z default" >> config-ose-prod.sh
+
   # if [ "$ISCLOUD" == "aws" ]
   # then
   #   echo "" >> config-ose-prod.sh
