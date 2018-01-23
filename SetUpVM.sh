@@ -230,7 +230,12 @@ CreateProfiles()
   if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "vsphere" ]
   then
     echo "...Creating Cloud bash profiles"
-    PUBLICHOST=$($SUDO curl -s http://169.254.169.254/latest/meta-data/public-hostname)
+    if [ "$ISCLOUD" == "aws" ]
+    then
+      PUBLICHOST=$($SUDO curl -s http://169.254.169.254/latest/meta-data/public-hostname)
+    else
+      PUBLICHOST=$INTERNALDNSHOST
+    fi
     echo "      Setting PUBLICHOST for AWS...$PUBLICHOST"
     echo "# AWS Stuff (Update accordingly and log back in each terminal0" >> .bash_profile 
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> .bash_profile
@@ -298,6 +303,9 @@ CreateProfiles()
     if [ "$ISCLOUD" == "gce" ]
     then
       echo "export CLOUD_CONFIG=/etc/gce/gce.conf" >> newbashrc
+      echo "export KUBE_GCE_INSTANCE_PREFIX=$INTERNALHOST" >> newbashrc
+      echo "export KUBE_FEATURE_GATES=$FEATURE_GATES" >> newbashrc 
+      echo "export KUBE_GCE_ZONE=$ZONE" >> newbashrc
     fi
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> newbashrc
     echo "export PUBLICDNSHOST=$PUBLICHOST" >> newbashrc
@@ -310,7 +318,7 @@ CreateProfiles()
     then
       echo "No Alpha Features Enabled..."
     else
-      echo "export FEATURE_GATES=$FEATURE_GATES" >> newbashrc  
+      echo "export FEATURE_GATES=$FEATURE_GATES" >> newbashrc
     fi
     if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "vsphere" ]
     then
@@ -1333,13 +1341,23 @@ else
     then
       echo "Enabling rhel 7 rpms for OCP 3.6..."
       until $SUDO subscription-manager repos --disable="*"> /dev/null; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
-      until $SUDO yum-config-manager --disable \*> /dev/null; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
+      if [ "$ISCLOUD" == "gce" ]
+      then
+        echo "...skipping disable of yum-config-manager"
+      else
+        until $SUDO yum-config-manager --disable \*> /dev/null; do echo "Failure disabling yum-config-manager, retrying..."; sleep 8; done
+      fi
       until $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.6-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
       echo ""
     else
       echo "Enabling rhel 7 rpms defaulting to OCP 3.6 as latest..."
       until $SUDO subscription-manager repos --disable="*"> /dev/null; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
-      until $SUDO yum-config-manager --disable \*> /dev/null; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
+      if [ "$ISCLOUD" == "gce" ]
+      then
+        echo "...skipping disable of yum-config-manager"
+      else
+        until $SUDO yum-config-manager --disable \*> /dev/null; do echo "Failure disabling yum-config-manager, retrying..."; sleep 8; done
+      fi
       until $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.6-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
       echo ""
     fi
@@ -1660,51 +1678,55 @@ CreateConfigs
 # Install ec2 api tools and ruby
 if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
 then
-  echo "Install ec2 api tools (aws cli)..."
-  cd $GOLANGPATH
-  curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-  unzip awscli-bundle.zip
-  $SUDO ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-  echo "...configuring aws"
-  aws configure < myconf.txt
+  if [ "$ISCLOUD" == "aws" ]
+  then
+    echo "Install ec2 api tools (aws cli)..."
+    cd $GOLANGPATH
+    curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+    unzip awscli-bundle.zip
+    $SUDO ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+    echo "...configuring aws"
+    aws configure < myconf.txt
 
-  echo "...creating aws.conf file"  
-  cd /etc
-  $SUDO mkdir aws
-  $SUDO chmod -R 777 /etc/aws  
-  cd /etc/aws
-  echo "[Global]" > aws.conf
-
-
-  # echo "multizone = $MULTIZONE" >> aws.conf
-  echo "Zone = $ZONE" >> aws.conf
-  # echo "KubernetesClusterTag=my-cluster" >> aws.conf
-  echo "# KubernetesClusterID=my-cluster" >> aws.conf
-  cp aws.conf /etc/kubernetes/cloud-config
-  cd $GOLANGPATH
-  echo ""
-  # TODO: create the /etc/sysconfig/atomic-openshift-master files with the keys
-  #  AWS_ACCESS_KEY_ID=key
-  #  AWS_SECRET_ACCESS_KEY=key
+    echo "...creating aws.conf file"  
+    cd /etc
+    $SUDO mkdir aws
+    $SUDO chmod -R 777 /etc/aws  
+    cd /etc/aws
+    echo "[Global]" > aws.conf
 
 
+    # echo "multizone = $MULTIZONE" >> aws.conf
+    echo "Zone = $ZONE" >> aws.conf
+    # echo "KubernetesClusterTag=my-cluster" >> aws.conf
+    echo "# KubernetesClusterID=my-cluster" >> aws.conf
+    cp aws.conf /etc/kubernetes/cloud-config
+    cd $GOLANGPATH
+    echo ""
+    # TODO: create the /etc/sysconfig/atomic-openshift-master files with the keys
+    #  AWS_ACCESS_KEY_ID=key
+    #  AWS_SECRET_ACCESS_KEY=key
+  fi
 
-  echo "...creating gce.conf file"  
-  cd /etc
-  $SUDO mkdir gce
-  $SUDO chmod -R 777 /etc/gce  
-  cd /etc/gce
-  echo "[Global]" > gce.conf
-  echo "multizone = $MULTIZONE" >> gce.conf
-  echo "Zone = $ZONE" >> gce.conf
-  cd $GOLANGPATH
-  echo ""
+  if [ "$ISCLOUD" == "gce" ]
+  then  
+    echo "...creating gce.conf file"  
+    cd /etc
+    $SUDO mkdir gce
+    $SUDO chmod -R 777 /etc/gce  
+    cd /etc/gce
+    echo "[Global]" > gce.conf
+    echo "multizone = $MULTIZONE" >> gce.conf
+    echo "Zone = $ZONE" >> gce.conf
+    cd $GOLANGPATH
+    echo ""
 
-  # echo "Install GCE tools (gcloud)..."
-  # cd /home/$USER
-  # curl "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-113.0.0-linux-x86_64.tar.gz" -o "google-cloud-sdk-113.0.0-linux-x86_64.tar.gz"
-  # tar -zxvf google-cloud-sdk-113.0.0-linux-x86_64.tar.gz
-  # $SUDO ./google-cloud-sdk/install.sh
+    # echo "Install GCE tools (gcloud)..."
+    # cd /home/$USER
+    # curl "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-113.0.0-linux-x86_64.tar.gz" -o "google-cloud-sdk-113.0.0-linux-x86_64.tar.gz"
+    # tar -zxvf google-cloud-sdk-113.0.0-linux-x86_64.tar.gz
+    # $SUDO ./google-cloud-sdk/install.sh
+  fi
 elif [ "$ISCLOUD" == "vsphere" ]
 then
   echo "...creating vSphere conf template"
@@ -2143,7 +2165,13 @@ else
   echo ""
   echo ""
   echo "*** OTHER NOTES ***"
-  echo " Dirty Kube 1.6 - issue with local-up-cluster.sh  see https://github.com/kubernetes/kubernetes/issues/40459 - should be fixed now"
+  echo " 1/24/2018 - local-up-cluster.sh on GCE seems broke - get NetworkUnavailable error and can't schedule pods"
+  echo "             work around: "
+  echo "                  make quick-release (if this fails, edit build/lib/release.sh around line 330 switch       ) &  to )"
+  echo " "
+  echo "                  then run ./cluster/kube-up.sh "
+  echo ""
+  echo "               see:  https://github.com/kad/kubernetes/commit/550b4cd13d4d0231e00b3fb1381d457a25d57481 " 
 
 fi
 
