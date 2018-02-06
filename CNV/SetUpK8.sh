@@ -127,6 +127,7 @@ then
     $SUDO mkdir -p $GOLANGPATH/dev-configs/gce
     $SUDO mkdir -p $GOLANGPATH/dev-configs/nfs
     $SUDO mkdir -p $GOLANGPATH/dev-configs/glusterfs
+    $SUDO mkdir -p $GOLANGPATH/dev-configs/cinder
     $SUDO chmod -R 777 $GOLANGPATH
   fi
 
@@ -138,12 +139,14 @@ then
     mkdir -p $KUBEPATH/dev-configs/gce
     mkdir -p $KUBEPATH/dev-configs/nfs
     mkdir -p $KUBEPATH/dev-configs/glusterfs
+    mkdir -p $KUBEPATH/dev-configs/cinder
   else
     $SUDO mkdir -p $KUBEPATH/dev-configs
     $SUDO mkdir -p $KUBEPATH/dev-configs/aws
     $SUDO mkdir -p $KUBEPATH/dev-configs/gce
     $SUDO mkdir -p $KUBEPATH/dev-configs/nfs
     $SUDO mkdir -p $KUBEPATH/dev-configs/glusterfs
+    $SUDO mkdir -p $KUBEPATH/dev-configs/cinder
     $SUDO chmod -R 777 $KUBEPATH
   fi
 fi
