@@ -155,12 +155,11 @@ fi
 # Docker, golang, etc...
 echo ""
 echo ""
-echo "Installing Kubernetes Setup..."
-echo ""
 if [ "$SETUP_TYPE" == "cnv-dev" ] || [ "$SETUP_TYPE" == "cnv-k8" ] || [ "$SETUP_TYPE" == "cnv-cinder-k8" ] || [ "$SETUP_TYPE" == "cnv-cinder-k8" ] || [ "$SETUP_TYPE" == "cnv-k8-existing" ]
 then
-
-  echo "Installing various software..."
+  echo ""
+  echo "Installing Kubernetes Setup..."
+  echo "...Installing various software..."
   echo ""
   yum install -y wget gcc python-virtualenv git net-tools unzip bash-completion telnet kexec-tools sos psacct> /dev/null
 
