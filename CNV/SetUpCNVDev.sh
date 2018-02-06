@@ -92,8 +92,7 @@ then
   cd /root
   echo "cd /etc/ceph" > config-ceph.sh
   echo "chmod 644 ceph.client.admin.keyring" >> config-ceph.sh
-  echo "cinder type-key iscsi set volume_backend_name=ceph> /dev/null" >> config-ceph.sh
-  echo "cinder type-show iscsi" >> config-ceph.sh
+#  echo "cinder type-key iscsi set volume_backend_name=ceph> /dev/null" >> config-ceph.sh
   echo "" >> config-ceph.sh
   echo "echo \"\" >> /etc/ceph/ceph.conf" >> config-ceph.sh
   echo "echo \"[client]\" >> /etc/ceph/ceph.conf" >> config-ceph.sh
@@ -104,8 +103,8 @@ then
   echo "echo \"rbd concurrent management ops = 20\" >> /etc/ceph/ceph.conf" >> config-ceph.sh
   echo "echo \"rbd default features = 3\" >> /etc/ceph/ceph.conf" >> config-ceph.sh
   echo "" >> config-ceph.sh
-  echo "service openstack-cinder-volume restart" >> config-ceph.sh
-  echo "service openstack-cinder-api restart" >> config-ceph.sh
+#  echo "service openstack-cinder-volume restart" >> config-ceph.sh
+#  echo "service openstack-cinder-api restart" >> config-ceph.sh
 
   chmod +x config-ceph.sh
   systemctl restart sshd
@@ -212,8 +211,20 @@ then
 
     echo " Testing Connection to Remote Node..."
     echo "hostname" | ssh -o StrictHostKeyChecking=no root@"${CINDERHOST}"
+    echo ""
+    echo "Running Additional Configs on Cinder Node"
     echo "cd /root;./config-ceph.sh" | ssh -o StrictHostKeyChecking=no root@"${CINDERHOST}"
+    echo ""
+
+    # set Ceph backend on Cinder box
+    echo "Setting ceph backend"
+    echo "cinder type-key iscsi set volume_backend_name=ceph" | ssh -o StrictHostKeyChecking=no root@"${CINDERHOST}"
+    echo ""
    
+    # Restarting Services on Cinder
+    echo "Restarting Services on Cinder"
+    echo "service openstack-cinder-volume restart;service openstack-cinder-api restart" | ssh -o StrictHostKeyChecking=no root@"${CINDERHOST}"
+
     cd /root
   fi 
 fi
