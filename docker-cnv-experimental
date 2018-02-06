@@ -1,0 +1,116 @@
+  # Install etcd
+  if rpm -qa | grep etcd >/dev/null 2>&1
+  then
+    echo ""
+    echo " --- etcd version info ---"
+    etcd --version
+    echo " -------------------------"
+    echo ""
+    echo "etcd is already installed...do you want to fresh install anyway with your specified version from setupvm.config? (y/n)"
+    read isaccepted3
+    if [ "$isaccepted3" == "$yval1" ] || [ "$isaccepted3" == "$yval2" ]
+    then
+      if [ "$ETCD_VER" == "default" ] || [ "$ETCD_VER" == "" ]
+      then
+        echo "installing default etcd per rhel repo configuration..."
+        $SUDO yum remove etcd -y> /dev/null
+        $SUDO rm -rf /usr/bin/etcd
+        $SUDO yum install etcd -y> /dev/null
+      else
+        echo "installing specific etcd version - etcd-v$ETCD_VER..."
+        $SUDO wget https://github.com/coreos/etcd/releases/download/v$ETCD_VER/etcd-v$ETCD_VER-linux-amd64.tar.gz
+        $SUDO rm -rf /usr/bin/etcd
+        $SUDO tar -zxvf etcd-v$ETCD_VER-linux-amd64.tar.gz
+        $SUDO cp etcd-v$ETCD_VER-linux-amd64/etcd /usr/bin
+      fi
+    fi
+  else
+    if [ "$ETCD_VER" == "default" ] || [ "$ETCD_VER" == "" ]
+    then
+      echo "installing default etcd per rhel repo configuration..."
+      $SUDO yum remove etcd -y> /dev/null
+      $SUDO rm -rf /usr/bin/etcd
+      $SUDO yum install etcd -y> /dev/null
+    else
+      echo "installing specific etcd version - etcd-v$ETCD_VER..."
+      $SUDO wget https://github.com/coreos/etcd/releases/download/v$ETCD_VER/etcd-v$ETCD_VER-linux-amd64.tar.gz
+      $SUDO rm -rf /usr/bin/etcd
+      $SUDO tar -zxvf etcd-v$ETCD_VER-linux-amd64.tar.gz
+      $SUDO cp etcd-v$ETCD_VER-linux-amd64/etcd /usr/bin
+    fi
+  fi
+
+  echo ""
+  if [ "$SKIPSOURCECLONE" == "no" ]
+  then
+    cd $GOLANGPATH/go/src/k8s.io
+    rm -rf kubernetes
+    echo "...Cloning Kubernetes"
+    echo ""
+    git clone https://github.com/kubernetes/kubernetes.git
+  fi
+
+  if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
+  then 
+    # TODO: fix this, just want to run sudo if needed
+    # can't get this to work the way I want so doing 2nd approach for now
+    # and will come back - for now just removing the function test_docker
+    echo "Editing local-up-cluster.sh"
+    sed -i '/function test_docker/,+6d' $GOLANGPATH/go/src/k8s.io/kubernetes/hack/local-up-cluster.sh> /dev/null
+    sed -i '/test_docker/d' $GOLANGPATH/go/src/k8s.io/kubernetes/hack/local-up-cluster.sh> /dev/null
+  
+    # making sure we also have --cloud-config working
+    sed -i '/^# You may need to run this as root to allow kubelet to open docker/a CLOUD_CONFIG=${CLOUD_CONFIG:-\"\"}' $GOLANGPATH/go/src/k8s.io/kubernetes/hack/local-up-cluster.sh> /dev/null
+    sed -i '/      --cloud-provider=/a\ \ \ \ \ \ --cloud-config=\"${CLOUD_CONFIG}\" \\' $GOLANGPATH/go/src/k8s.io/kubernetes/hack/local-up-cluster.sh> /dev/null
+  fi
+
+
+  # Installing Docker
+  echo ""
+  if rpm -qa | grep docker >/dev/null 2>&1
+  then
+    echo "docker previously installed..."
+    echo " --- docker version info ---"
+    docker version
+    echo " -------------------------"
+    echo ""
+    echo "docker is already installed...do you want to fresh install anyway with your specified version from setupvm.config? (y/n)"
+    read isaccepted2
+    if [ "$isaccepted2" == "$yval1" ] || [ "$isaccepted2" == "$yval2" ]
+    then    
+      # Removing existing docker if it exists
+      $SUDO yum remove docker -y> /dev/null
+      $SUDO rm -rf /usr/bin/docker
+      echo "...Installing Docker"
+      if [ "$DOCKERVER" == "" ] || [ "$DOCKERVER" == "default" ] || [ "$DOCKERVER" == "yum" ]
+      then
+        if [ "$HOSTENV" == "rhel" ]
+        then
+          $SUDO yum install docker -y> /dev/null
+        elif [ "$HOSTENV" == "centos" ]
+        then
+          # set up a docker repo
+          # echo "[virt7-docker-common-release]" > virt7-docker-common-release
+          # echo "name=virt7-docker-common-release" >> virt7-docker-common-release
+          # echo "baseurl=http://cbs.centos.org/repos/virt7-docker-common-release/x86_64/os/" >> virt7-docker-common-release
+          # echo "gpgcheck=0" >> virt7-docker-common-release
+          echo "[docker]" > /etc/yum.repos.d/docker.repo
+          echo "name=Docker Repository" >> /etc/yum.repos.d/docker.repo
+          echo "baseurl=https://yum.dockerproject.org/repo/main/centos/7/" >> /etc/yum.repos.d/docker.repo
+          echo "enabled=1" >> /etc/yum.repos.d/docker.repo
+          echo "gpgcheck=1" >> /etc/yum.repos.d/docker.repo
+          echo "gpgkey=https://yum.dockerproject.org/gpg" >> /etc/yum.repos.d/docker.repo
+            
+          # $SUDO yum install --enablerepo=virt7-docker-common-release docker flannel -y> /dev/null
+          $SUDO yum install docker-engine docker-engine-selinux -y> /dev/null
+        fi
+      else
+        if [ "$DOCKERVER" == "latest"
+        cd ~
+        $SUDO wget https://yum.dockerproject.org/repo/main/centos/7/Packages/docker-engine-$DOCKERVER-1.el7.centos.x86_64.rpm
+        $SUDO wget https://yum.dockerproject.org/repo/main/centos/7/Packages/docker-engine-selinux-$DOCKERVER-1.el7.centos.noarch.rpm
+        $SUDO yum install docker-engine-selinux-$DOCKERVER-1.el7.centos.noarch.rpm -y> /dev/null
+        $SUDO yum install docker-engine-$DOCKERVER-1.el7.centos.x86_64.rpm -y> /dev/null
+      fi
+      echo ""
+    fi

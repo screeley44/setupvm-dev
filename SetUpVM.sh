@@ -52,7 +52,24 @@ then
   chmod +x SetUpGFS.sh
   ./SetUpGFS.sh
 fi
-
+if [ "$SETUP_TYPE" == "cnv-dev" ]
+then
+  chmod +x SetUpCNVDev.sh
+  ./SetUpCNVDev.sh
+  exit 1
+fi
+if [ "$SETUP_TYPE" == "cnv-cinder" ]
+then
+  chmod +x SetUpCNVCinder.sh
+  ./SetUpCNVCinder.sh
+  exit 1
+fi
+if [ "$SETUP_TYPE" == "cnv-ceph" ]
+then
+  chmod +x SetUpCNVCeph.sh
+  ./SetUpCNVCeph.sh
+  exit 1
+fi
 
 echo ""
 
@@ -242,6 +259,8 @@ CreateProfiles()
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> .bash_profile
     echo "export ALLOW_SECURITY_CONTEXT=true" >> .bash_profile
     echo "export ALLOW_PRIVILEGED=true" >> .bash_profile
+    echo "export LOG_LEVEL=5" >> .bash_profile
+    echo "export KUBE_DEFAULT_STORAGE_CLASS=false" >> .bash_profile
     if [ "$ISCLOUD" == "aws" ]
     then
       echo "export CLOUD_CONFIG=/etc/aws/aws.conf" >> .bash_profile
@@ -313,6 +332,8 @@ CreateProfiles()
     echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> newbashrc
     echo "export ALLOW_SECURITY_CONTEXT=true" >> newbashrc
     echo "export ALLOW_PRIVILEGED=true" >> newbashrc
+    echo "export LOG_LEVEL=5" >> newbashrc
+    echo "export KUBE_DEFAULT_STORAGE_CLASS=false" >> newbashrc
     echo "export ZONE=$ZONE" >> newbashrc
     if [ "$FEATURE_GATES" == "" ]
     then
@@ -336,11 +357,15 @@ CreateProfiles()
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> newbashrc
     echo "export ALLOW_SECURITY_CONTEXT=true" >> newbashrc
     echo "export ALLOW_PRIVILEGED=true" >> newbashrc
+    echo "export LOG_LEVEL=5" >> newbashrc
+    echo "export KUBE_DEFAULT_STORAGE_CLASS=false" >> newbashrc
     echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> .bash_profile
     echo "export HOSTNAME_OVERRIDE=$INTERNALHOST" >> .bash_profile
     echo "export INTERNALDNSHOST=$INTERNALHOST" >> .bash_profile
     echo "export ALLOW_SECURITY_CONTEXT=true" >> .bash_profile
     echo "export ALLOW_PRIVILEGED=true" >> .bash_profile
+    echo "export LOG_LEVEL=5" >> .bash_profile
+    echo "export KUBE_DEFAULT_STORAGE_CLASS=false" >> .bash_profile
     if [ "$FEATURE_GATES" == "" ]
     then
       echo "No Alpha Features Enabled..."
