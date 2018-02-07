@@ -218,7 +218,7 @@ then
 
     # set Ceph backend on Cinder box
     echo "Setting ceph backend"
-    echo "cinder type-key iscsi set volume_backend_name=ceph" | ssh -o StrictHostKeyChecking=no root@"${CINDERHOST}"
+    echo "cd /root;source keystonerc_admin;cinder type-key iscsi set volume_backend_name=ceph" | ssh -o StrictHostKeyChecking=no root@"${CINDERHOST}"
     echo ""
    
     # Restarting Services on Cinder

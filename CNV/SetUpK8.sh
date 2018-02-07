@@ -128,6 +128,7 @@ then
     $SUDO mkdir -p $GOLANGPATH/dev-configs/nfs
     $SUDO mkdir -p $GOLANGPATH/dev-configs/glusterfs
     $SUDO mkdir -p $GOLANGPATH/dev-configs/cinder
+    $SUDO mkdir -p $GOLANGPATH/dev-configs/data-importer
     $SUDO chmod -R 777 $GOLANGPATH
   fi
 
@@ -147,6 +148,7 @@ then
     $SUDO mkdir -p $KUBEPATH/dev-configs/nfs
     $SUDO mkdir -p $KUBEPATH/dev-configs/glusterfs
     $SUDO mkdir -p $KUBEPATH/dev-configs/cinder
+    $SUDO mkdir -p $KUBEPATH/dev-configs/data-importer
     $SUDO chmod -R 777 $KUBEPATH
   fi
 fi
@@ -380,7 +382,6 @@ then
   $SUDO cp newbashrc /root/.bashrc
 
 
-
   echo ""
   echo " *********************************************** "
   echo "" 
@@ -388,6 +389,7 @@ then
   echo ""
   echo " *********************************************** "
 
+  source testfiles.sh
 
 fi
 
