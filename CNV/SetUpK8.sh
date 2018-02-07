@@ -344,7 +344,6 @@ then
     echo ""
     echo "Enabled Alpha Feature Gates $FEATURE_GATES"
     echo "export FEATURE_GATES=$FEATURE_GATES" >> newbashrc
-    echo "Enabled Alpha Feature Gates $FEATURE_GATES"
     echo "export FEATURE_GATES=$FEATURE_GATES" >> .bash_profile
     echo ""  
   fi
@@ -378,7 +377,6 @@ then
   echo "" >> .bash_profile
   echo "export PATH" >> .bash_profile
 
-  $SUDO cp .bash_profile /root
   $SUDO cp newbashrc /root/.bashrc
 
 
