@@ -250,8 +250,19 @@ then
   echo ""
   echo "Installing Docker ..."
   echo ""
-  $SUDO yum check-update
-  $SUDO curl -fsSL https://get.docker.com/ | sh
+  if [ "$DOCKERVER" == "default" ] || [ "$DOCKERVER" == "" ]
+  then
+    echo " ... installing default docker from enabled repos..."
+    $SUDO yum install docker -y
+  elif [ "$DOCKERVER" == "ce" ] 
+  then
+    echo " ... installing latest docker ce release"
+    $SUDO yum check-update
+    $SUDO curl -fsSL https://get.docker.com/ | sh    
+  else
+    echo " ... installing Docker version $DOCKERVER"
+    $SUDO yum install docker-$DOCKERVER -y
+  fi
 
   # Restart Docker
   echo "...Restarting Docker"
