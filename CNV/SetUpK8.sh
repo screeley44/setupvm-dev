@@ -318,6 +318,7 @@ then
   echo "export ALLOW_SECURITY_CONTEXT=true" >> newbashrc
   echo "export ALLOW_PRIVILEGED=true" >> newbashrc
   echo "export LOG_LEVEL=5" >> newbashrc
+  echo "export KUBE_ENABLE_CLUSTER_DNS=$KUBE_ENABLE_CLUSTER_DNS" >> newbashrc
   echo "export KUBE_DEFAULT_STORAGE_CLASS=false" >> newbashrc
   echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> newbashrc
   echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> newbashrc
@@ -330,6 +331,7 @@ then
   echo "export ALLOW_SECURITY_CONTEXT=true" >> .bash_profile
   echo "export ALLOW_PRIVILEGED=true" >> .bash_profile
   echo "export LOG_LEVEL=5" >> .bash_profile
+  echo "export KUBE_ENABLE_CLUSTER_DNS=$KUBE_ENABLE_CLUSTER_DNS" >> newbashrc
   echo "export KUBE_DEFAULT_STORAGE_CLASS=false" >> .bash_profile
   echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> .bash_profile
   echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> .bash_profile
