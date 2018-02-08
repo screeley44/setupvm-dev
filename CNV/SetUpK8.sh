@@ -231,6 +231,17 @@ then
     echo "...Cloning Kubernetes in $GOLANGPATH"
     echo ""
     git clone https://github.com/kubernetes/kubernetes.git
+
+    echo "...Cloning support repos in /root"
+    cd /root
+    rm -rf containerized-data-importer
+    git clone https://github.com/kubevirt/containerized-data-importer.git
+
+    if [ ! -d "/root/setupvm-dev" ]
+      rm -rf setupvm-dev
+      git clone https://github.com/screeley44/setupvm-dev.git
+    fi
+
   fi
 
   if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
@@ -381,6 +392,11 @@ then
 
   $SUDO cp newbashrc /root/.bashrc
 
+  # source testfiles.sh
+  $SUDO cp /root/setupvm-dev/CNV/yaml/* $KUBEPATH/dev-configs/cinder
+
+  $SUDO cp /root/containerized-data-importer/manifests/importer/* $KUBEPATH/dev-configs/data-importer
+  
 
   echo ""
   echo " *********************************************** "
@@ -389,7 +405,6 @@ then
   echo ""
   echo " *********************************************** "
 
-  source testfiles.sh
 
 fi
 

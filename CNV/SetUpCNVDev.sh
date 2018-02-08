@@ -1,7 +1,7 @@
 #! /bin/bash
 # Some automation to setting up OSE/K8 VM's
 
-
+SCRIPT_HOME="$(realpath $(dirname $0))"
 source setupvm.config
 
 # Run On All Systems
@@ -225,12 +225,11 @@ then
     echo "Restarting Services on Cinder"
     echo "service openstack-cinder-volume restart;service openstack-cinder-api restart" | ssh -o StrictHostKeyChecking=no root@"${CINDERHOST}"
 
-    cd /root
   fi 
 fi
 
 
-source SetUpK8.sh
+source $SCRIPT_HOME/SetUpK8.sh
 
 echo ""
 echo "INSTALLATION COMPLETED FOR SETUP_TYPE $SETUP_TYPE on $HOSTNAME!!"
