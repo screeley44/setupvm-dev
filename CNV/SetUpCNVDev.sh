@@ -208,23 +208,23 @@ then
     ceph auth get-or-create client.cinder -o /etc/ceph/ceph.client.cinder.keyring> /dev/null 
     chmod 644 ceph.client.admin.keyring
     scp ceph.client.cinder.keyring root@$CINDERHOST:/etc/ceph
-    echo "chmod 644 /etc/ceph/ceph.client.admin.keyring" | ssh -o StrictHostKeyChecking=no root@"${CINDERHOST}"
+    echo "chmod 644 /etc/ceph/ceph.client.admin.keyring" | ssh -T -o StrictHostKeyChecking=no root@"${CINDERHOST}"
 
     echo " Testing Connection to Remote Node..."
     echo "hostname" | ssh -o StrictHostKeyChecking=no root@"${CINDERHOST}"
     echo ""
     echo "Running Additional Configs on Cinder Node"
-    echo "cd /root;./config-ceph.sh" | ssh -o StrictHostKeyChecking=no root@"${CINDERHOST}"
+    echo "cd /root;./config-ceph.sh" | ssh -T -o StrictHostKeyChecking=no root@"${CINDERHOST}"
     echo ""
 
     # set Ceph backend on Cinder box
     echo "Setting ceph backend"
-    echo "cd /root;source keystonerc_admin;cinder type-key iscsi set volume_backend_name=ceph" | ssh -o StrictHostKeyChecking=no root@"${CINDERHOST}"
+    echo "cd /root;source keystonerc_admin;cinder type-key iscsi set volume_backend_name=ceph" | ssh -T -o StrictHostKeyChecking=no root@"${CINDERHOST}"
     echo ""
    
     # Restarting Services on Cinder
     echo "Restarting Services on Cinder"
-    echo "service openstack-cinder-volume restart;service openstack-cinder-api restart" | ssh -o StrictHostKeyChecking=no root@"${CINDERHOST}"
+    echo "service openstack-cinder-volume restart;service openstack-cinder-api restart" | ssh -T -o StrictHostKeyChecking=no root@"${CINDERHOST}"
   fi 
 fi
 
