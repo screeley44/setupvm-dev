@@ -2,8 +2,19 @@
 # Some automation to setting up OSE/K8 VM's
 
 K8_SCRIPT_HOME="$(realpath $(dirname $0))"
-source $SCRIPT_HOME/setupvm.config
+CONFIG_HOME=""
 
+if [ -f "$SCRIPT_HOME/setupvm.config" ]
+then
+  CONFIG_HOME=$SCRIPT_HOME
+elif [ -f "$K8_SCRIPT_HOME/setupvm.config" ]
+then
+  CONFIG_HOME=$K8_SCRIPT_HOME
+else
+  CONFIG_HOME="/root/setupvm-dev/CNV"
+fi
+
+source $CONFIG_HOME/setupvm.config
 SUDO=""
 
 
