@@ -3,6 +3,7 @@
 
 K8_SCRIPT_HOME="$(realpath $(dirname $0))"
 source $K8_SCRIPT_HOME/setupvm.config
+
 SUDO=""
 
 
