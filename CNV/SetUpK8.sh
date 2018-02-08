@@ -2,7 +2,7 @@
 # Some automation to setting up OSE/K8 VM's
 
 
-source setupvm.config
+source $SCRIPT_HOME/setupvm.config
 SUDO=""
 
 
@@ -239,7 +239,6 @@ then
 
     if [ ! -d "/root/setupvm-dev" ]
     then
-      rm -rf setupvm-dev
       git clone https://github.com/screeley44/setupvm-dev.git
     fi
 
