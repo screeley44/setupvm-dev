@@ -233,7 +233,6 @@ fi
 source SetUpK8.sh
 
 echo ""
-echo ""
-echo "INSTALLATION COMPLETED!!"
+echo "INSTALLATION COMPLETED FOR SETUP_TYPE $SETUP_TYPE on $HOSTNAME!!"
 
 

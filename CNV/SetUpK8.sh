@@ -385,7 +385,7 @@ then
   echo ""
   echo " *********************************************** "
   echo "" 
-  echo "     Kubernetes Setup Completed!"
+  echo "     Kubernetes Setup Completed on host $HOSTNAME!"
   echo ""
   echo " *********************************************** "
 
