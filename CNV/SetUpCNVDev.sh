@@ -20,6 +20,7 @@ setenforce 0
 
 # determine our block device prefix - aws = xv i.e.(xvdb) local could be sdb or svdb or ???
 # assuming this is a fresh dev environment
+BLOCKPREFIX="xv"
 if (lsblk | grep -q "xvdb")
 then
   BLOCKPREFIX="xv"
