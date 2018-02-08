@@ -64,6 +64,7 @@ then
   echo "Installing OpenStack..."
   echo ""
 
+  cd /root
   packstack --allinone
 fi
 
