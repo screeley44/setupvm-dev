@@ -238,6 +238,7 @@ then
     git clone https://github.com/kubevirt/containerized-data-importer.git
 
     if [ ! -d "/root/setupvm-dev" ]
+    then
       rm -rf setupvm-dev
       git clone https://github.com/screeley44/setupvm-dev.git
     fi

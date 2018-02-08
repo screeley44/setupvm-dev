@@ -225,11 +225,12 @@ then
     # Restarting Services on Cinder
     echo "Restarting Services on Cinder"
     echo "service openstack-cinder-volume restart;service openstack-cinder-api restart" | ssh -o StrictHostKeyChecking=no root@"${CINDERHOST}"
-
+    cd /root
   fi 
 fi
 
-
+echo ""
+echo " Checking if Kube and Components need to be setup..."
 source $SCRIPT_HOME/SetUpK8.sh
 
 echo ""
