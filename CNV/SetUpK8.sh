@@ -2,7 +2,7 @@
 # Some automation to setting up OSE/K8 VM's
 
 K8_SCRIPT_HOME="$(realpath $(dirname $0))"
-source $K8_SCRIPT_HOME/setupvm.config
+source $SCRIPT_HOME/setupvm.config
 
 SUDO=""
 
