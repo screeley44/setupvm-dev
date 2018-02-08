@@ -16,6 +16,7 @@ systemctl stop NetworkManager> /dev/null
 systemctl enable network> /dev/null
 systemctl start network> /dev/null
 iptables -F> /dev/null
+setenforce 0
 
 # Prereqs and Yum Installs
 echo ""
