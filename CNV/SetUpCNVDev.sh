@@ -18,6 +18,22 @@ systemctl start network> /dev/null
 iptables -F> /dev/null
 setenforce 0
 
+# determine our block device prefix - aws = xv i.e.(xvdb) local could be sdb or svdb or ???
+# assuming this is a fresh dev environment
+if (lsblk | grep -q "xvdb")
+then
+  BLOCKPREFIX="xv"
+elif (lsblk | grep -q "sdb")
+then
+  BLOCKPREFIX="s"  
+elif (lsblk | grep -q "svdb")
+then
+  BLOCKPREFIX="sv"
+else
+  BLOCKPREFIX="xv"
+fi
+
+
 # Prereqs and Yum Installs
 echo ""
 echo ""
@@ -174,12 +190,12 @@ then
   sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy mon create-initial"
 
   # Prepare and activate OSDs
-  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd prepare $HOSTNAME:xvdb"
-  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd prepare $HOSTNAME:xvdc"
-  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd prepare $HOSTNAME:xvdd"
-  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd activate $HOSTNAME:xvdb1"
-  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd activate $HOSTNAME:xvdc1"
-  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd activate $HOSTNAME:xvdd1"
+  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd prepare $HOSTNAME:$BLOCKPREFIXdb"
+  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd prepare $HOSTNAME:$BLOCKPREFIXdc"
+  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd prepare $HOSTNAME:$BLOCKPREFIXdd"
+  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd activate $HOSTNAME:$BLOCKPREFIXdb1"
+  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd activate $HOSTNAME:$BLOCKPREFIXdc1"
+  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd activate $HOSTNAME:$BLOCKPREFIXdd1"
 
   # Create volumes pool
   ceph osd pool create volumes 128
