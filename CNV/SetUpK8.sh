@@ -23,7 +23,7 @@ KUBEPATH=""
 GOLANGPATH=""
 
 
-if [ "$SETUP_TYPE" == "cnv-dev" ] || [ "$SETUP_TYPE" == "cnv-k8" ] || [ "$SETUP_TYPE" == "cnv-cinder-k8" ] || [ "$SETUP_TYPE" == "cnv-cinder-k8" ] || [ "$SETUP_TYPE" == "cnv-k8-existing" ]
+if [ "$SETUP_TYPE" == "cnv-dev" ] || [ "$SETUP_TYPE" == "cnv-k8" ] || [ "$SETUP_TYPE" == "cnv-cinder-k8" ] || [ "$SETUP_TYPE" == "cnv-ceph-k8" ] || [ "$SETUP_TYPE" == "cnv-k8-existing" ]
 then
   # determine if using defaults or values
   # for paths
@@ -157,7 +157,7 @@ fi
 # Docker, golang, etc...
 echo ""
 echo ""
-if [ "$SETUP_TYPE" == "cnv-dev" ] || [ "$SETUP_TYPE" == "cnv-k8" ] || [ "$SETUP_TYPE" == "cnv-cinder-k8" ] || [ "$SETUP_TYPE" == "cnv-cinder-k8" ] || [ "$SETUP_TYPE" == "cnv-k8-existing" ]
+if [ "$SETUP_TYPE" == "cnv-dev" ] || [ "$SETUP_TYPE" == "cnv-k8" ] || [ "$SETUP_TYPE" == "cnv-cinder-k8" ] || [ "$SETUP_TYPE" == "cnv-ceph-k8" ] || [ "$SETUP_TYPE" == "cnv-k8-existing" ]
 then
   echo ""
   echo "Installing Kubernetes Setup..."
