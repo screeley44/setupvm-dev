@@ -191,12 +191,12 @@ then
   sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy mon create-initial"
 
   # Prepare and activate OSDs
-  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd prepare $HOSTNAME:$BLOCKPREFIXdb"
-  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd prepare $HOSTNAME:$BLOCKPREFIXdc"
-  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd prepare $HOSTNAME:$BLOCKPREFIXdd"
-  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd activate $HOSTNAME:$BLOCKPREFIXdb1"
-  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd activate $HOSTNAME:$BLOCKPREFIXdc1"
-  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd activate $HOSTNAME:$BLOCKPREFIXdd1"
+  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd prepare $HOSTNAME:${BLOCKPREFIX}db"
+  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd prepare $HOSTNAME:${BLOCKPREFIX}dc"
+  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd prepare $HOSTNAME:${BLOCKPREFIX}dd"
+  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd activate $HOSTNAME:${BLOCKPREFIX}db1"
+  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd activate $HOSTNAME:${BLOCKPREFIX}dc1"
+  sudo -niu ceph-deploy -- bash -c "cd my-cluster && ceph-deploy osd activate $HOSTNAME:${BLOCKPREFIX}dd1"
 
   # Create volumes pool
   ceph osd pool create volumes 128
