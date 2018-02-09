@@ -229,7 +229,7 @@ then
     echo "chmod 644 /etc/ceph/ceph.client.admin.keyring" | ssh -T -o StrictHostKeyChecking=no root@"${CINDERHOST}"
 
     echo " Testing Connection to Remote Node..."
-    echo "hostname" | ssh -o StrictHostKeyChecking=no root@"${CINDERHOST}"
+    echo "hostname" | ssh -T -o StrictHostKeyChecking=no root@"${CINDERHOST}"
     echo ""
     echo "Running Additional Configs on Cinder Node"
     echo "cd /root;./config-ceph.sh" | ssh -T -o StrictHostKeyChecking=no root@"${CINDERHOST}"
