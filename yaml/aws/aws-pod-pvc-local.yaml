@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: local-busybox
+spec:
+    containers:
+    - name: local-busybox
+      image: busybox
+      command: ["sleep", "600000"]
+      volumeDevices:
+      - name: localdev
+        devicePath: /dev/xvdf
+    volumes:
+    - name: localdev
+      persistentVolumeClaim:
+        claimName: local-claim

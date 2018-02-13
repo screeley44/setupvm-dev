@@ -1,0 +1,25 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-raw-pv
+  annotations:
+         "volume.alpha.kubernetes.io/node-affinity": '{
+             "requiredDuringSchedulingIgnoredDuringExecution": {
+                "nodeSelectorTerms": [
+                    { "matchExpressions": [
+                        { "key": "kubernetes.io/hostname",
+                          "operator": "In",
+                          "values": ["ip-172-18-11-174.ec2.internal"]
+                        }
+                    ]}
+                 ]}
+              }'
+spec:
+  volumeMode: Block
+  capacity:
+    storage: 10Gi
+  local:
+    path: /dev/xvdf
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain

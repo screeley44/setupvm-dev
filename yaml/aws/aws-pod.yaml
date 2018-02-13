@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aws-ebs-bb-pod1
+spec:
+  containers:
+  - name: aws-ebs-bb-pod1
+    image: busybox
+    command: ["sleep", "600000"]
+    volumeMounts:
+    - mountPath: /usr/share/busybox
+      name: ebsvol
+  volumes:
+  - name: ebsvol
+    awsElasticBlockStore:
+      volumeID: vol-96ab0224
+      fsType: ext4

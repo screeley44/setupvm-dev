@@ -646,189 +646,6 @@ CreateConfigs()
 
 CreateTestYamlEC2()
 {
-  cd $GOLANGPATH/dev-configs/aws
-  echo "kind: PersistentVolume" > local-pv.yaml
-  echo "apiVersion: v1" >> local-pv.yaml
-  echo "metadata:" >> local-pv.yaml
-  echo "  name: local-raw-pv" >> local-pv.yaml
-  echo "  annotations:" >> local-pv.yaml
-  echo "         \"volume.alpha.kubernetes.io/node-affinity\": '{" >> local-pv.yaml
-  echo "             \"requiredDuringSchedulingIgnoredDuringExecution\": {" >> local-pv.yaml
-  echo "                \"nodeSelectorTerms\": [" >> local-pv.yaml
-  echo "                    { \"matchExpressions\": [" >> local-pv.yaml
-  echo "                        { \"key\": \"kubernetes.io/hostname\"," >> local-pv.yaml
-  echo "                          \"operator\": \"In\"," >> local-pv.yaml
-  echo "                          \"values\": [\"ip-172-18-11-174.ec2.internal\"]" >> local-pv.yaml
-  echo "                        }" >> local-pv.yaml
-  echo "                    ]}" >> local-pv.yaml
-  echo "                 ]}" >> local-pv.yaml
-  echo "              }'" >> local-pv.yaml
-  echo "spec:" >> local-pv.yaml
-  echo "  volumeMode: Block" >> local-pv.yaml
-  echo "  capacity:" >> local-pv.yaml
-  echo "    storage: 10Gi" >> local-pv.yaml
-  echo "  local:" >> local-pv.yaml
-  echo "    path: /dev/xvdf" >> local-pv.yaml
-  echo "  accessModes:" >> local-pv.yaml
-  echo "    - ReadWriteOnce" >> local-pv.yaml
-  echo "  persistentVolumeReclaimPolicy: Retain" >> local-pv.yaml
-
-  echo "kind: PersistentVolumeClaim" > local-pvc.yaml
-  echo "apiVersion: v1" >> local-pvc.yaml
-  echo "metadata:" >> local-pvc.yaml
-  echo "  name: local-claim" >> local-pvc.yaml
-  echo "spec:" >> local-pvc.yaml
-  echo "  volumeMode: Block" >> local-pvc.yaml
-  echo "  accessModes:" >> local-pvc.yaml
-  echo "    - ReadWriteOnce" >> local-pvc.yaml
-  echo "  resources:" >> local-pvc.yaml
-  echo "    requests:" >> local-pvc.yaml
-  echo "      storage: 5Gi" >> local-pvc.yaml
-
-  echo "apiVersion: v1" > local-pod.yaml
-  echo "kind: Pod" >> local-pod.yaml
-  echo "metadata:" >> local-pod.yaml
-  echo "  name: local-busybox" >> local-pod.yaml
-  echo "spec:" >> local-pod.yaml
-  echo "    containers:" >> local-pod.yaml
-  echo "    - name: local-busybox" >> local-pod.yaml
-  echo "      image: busybox" >> local-pod.yaml
-  echo "      command: [\"sleep\", \"600000\"]" >> local-pod.yaml
-  echo "      volumeDevices:" >> local-pod.yaml
-  echo "      - name: localdev" >> local-pod.yaml
-  echo "        devicePath: /dev/xvdf" >> local-pod.yaml
-  echo "    volumes:" >> local-pod.yaml
-  echo "    - name: localdev" >> local-pod.yaml
-  echo "      persistentVolumeClaim:" >> local-pod.yaml
-  echo "        claimName: local-claim" >> local-pod.yaml
-
-  echo "apiVersion: v1" > busybox-ebs.yaml
-  echo "kind: Pod" >> busybox-ebs.yaml
-  echo "metadata:"  >> busybox-ebs.yaml
-  echo "  name: aws-ebs-bb-pod1"  >> busybox-ebs.yaml
-  echo "spec:"  >> busybox-ebs.yaml
-  echo "  containers:"  >> busybox-ebs.yaml
-  echo "  - name: aws-ebs-bb-pod1"  >> busybox-ebs.yaml
-  echo "    image: busybox"  >> busybox-ebs.yaml
-  echo "    command: [\"sleep\", \"600000\"]" >> busybox-ebs.yaml
-  echo "    volumeMounts:"  >> busybox-ebs.yaml
-  echo "    - mountPath: /usr/share/busybox"  >> busybox-ebs.yaml
-  echo "      name: ebsvol"  >> busybox-ebs.yaml
-  echo "  volumes:"  >> busybox-ebs.yaml
-  echo "  - name: ebsvol"  >> busybox-ebs.yaml
-  echo "    awsElasticBlockStore:"  >> busybox-ebs.yaml
-  echo "      volumeID: vol-96ab0224"  >> busybox-ebs.yaml
-  echo "      fsType: ext4"  >> busybox-ebs.yaml
-
-  echo "apiVersion: v1" > ebs-pv.yaml
-  echo "kind: PersistentVolume" >> ebs-pv.yaml
-  echo "metadata:" >> ebs-pv.yaml
-  echo " name: pv-ebs" >> ebs-pv.yaml
-  echo "spec:" >> ebs-pv.yaml
-  echo " capacity:" >> ebs-pv.yaml
-  echo "   storage: 1Gi" >> ebs-pv.yaml
-  echo " accessModes:" >> ebs-pv.yaml
-  echo "   - ReadWriteOnce" >> ebs-pv.yaml
-  echo " awsElasticBlockStore:" >> ebs-pv.yaml
-  echo "   volumeID: vol-469b10f4" >> ebs-pv.yaml
-  echo "   fsType: ext4" >> ebs-pv.yaml
-
-
-  echo "apiVersion: v1" > ebs-pvc.yaml
-  echo "kind: PersistentVolumeClaim" >> ebs-pvc.yaml
-  echo "metadata:" >> ebs-pvc.yaml
-  echo " name: ebs-claim" >> ebs-pvc.yaml
-  echo "spec:" >> ebs-pvc.yaml
-  echo " accessModes:" >> ebs-pvc.yaml
-  echo "  - ReadWriteOnce" >> ebs-pvc.yaml
-  echo " resources:" >> ebs-pvc.yaml
-  echo "   requests:" >> ebs-pvc.yaml
-  echo "     storage: 1Gi" >> ebs-pvc.yaml
-
-  echo "apiVersion: v1" > busybox-ebs-pvc.yaml
-  echo "kind: Pod" >> busybox-ebs-pvc.yaml
-  echo "metadata:" >> busybox-ebs-pvc.yaml
-  echo "  name: aws-ebs-bb-pod2" >> busybox-ebs-pvc.yaml
-  echo "spec:" >> busybox-ebs-pvc.yaml
-  echo "  containers:" >> busybox-ebs-pvc.yaml
-  echo "  - name: aws-ebs-bb-pod2" >> busybox-ebs-pvc.yaml
-  echo "    image: busybox" >> busybox-ebs-pvc.yaml
-  echo "    command: [\"sleep\", \"600000\"]" >> busybox-ebs-pvc.yaml
-  echo "    volumeMounts:" >> busybox-ebs-pvc.yaml
-  echo "    - mountPath: /usr/share/busybox" >> busybox-ebs-pvc.yaml
-  echo "      name: ebsvol" >> busybox-ebs-pvc.yaml
-  echo "  volumes:" >> busybox-ebs-pvc.yaml
-  echo "    - name: ebsvol" >> busybox-ebs-pvc.yaml
-  echo "      persistentVolumeClaim:" >> busybox-ebs-pvc.yaml
-  echo "        claimName: ebs-claim" >> busybox-ebs-pvc.yaml
-
-  echo "kind: StorageClass" > aws-storage-class1.yaml
-  echo "apiVersion: storage.k8s.io/v1beta1" >> aws-storage-class1.yaml
-  echo "metadata:" >> aws-storage-class1.yaml
-  echo "  name: slow" >> aws-storage-class1.yaml
-  echo "provisioner: kubernetes.io/aws-ebs" >> aws-storage-class1.yaml
-  echo "parameters:" >> aws-storage-class1.yaml
-  echo "  type: gp2" >> aws-storage-class1.yaml
-  echo "  zone: us-east-1d" >> aws-storage-class1.yaml
-
-  echo "apiVersion: v1" > aws-pvc-storage-class.yaml
-  echo "kind: PersistentVolumeClaim" >> aws-pvc-storage-class.yaml
-  echo "metadata:" >> aws-pvc-storage-class.yaml
-  echo " name: ebs-claim" >> aws-pvc-storage-class.yaml
-  echo " annotations:" >> aws-pvc-storage-class.yaml
-  echo "   volume.beta.kubernetes.io/storage-class: slow" >> aws-pvc-storage-class.yaml
-  echo "spec:" >> aws-pvc-storage-class.yaml
-  echo " accessModes:" >> aws-pvc-storage-class.yaml
-  echo "  - ReadWriteOnce" >> aws-pvc-storage-class.yaml
-  echo " resources:" >> aws-pvc-storage-class.yaml
-  echo "   requests:" >> aws-pvc-storage-class.yaml
-  echo "     storage: 5Gi" >> aws-pvc-storage-class.yaml
-
-  echo "apiVersion: v1" > aws-pv-storageclass.yaml
-  echo "kind: PersistentVolume" >> aws-pv-storageclass.yaml
-  echo "metadata:" >> aws-pv-storageclass.yaml
-  echo " name: silver.east" >> aws-pv-storageclass.yaml
-  echo " annotations:" >> aws-pv-storageclass.yaml
-  echo "   volume.beta.kubernetes.io/storage-class: silver.east" >> aws-pv-storageclass.yaml
-  echo "spec:" >> aws-pv-storageclass.yaml
-  echo " capacity:" >> aws-pv-storageclass.yaml
-  echo "   storage: 10Gi" >> aws-pv-storageclass.yaml
-  echo " accessModes:" >> aws-pv-storageclass.yaml
-  echo "   - ReadWriteOnce" >> aws-pv-storageclass.yaml
-  echo " awsElasticBlockStore:" >> aws-pv-storageclass.yaml
-  echo "   volumeID: vol-26eaa981" >> aws-pv-storageclass.yaml
-  echo "   fsType: ext4" >> aws-pv-storageclass.yaml
-
-  echo "apiVersion: v1" > aws-pvc-storageclass.yaml
-  echo "kind: PersistentVolumeClaim" >> aws-pvc-storageclass.yaml
-  echo "metadata:" >> aws-pvc-storageclass.yaml
-  echo " name: ebs-claim-silver" >> aws-pvc-storageclass.yaml
-  echo " annotations:" >> aws-pvc-storageclass.yaml
-  echo "   volume.beta.kubernetes.io/storage-class: silver.east" >> aws-pvc-storageclass.yaml
-  echo "spec:" >> aws-pvc-storageclass.yaml
-  echo " accessModes:" >> aws-pvc-storageclass.yaml
-  echo "  - ReadWriteOnce" >> aws-pvc-storageclass.yaml
-  echo " resources:" >> aws-pvc-storageclass.yaml
-  echo "   requests:" >> aws-pvc-storageclass.yaml
-  echo "     storage: 10Gi" >> aws-pvc-storageclass.yaml
-
-  echo "apiVersion: v1" > default-service-account.yaml
-  echo "kind: ServiceAccount" >> default-service-account.yaml
-  echo "metadata:" >> default-service-account.yaml
-  echo "  name: default" >> default-service-account.yaml
-  echo "  namespace: default" >> default-service-account.yaml
-  echo "secrets:" >> default-service-account.yaml
-  echo "- name: default-secret" >> default-service-account.yaml
-
-  echo "kind: Secret" > service-account-secret.yaml
-  echo "apiVersion: v1" >> service-account-secret.yaml
-  echo "metadata:" >> service-account-secret.yaml
-  echo "  name: default-secret" >> service-account-secret.yaml
-  echo "  annotations:" >> service-account-secret.yaml
-  echo "    kubernetes.io/service-account.name: default" >> service-account-secret.yaml
-  echo "type: kubernetes.io/service-account-token" >> service-account-secret.yaml
-
-
 
   cd $GOLANGPATH/dev-configs/gce
   echo "apiVersion: v1" > busybox-gce.yaml
@@ -1641,6 +1458,12 @@ then
 
       mkdir -p /etc/runc/dev-configs
     fi
+  else
+    if [ ! -d "/root/setupvm-dev" ]
+    then
+      cd /root
+      git clone https://github.com/screeley44/setupvm-dev.git
+    fi
   fi
 fi
   
@@ -2026,6 +1849,9 @@ fi
 #$SUDO go get -u github.com/jteeuwen/go-bindata/go-bindata
 
 echo "DIDRUN" > $GOLANGPATH/didcomplete
+
+# copy test files
+$SUDO cp /root/setupvm-dev/yaml/aws/* $KUBEPATH/dev-configs/aws
 
 if [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ]
 then
