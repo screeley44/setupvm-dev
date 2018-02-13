@@ -4,7 +4,7 @@ metadata:
   name: pod-ebs-block
 spec:
   containers:
-  - name: pod-ebs-block:
+  - name: pod-ebs-block
     image: busybox
     command: ["sleep", "600000"]
     volumeDevices:
