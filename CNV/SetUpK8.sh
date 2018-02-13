@@ -341,8 +341,16 @@ then
 
   # Export file
   echo "# Some K8 exports" >> newbashrc 
-  #echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> newbashrc
-  #echo "export CLOUD_PROVIDER=$ISCLOUD" >> newbashrc
+  if [ "$ISCLOUD" == "aws" ]
+  then
+    echo "export CLOUD_CONFIG=/etc/aws/aws.conf" >> newbashrc
+    echo "export CLOUD_PROVIDER=$ISCLOUD" >> newbashrc
+  fi
+  if [ "$ISCLOUD" == "gce" ]
+  then
+    echo "export CLOUD_CONFIG=/etc/gce/gce.conf" >> newbashrc
+    echo "export CLOUD_PROVIDER=$ISCLOUD" >> newbashrc
+  fi
   echo "export HOSTNAME_OVERRIDE=$HOSTNAME" >> newbashrc
   echo "export ALLOW_SECURITY_CONTEXT=true" >> newbashrc
   echo "export ALLOW_PRIVILEGED=true" >> newbashrc
@@ -354,8 +362,16 @@ then
   echo "export ZONE=$ZONE" >> newbashrc
 
   echo "# Some K8 exports" >> .bash_profile 
-  #echo "export KUBERNETES_PROVIDER=$ISCLOUD" >> .bash_profile
-  #echo "export CLOUD_PROVIDER=$ISCLOUD" >> .bash_profile
+  if [ "$ISCLOUD" == "aws" ]
+  then
+    echo "export CLOUD_CONFIG=/etc/aws/aws.conf" >> .bash_profile
+    echo "export CLOUD_PROVIDER=$ISCLOUD" >> .bash_profile
+  fi
+  if [ "$ISCLOUD" == "gce" ]
+  then
+    echo "export CLOUD_CONFIG=/etc/gce/gce.conf" >> .bash_profile
+    echo "export CLOUD_PROVIDER=$ISCLOUD" >> .bash_profile
+  fi
   echo "export HOSTNAME_OVERRIDE=$HOSTNAME" >> .bash_profile
   echo "export ALLOW_SECURITY_CONTEXT=true" >> .bash_profile
   echo "export ALLOW_PRIVILEGED=true" >> .bash_profile
@@ -413,6 +429,25 @@ then
 
   $SUDO cp /root/containerized-data-importer/manifests/importer/* $KUBEPATH/dev-configs/data-importer
   
+  if [ "$ISCLOUD" == "aws" ]
+  then
+
+    echo "Install ec2 api tools (aws cli)..."
+    cd $GOLANGPATH
+    curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+    unzip awscli-bundle.zip
+    $SUDO ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+    echo "...configuring aws"
+    aws configure < myconf.txt
+    echo "...creating aws.conf file"  
+    cd /etc
+    $SUDO mkdir aws
+    $SUDO chmod -R 777 /etc/aws  
+    cd /etc/aws
+    echo "[Global]" > aws.conf
+    echo "Zone = $ZONE" >> aws.conf
+    cp aws.conf /etc/kubernetes/cloud-config
+  fi
 
   echo ""
   echo " *********************************************** "
