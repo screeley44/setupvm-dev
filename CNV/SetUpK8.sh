@@ -35,7 +35,7 @@ KUBEPATH=""
 GOLANGPATH=""
 
 
-if [ "$SETUP_TYPE" == "cnv-dev" ] || [ "$SETUP_TYPE" == "cnv-k8" ] || [ "$SETUP_TYPE" == "cnv-cinder-k8" ] || [ "$SETUP_TYPE" == "cnv-ceph-k8" ] || [ "$SETUP_TYPE" == "cnv-k8-existing" ]
+if [ "$SETUP_TYPE" == "k8-dev" ] || [ "$SETUP_TYPE" == "cnv-dev" ] || [ "$SETUP_TYPE" == "cnv-k8" ] || [ "$SETUP_TYPE" == "cnv-cinder-k8" ] || [ "$SETUP_TYPE" == "cnv-ceph-k8" ] || [ "$SETUP_TYPE" == "cnv-k8-existing" ]
 then
   # determine if using defaults or values
   # for paths
@@ -169,7 +169,7 @@ fi
 # Docker, golang, etc...
 echo ""
 echo ""
-if [ "$SETUP_TYPE" == "cnv-dev" ] || [ "$SETUP_TYPE" == "cnv-k8" ] || [ "$SETUP_TYPE" == "cnv-cinder-k8" ] || [ "$SETUP_TYPE" == "cnv-ceph-k8" ] || [ "$SETUP_TYPE" == "cnv-k8-existing" ]
+if [ "$SETUP_TYPE" == "k8-dev" ] || [ "$SETUP_TYPE" == "cnv-dev" ] || [ "$SETUP_TYPE" == "cnv-k8" ] || [ "$SETUP_TYPE" == "cnv-cinder-k8" ] || [ "$SETUP_TYPE" == "cnv-ceph-k8" ] || [ "$SETUP_TYPE" == "cnv-k8-existing" ]
 then
   echo ""
   echo "Installing Kubernetes Setup..."
@@ -438,7 +438,16 @@ then
     unzip awscli-bundle.zip
     $SUDO ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
     echo "...configuring aws"
+
+    cd $GOLANGPATH
+    echo "...creating aws cli input"
+    echo "$AWSKEY" > myconf.txt
+    echo "$AWSSECRET" >> myconf.txt
+    echo "$ZONE" >> myconf.txt
+    echo "json" >> myconf.txt
+    echo ""
     aws configure < myconf.txt
+
     echo "...creating aws.conf file"  
     cd /etc
     $SUDO mkdir aws
@@ -446,6 +455,7 @@ then
     cd /etc/aws
     echo "[Global]" > aws.conf
     echo "Zone = $ZONE" >> aws.conf
+    $SUDO mkdir -p /etc/kubernetes/cloud-config
     cp aws.conf /etc/kubernetes/cloud-config
   fi
 
