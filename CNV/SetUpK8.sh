@@ -427,6 +427,7 @@ then
   # source testfiles.sh
   $SUDO cp /root/setupvm-dev/CNV/yaml/* $KUBEPATH/dev-configs/cinder
   $SUDO cp /root/setupvm-dev/yaml/aws/* $KUBEPATH/dev-configs/aws
+  $SUDO cp /root/setupvm-dev/yaml/gce/* $KUBEPATH/dev-configs/gce
 
   $SUDO cp /root/containerized-data-importer/manifests/importer/* $KUBEPATH/dev-configs/data-importer
   

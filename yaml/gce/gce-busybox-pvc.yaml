@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gce-busybox-pvc
+spec:
+  containers:
+  - name: gce-busybox-pvc
+    image: busybox
+    command: [\"sleep\", \"600000\"]
+    volumeMounts:
+    - mountPath: /usr/share/busybox
+      name: gcevol
+  volumes:
+    - name: gcevol
+      persistentVolumeClaim:
+        claimName: gce-claim

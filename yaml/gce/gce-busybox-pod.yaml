@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gce-bb-pod1
+spec:
+  containers:
+  - name: gce-bb-pod1
+    image: busybox
+    command: [\"sleep\", \"600000\"]
+    volumeMounts:
+    - mountPath: /usr/share/busybox
+      name: gcevol
+  volumes:
+  - name: gcevol
+    gcePersistentDisk:
+      readOnly: false
+      pdName: yourdisk
+      fsType: ext4
