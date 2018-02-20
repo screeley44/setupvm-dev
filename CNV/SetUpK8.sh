@@ -460,6 +460,17 @@ then
     cp aws.conf /etc/kubernetes/cloud-config
   fi
 
+  if [ "$ISCLOUD" == "gce" ]
+  then
+    cd /etc
+    $SUDO mkdir -p gce
+    $SUDO chmod -R 777 /etc/gce  
+    cd /etc/gce
+    echo "[Global]" > gce.conf
+    echo "Zone = $ZONE" >> gce.conf
+    cd $GOLANGPATH
+    echo ""
+
   echo ""
   echo " *********************************************** "
   echo "" 
