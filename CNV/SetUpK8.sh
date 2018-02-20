@@ -165,6 +165,14 @@ then
   fi
 fi
 
+# Install cinder client if k8-dev and cinder_client is listed
+if [ "$SETUP_TYPE" == "k8-dev" ] && [ "$CINDER_CLIENT" == "Y" ] && [ "$HOSTENV" == "centos" ]
+then
+  yum install epel-release -y
+  yum install python-pip -y
+  pip install python-cinderclient
+fi
+
 # Install K8 Stuff
 # Docker, golang, etc...
 echo ""
