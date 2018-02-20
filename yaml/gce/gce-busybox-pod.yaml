@@ -6,7 +6,7 @@ spec:
   containers:
   - name: gce-bb-pod1
     image: busybox
-    command: [\"sleep\", \"600000\"]
+    command: ["sleep", "600000"]
     volumeMounts:
     - mountPath: /usr/share/busybox
       name: gcevol

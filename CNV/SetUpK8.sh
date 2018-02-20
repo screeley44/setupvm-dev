@@ -350,6 +350,7 @@ then
   then
     echo "export CLOUD_CONFIG=/etc/gce/gce.conf" >> newbashrc
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> newbashrc
+    echo "export NUM_NODES=$KUBEUP_NUM_NODES" >> newbashrc
   fi
   echo "export HOSTNAME_OVERRIDE=$HOSTNAME" >> newbashrc
   echo "export ALLOW_SECURITY_CONTEXT=true" >> newbashrc
@@ -371,6 +372,7 @@ then
   then
     echo "export CLOUD_CONFIG=/etc/gce/gce.conf" >> .bash_profile
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> .bash_profile
+    echo "export NUM_NODES=$KUBEUP_NUM_NODES" >> .bash_profile
   fi
   echo "export HOSTNAME_OVERRIDE=$HOSTNAME" >> .bash_profile
   echo "export ALLOW_SECURITY_CONTEXT=true" >> .bash_profile
