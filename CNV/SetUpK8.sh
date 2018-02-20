@@ -163,15 +163,15 @@ then
     $SUDO mkdir -p $KUBEPATH/dev-configs/data-importer
     $SUDO chmod -R 777 $KUBEPATH
   fi
+
+  echo ""
+  echo " *********************************************** "
+  echo "" 
+  echo "     Configuration and Directory Setup Completed on host $HOSTNAME!"
+  echo ""
+  echo " *********************************************** "
 fi
 
-# Install cinder client if k8-dev and cinder_client is listed
-if [ "$SETUP_TYPE" == "k8-dev" ] && [ "$CINDER_CLIENT" == "Y" ] && [ "$HOSTENV" == "centos" ]
-then
-  yum install epel-release -y
-  yum install python-pip -y
-  pip install python-cinderclient
-fi
 
 # Install K8 Stuff
 # Docker, golang, etc...
@@ -503,5 +503,20 @@ then
   echo " *********************************************** "
 
 
+fi
+
+# Install cinder client if k8-dev and cinder_client is listed
+if [ "$SETUP_TYPE" == "k8-dev" ] && [ "$CINDER_CLIENT" == "Y" ] && [ "$HOSTENV" == "centos" ]
+then
+  yum install epel-release -y
+  yum install python-pip -y
+  pip install python-cinderclient
+
+  echo ""
+  echo " *********************************************** "
+  echo "" 
+  echo "     Cinder Client Setup Completed on host $HOSTNAME!"
+  echo ""
+  echo " *********************************************** "
 fi
 
