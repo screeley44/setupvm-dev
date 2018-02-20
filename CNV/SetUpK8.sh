@@ -520,3 +520,10 @@ then
   echo " *********************************************** "
 fi
 
+echo ""
+echo " *********************************************** "
+echo "" 
+echo "     Script Complete!  Kubernetes Setup Completed on host $HOSTNAME!"
+echo ""
+echo " *********************************************** "
+
