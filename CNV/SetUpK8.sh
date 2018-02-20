@@ -361,6 +361,12 @@ then
   echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> newbashrc
   echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> newbashrc
   echo "export ZONE=$ZONE" >> newbashrc
+  echo "" >> newbashrc
+  echo "# Cinder Env Vars" >> newbashrc
+  echo "export OS_AUTH_TYPE=$COS_AUTH_TYPE" >> newbashrc
+  echo "export CINDERCLIENT_BYPASS_URL=$CCINDERCLIENT_BYPASS_URL" >> newbashrc
+  echo "export OS_PROJECT_ID=$COS_PROJECT_ID" >> newbashrc
+  echo "export OS_VOLUME_API_VERSION=$COS_VOLUME_API_VERSION" >> newbashrc
 
   echo "# Some K8 exports" >> .bash_profile 
   if [ "$ISCLOUD" == "aws" ]
@@ -383,6 +389,12 @@ then
   echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> .bash_profile
   echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> .bash_profile
   echo "export ZONE=$ZONE" >> .bash_profile
+  echo "" >> .bash_profile
+  echo "# Cinder Env Vars" >> .bash_profile
+  echo "export OS_AUTH_TYPE=$COS_AUTH_TYPE" >> .bash_profile
+  echo "export CINDERCLIENT_BYPASS_URL=$CCINDERCLIENT_BYPASS_URL" >> .bash_profile
+  echo "export OS_PROJECT_ID=$COS_PROJECT_ID" >> .bash_profile
+  echo "export OS_VOLUME_API_VERSION=$COS_VOLUME_API_VERSION" >> .bash_profile
 
   if [ "$FEATURE_GATES" == "" ]
   then
