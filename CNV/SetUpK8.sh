@@ -470,6 +470,7 @@ then
     echo "Zone = $ZONE" >> gce.conf
     cd $GOLANGPATH
     echo ""
+  fi
 
   echo ""
   echo " *********************************************** "
