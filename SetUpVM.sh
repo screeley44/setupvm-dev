@@ -1564,7 +1564,6 @@ then
     $SUDO chmod -R 777 /etc/gce  
     cd /etc/gce
     echo "[Global]" > gce.conf
-    echo "multizone = $MULTIZONE" >> gce.conf
     echo "Zone = $ZONE" >> gce.conf
     cd $GOLANGPATH
     echo ""
