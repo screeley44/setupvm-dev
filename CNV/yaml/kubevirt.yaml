@@ -1,0 +1,291 @@
+# RBAC
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: kubevirt-controller
+  namespace: default
+  labels:
+    kubevirt.io: ""
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+      - delete
+      - update
+      - create
+  - apiGroups:
+      - ''
+    resources:
+      - nodes
+      - persistentvolumeclaims
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - kubevirt.io
+    resources:
+      - virtualmachines
+      - virtualmachinereplicasets
+    verbs:
+      - get
+      - list
+      - watch
+      - delete
+      - update
+      - create
+      - deletecollection
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubevirt-controller
+  namespace: default
+  labels:
+    kubevirt.io: ""
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubevirt-privileged
+  namespace: default
+  labels:
+    kubevirt.io: ""
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: kubevirt-controller
+  namespace: default
+  labels:
+    kubevirt.io: ""
+roleRef:
+  kind: ClusterRole
+  name: kubevirt-controller
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: kubevirt-controller
+    namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: kubevirt-controller-cluster-admin
+  namespace: default
+  labels:
+    kubevirt.io: ""
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: kubevirt-controller
+    namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: kubevirt-privileged-cluster-admin
+  namespace: default
+  labels:
+    kubevirt.io: ""
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: kubevirt-privileged
+    namespace: default
+---
+# custom resource definitions
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: virtualmachines.kubevirt.io
+  labels:
+    kubevirt.io: ""
+spec:
+  group: kubevirt.io
+  version: v1alpha1
+  scope: Namespaced
+  names:
+    plural: virtualmachines
+    singular: virtualmachine
+    kind: VirtualMachine
+    shortNames:
+      - vm
+      - vms
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: virtualmachinereplicasets.kubevirt.io
+  labels:
+    kubevirt.io: ""
+spec:
+  scope: Namespaced
+  group: kubevirt.io
+  version: v1alpha1
+  names:
+    kind: VirtualMachineReplicaSet
+    plural: virtualmachinereplicasets
+    singular: virtualmachinereplicaset
+    shortNames:
+      - vmrs
+      - vmrss
+---        
+# kubevirt controller
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: virt-controller
+  namespace: default
+  labels:
+    kubevirt.io: "virt-controller"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        kubevirt.io: virt-controller
+    spec:
+      serviceAccountName: kubevirt-controller
+      containers:
+        - name: virt-controller
+          image: kubevirt/virt-controller:v0.3.0-alpha.3
+          imagePullPolicy: IfNotPresent
+          command:
+              - "/virt-controller"
+              - "--launcher-image"
+              - "kubevirt/virt-launcher:v0.3.0-alpha.3"
+              - "--port"
+              - "8182"
+          ports:
+            - containerPort: 8182
+              name: "virt-controller"
+              protocol: "TCP"
+          livenessProbe:
+            failureThreshold: 8
+            httpGet:
+              port: 8182
+              path: /healthz
+            initialDelaySeconds: 15
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              port: 8182
+              path: /leader
+            initialDelaySeconds: 15
+            timeoutSeconds: 10
+          securityContext:
+            runAsNonRoot: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubevirt
+  labels:
+    app: virt-handler
+spec:
+  ports:
+  - port: 8185
+    name: vhandler
+  clusterIP: None
+  selector:
+    app: virt-handler
+---
+# virt-handler StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: virt-handler
+  namespace: default
+  labels:
+    kubevirt.io: virt-handler
+spec:
+  selector:
+    matchLabels:
+      name: virt-handler
+  serviceName: kubevirt
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: virt-handler
+        kubevirt.io: virt-handler
+    spec:
+      serviceAccountName: kubevirt-privileged
+      hostPID: true
+      containers:
+        - name: virt-handler
+          ports:
+            - containerPort: 8185
+              hostPort: 8185
+          image: kubevirt/virt-handler:v0.3.0-alpha.3
+          imagePullPolicy: IfNotPresent
+          command:
+            - "/virt-handler"
+            - "-v"
+            - "3"
+            - "--hostname-override"
+            - "$(NODE_NAME)"
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: libvirt-runtime
+              mountPath: /var/run/libvirt
+            - name: virt-share-dir
+              mountPath: /var/run/kubevirt
+            - name: virt-private-dir
+              mountPath: /var/run/kubevirt-private
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+#      volumes:
+#        - name: libvirt-runtime
+#          hostPath:
+#            path: /var/run/libvirt
+#        - name: virt-share-dir
+#          hostPath:
+#            path: /var/run/kubevirt
+#        - name: virt-private-dir
+#          hostPath:
+#            path: /var/run/kubevirt-private
+  volumeClaimTemplates:
+  - metadata:
+      name: libvirt-runtime
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: demo
+      resources:
+        requests:
+          storage: 50Gi
+  - metadata:
+      name: virt-share-dir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: demo
+      resources:
+        requests:
+          storage: 50Gi
+  - metadata:
+      name: virt-private-dir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: demo
+      resources:
+        requests:
+          storage: 50Gi
+
+
+
