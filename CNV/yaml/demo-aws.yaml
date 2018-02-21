@@ -112,24 +112,68 @@ spec:
 #          value: http://127.0.0.1:8776/v2.0
       volumes:
       - name: scripts
-        emptyDir: {}
-      - name: cinderetc
-        emptyDir: {}
-      - name: cephvarlib
-        emptyDir: {}
-      - name: cephetc
-        emptyDir: {}
+        hostPath:
+          path: "/etc/demo/scripts"
+#      - name: cinderetc
+#        emptyDir: {}
+#      - name: cephvarlib
+#        emptyDir: {}
 #      - name: cephetc
-#        hostPath:
-#          path: "/etc/ceph"
-      - name: mariadbdata
-        emptyDir: {}
+#        emptyDir: {}
+##      - name: cephetc
+##        hostPath:
+##          path: "/etc/ceph"
+#      - name: mariadbdata
+#        emptyDir: {}
+  volumeClaimTemplates:
+  - metadata:
+      name: cephetc
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: demo
+      resources:
+        requests:
+          storage: 20Gi
+  - metadata:
+      name: cephvarlib
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: demo
+      resources:
+        requests:
+          storage: 20Gi
+  - metadata:
+      name: cinderetc
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: demo
+      resources:
+        requests:
+          storage: 20Gi
+  - metadata:
+      name: mariadbdata
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: demo
+      resources:
+        requests:
+          storage: 80Gi
+
 ---
 kind: StorageClass
 apiVersion: storage.k8s.io/v1beta1
 metadata:
   name: standalone-cinder
 provisioner: openstack.org/standalone-cinder
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+  name: demo
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+  zone: us-east-1d
 ---
 apiVersion: v1
 kind: Secret
@@ -138,5 +182,3 @@ metadata:
 type: "kubernetes.io/rbd"
 data:
   key: QVFDMkI0SmE2MDgzT3hBQTdOR0dpb0xpR1lqOHlJTFpkYUI1T0E9PQo=
-
-
