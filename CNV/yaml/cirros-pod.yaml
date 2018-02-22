@@ -1,0 +1,24 @@
+Version: v1
+kind: Pod
+metadata:
+ name: disk-importer
+spec:
+ restartPolicy: OnFailure
+ containers:
+ - name: importer
+   image: kubevirtci/disk-importer
+   env:
+     - name: CURL_OPTS
+       value: "-L"
+     - name: INSTALL_TO
+       value: /storage/disk.img
+     - name: URL
+       value: http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
+   volumeMounts:
+   - name: ceph-storage
+     mountPath: /storage
+ volumes:
+ - name: ceph-storage
+   persistentVolumeClaim:
+     claimName: cirros
+

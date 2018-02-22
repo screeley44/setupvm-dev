@@ -198,6 +198,8 @@ spec:
   ports:
   - port: 8185
     name: vhandler
+  - port: 8182
+    name: vlauncher
   clusterIP: None
   selector:
     app: virt-handler
