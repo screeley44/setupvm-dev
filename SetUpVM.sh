@@ -204,6 +204,24 @@ else
 fi
 
 GCENODEPATH="c.openshift-gce-devel.internal"
+SKIPSUBSCRIBE=N
+if [ "$RERUN" == "Y" ]
+then
+  rm -rf $GOLANGPATH/didrun
+  rm -rf /root/didrun
+  rm -rf ~/didrun
+  rm -rf $GOLANGPATH/didcomplete
+  SKIPSUBSCRIBE=Y
+fi
+
+if [ "$RERUN" == "YS" ]
+then
+  rm -rf $GOLANGPATH/didrun
+  rm -rf /root/didrun
+  rm -rf ~/didrun
+  rm -rf $GOLANGPATH/didcomplete
+  SKIPSUBSCRIBE=N
+fi
 
 CreateProfiles()
 {
@@ -1115,49 +1133,52 @@ then
   echo " Skipping subscription services and yum install of software as this script was run once already..."
   echo ""
 else
-  if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "aws" ]
+  if [ "$SKIPSUBSCRIBE" == "N" ]
   then
+    if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "aws" ]
+    then
+      if [ "$HOSTENV" == "rhel" ]
+      then
+        # Installing subscription manager on CLOUD INSTANCE
+        echo "...Checking to make sure subscription manager is installed..."
+        $SUDO yum install subscription-manager -y> /dev/null
+      fi
+    fi
+
     if [ "$HOSTENV" == "rhel" ]
     then
-      # Installing subscription manager on CLOUD INSTANCE
-      echo "...Checking to make sure subscription manager is installed..."
-      $SUDO yum install subscription-manager -y> /dev/null
+      # Subscription Manager Stuffs - for RHEL 7.X devices
+      echo "Setting up subscription services from RHEL..."
+      $SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS
     fi
-  fi
 
-  if [ "$HOSTENV" == "rhel" ]
-  then
-    # Subscription Manager Stuffs - for RHEL 7.X devices
-    echo "Setting up subscription services from RHEL..."
-    $SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS
-  fi
-
-  if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ] || [ "$SETUP_TYPE" == "base" ]
-  then
-    if [ "$HOSTENV" == "rhel" ] && [ "$POOLID" == "" ]
+    if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ] || [ "$SETUP_TYPE" == "base" ]
     then
-        $SUDO subscription-manager list --available | sed -n '/OpenShift Employee Subscription/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+      if [ "$HOSTENV" == "rhel" ] && [ "$POOLID" == "" ]
+      then
+          $SUDO subscription-manager list --available | sed -n '/OpenShift Employee Subscription/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+          $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
+      elif [ "$HOSTENV" == "rhel" ]
+      then
+        echo "Using Predefined POOLID..."
+        until $SUDO subscription-manager attach --pool=$POOLID; do echo "Failure on attaching pool id, retrying..."; sleep 5; done
+      else
+        echo "..."
+      fi 
+    fi
+
+    if [ "$SETUP_TYPE" == "aplo" ]
+    then
+      if [ "$HOSTENV" == "rhel" ] && [ "$POOLID" == "" ]
+      then
+        # FOR APLO
         $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
-    elif [ "$HOSTENV" == "rhel" ]
-    then
-      echo "Using Predefined POOLID..."
-      until $SUDO subscription-manager attach --pool=$POOLID; do echo "Failure on attaching pool id, retrying..."; sleep 5; done
-    else
-      echo "..."
-    fi 
-  fi
-
-  if [ "$SETUP_TYPE" == "aplo" ]
-  then
-    if [ "$HOSTENV" == "rhel" ] && [ "$POOLID" == "" ]
-    then
-      # FOR APLO
-      $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
-    elif [ "$HOSTENV" == "rhel" ]
-    then
-      $SUDO subscription-manager attach --pool=$POOLID
-    else
-      echo "..."
+      elif [ "$HOSTENV" == "rhel" ]
+      then
+        $SUDO subscription-manager attach --pool=$POOLID
+      else
+        echo "..."
+      fi
     fi
   fi
 
