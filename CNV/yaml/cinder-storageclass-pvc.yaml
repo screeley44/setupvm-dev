@@ -1,7 +1,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: test-clone
+  name: test-cinder-provisioner
   annotations:
 spec:
   storageClassName: standalone-cinder
