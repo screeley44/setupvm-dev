@@ -133,6 +133,11 @@ then
     mkdir -p $GOLANGPATH/dev-configs/gce
     mkdir -p $GOLANGPATH/dev-configs/nfs
     mkdir -p $GOLANGPATH/dev-configs/glusterfs
+    mkdir -p $GOLANGPATH/dev-configs/cinder
+    mkdir -p $GOLANGPATH/dev-configs/cnv/aws
+    mkdir -p $GOLANGPATH/dev-configs/cnv/gce
+    mkdir -p $GOLANGPATH/dev-configs/cnv/local
+    mkdir -p $GOLANGPATH/dev-configs/cnv/data-importer
   else
     $SUDO mkdir -p $GOLANGPATH/dev-configs
     $SUDO mkdir -p $GOLANGPATH/dev-configs/aws
@@ -140,7 +145,10 @@ then
     $SUDO mkdir -p $GOLANGPATH/dev-configs/nfs
     $SUDO mkdir -p $GOLANGPATH/dev-configs/glusterfs
     $SUDO mkdir -p $GOLANGPATH/dev-configs/cinder
-    $SUDO mkdir -p $GOLANGPATH/dev-configs/data-importer
+    $SUDO mkdir -p $GOLANGPATH/dev-configs/cnv/aws
+    $SUDO mkdir -p $GOLANGPATH/dev-configs/cnv/gce
+    $SUDO mkdir -p $GOLANGPATH/dev-configs/cnv/local
+    $SUDO mkdir -p $GOLANGPATH/dev-configs/cnv/data-importer
     $SUDO chmod -R 777 $GOLANGPATH
   fi
 
@@ -153,6 +161,10 @@ then
     mkdir -p $KUBEPATH/dev-configs/nfs
     mkdir -p $KUBEPATH/dev-configs/glusterfs
     mkdir -p $KUBEPATH/dev-configs/cinder
+    mkdir -p $KUBEPATH/dev-configs/cnv/aws
+    mkdir -p $KUBEPATH/dev-configs/cnv/gce
+    mkdir -p $KUBEPATH/dev-configs/cnv/local
+    mkdir -p $KUBEPATH/dev-configs/cnv/data-importer
   else
     $SUDO mkdir -p $KUBEPATH/dev-configs
     $SUDO mkdir -p $KUBEPATH/dev-configs/aws
@@ -160,7 +172,10 @@ then
     $SUDO mkdir -p $KUBEPATH/dev-configs/nfs
     $SUDO mkdir -p $KUBEPATH/dev-configs/glusterfs
     $SUDO mkdir -p $KUBEPATH/dev-configs/cinder
-    $SUDO mkdir -p $KUBEPATH/dev-configs/data-importer
+    $SUDO mkdir -p $KUBEPATH/dev-configs/cnv/aws
+    $SUDO mkdir -p $KUBEPATH/dev-configs/cnv/gce
+    $SUDO mkdir -p $KUBEPATH/dev-configs/cnv/local
+    $SUDO mkdir -p $KUBEPATH/dev-configs/cnv/data-importer
     $SUDO chmod -R 777 $KUBEPATH
   fi
 
@@ -450,6 +465,8 @@ then
   $SUDO cp /root/setupvm-dev/CNV/yaml/* $KUBEPATH/dev-configs/cinder
   $SUDO cp /root/setupvm-dev/yaml/aws/* $KUBEPATH/dev-configs/aws
   $SUDO cp /root/setupvm-dev/yaml/gce/* $KUBEPATH/dev-configs/gce
+  $SUDO cp -R /root/setupvm-dev/CNV/aws/* $KUBEPATH/dev-configs/cnv/aws
+  $SUDO cp -R /root/setupvm-dev/CNV/aws/* $KUBEPATH/dev-configs/cnv/local
 
   $SUDO cp /root/containerized-data-importer/manifests/importer/* $KUBEPATH/dev-configs/data-importer
   

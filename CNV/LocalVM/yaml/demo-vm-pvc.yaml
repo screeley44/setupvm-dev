@@ -1,0 +1,14 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+ name: demo-vm-cirros
+ annotations:
+   k8s.io/CloneRequest: cirros
+spec:
+ storageClassName: standalone-cinder-cirros
+ accessModes:
+   - ReadWriteOnce
+ resources:
+   requests:
+     storage: 1Gi
+
