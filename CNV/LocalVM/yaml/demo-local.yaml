@@ -112,8 +112,10 @@ spec:
 #          value: http://127.0.0.1:8776/v2.0
       volumes:
       - name: scripts
-        hostPath:
-          path: "/etc/demo/scripts"
+        emptyDir: {}
+#      - name: scripts
+#        hostPath:
+#          path: "/etc/demo/scripts"
       - name: cinderetc
         emptyDir: {}
       - name: cephvarlib
