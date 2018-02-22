@@ -166,15 +166,6 @@ metadata:
   name: standalone-cinder
 provisioner: openstack.org/standalone-cinder
 ---
-kind: StorageClass
-apiVersion: storage.k8s.io/v1beta1
-metadata:
-  name: demo
-provisioner: kubernetes.io/aws-ebs
-parameters:
-  type: gp2
-  zone: us-east-1d
----
 apiVersion: v1
 kind: Secret
 metadata:
