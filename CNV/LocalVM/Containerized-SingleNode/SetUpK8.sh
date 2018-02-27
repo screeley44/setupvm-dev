@@ -131,6 +131,7 @@ then
     mkdir -p $GOLANGPATH/dev-configs
     mkdir -p $GOLANGPATH/dev-configs/aws
     mkdir -p $GOLANGPATH/dev-configs/gce
+    mkdir -p $GOLANGPATH/dev-configs/hostpath
     mkdir -p $GOLANGPATH/dev-configs/nfs
     mkdir -p $GOLANGPATH/dev-configs/glusterfs
     mkdir -p $GOLANGPATH/dev-configs/cinder
@@ -142,6 +143,7 @@ then
     $SUDO mkdir -p $GOLANGPATH/dev-configs
     $SUDO mkdir -p $GOLANGPATH/dev-configs/aws
     $SUDO mkdir -p $GOLANGPATH/dev-configs/gce
+    $SUDO mkdir -p $GOLANGPATH/dev-configs/hostpath
     $SUDO mkdir -p $GOLANGPATH/dev-configs/nfs
     $SUDO mkdir -p $GOLANGPATH/dev-configs/glusterfs
     $SUDO mkdir -p $GOLANGPATH/dev-configs/cinder
@@ -161,6 +163,7 @@ then
     mkdir -p $KUBEPATH/dev-configs/nfs
     mkdir -p $KUBEPATH/dev-configs/glusterfs
     mkdir -p $KUBEPATH/dev-configs/cinder
+    mkdir -p $KUBEPATH/dev-configs/hostpath
     mkdir -p $KUBEPATH/dev-configs/cnv/aws
     mkdir -p $KUBEPATH/dev-configs/cnv/gce
     mkdir -p $KUBEPATH/dev-configs/cnv/local
@@ -171,6 +174,7 @@ then
     $SUDO mkdir -p $KUBEPATH/dev-configs/gce
     $SUDO mkdir -p $KUBEPATH/dev-configs/nfs
     $SUDO mkdir -p $KUBEPATH/dev-configs/glusterfs
+    $SUDO mkdir -p $KUBEPATH/dev-configs/hostpath
     $SUDO mkdir -p $KUBEPATH/dev-configs/cinder
     $SUDO mkdir -p $KUBEPATH/dev-configs/cnv/aws
     $SUDO mkdir -p $KUBEPATH/dev-configs/cnv/gce
@@ -467,6 +471,7 @@ then
   $SUDO cp /root/setupvm-dev/CNV/yaml/* $KUBEPATH/dev-configs/cinder
   $SUDO cp /root/setupvm-dev/yaml/aws/* $KUBEPATH/dev-configs/aws
   $SUDO cp /root/setupvm-dev/yaml/gce/* $KUBEPATH/dev-configs/gce
+  $SUDO cp /root/setupvm-dev/yaml/hostpath/* $KUBEPATH/dev-configs/hostpath
   $SUDO cp -R /root/setupvm-dev/CNV/aws/* $KUBEPATH/dev-configs/cnv/aws
   $SUDO cp -R /root/setupvm-dev/CNV/aws/* $KUBEPATH/dev-configs/cnv/local
 
