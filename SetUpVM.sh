@@ -1241,8 +1241,8 @@ else
   # Install software
   if [ "$SETUP_TYPE" == "dev" ] || [ "$SETUP_TYPE" == "aplo" ] || [ "$SETUP_TYPE" == "base" ]
   then  
-    echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet unzip kexec-tools sos psacct ... this will take several minutes"
-    until $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct -y> /dev/null; do echo "Failure installing utils Repos, retrying..."; sleep 8; done
+    echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet unzip kexec-tools sos psacct krb5-devel ... this will take several minutes"
+    until $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct krb5-devel -y> /dev/null; do echo "Failure installing utils Repos, retrying..."; sleep 8; done
     echo "...performing yum update"
     $SUDO yum update -y> /dev/null
     if [ "$HOSTENV" == "rhel" ]
@@ -1250,7 +1250,7 @@ else
       if [ "$SETUP_TYPE" == "aplo" ]
       then
         echo "...Installing openshift utils, clients and atomic-openshift for APLO setup type..."
-        $SUDO yum install atomic-openshift-utils atomic-openshift-clients atomic-openshift kexec-tools sos psacct -y> /dev/null
+        $SUDO yum install atomic-openshift-utils atomic-openshift-clients atomic-openshift kexec-tools sos psacct krb5-devel -y> /dev/null
         $SUDO yum install heketi-client heketi-templates -y> /dev/null
         # $SUDO openshift_clock_enabled=true
       else
@@ -1291,8 +1291,8 @@ else
   else
     if [ "$SETUP_TYPE" == "kubeadm" ] || [ "$SETUP_TYPE" == "kubeadm15" ]
     then
-      echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip kexec-tools sos psacct for KUBEADM setup type  ... this will take several minutes"
-      until $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct -y> /dev/null; do echo "Failure installing utils, retrying..."; sleep 8; done
+      echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip kexec-tools sos psacct krb5-devel for KUBEADM setup type  ... this will take several minutes"
+      until $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct krb5-devel -y> /dev/null; do echo "Failure installing utils, retrying..."; sleep 8; done
       echo "...performing yum update"
       $SUDO yum update -y> /dev/null
 
@@ -1363,8 +1363,8 @@ else
         $SUDO yum install kubelet kubeadm kubectl kubernetes-cni -y> /dev/null
       fi
     else
-      echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip kexec-tools sos psacctfor CLIENT setup type  ... this will take several minutes"
-      $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct -y> /dev/null
+      echo "...Installing wget, git, net-tools, bind-utils, iptables-services, bridge-utils, gcc, python-virtualenv, bash-completion, telnet, unzip kexec-tools sos psacct krb5-devel for CLIENT setup type  ... this will take several minutes"
+      $SUDO yum install wget git net-tools bind-utils iptables-services bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct krb5-devel -y> /dev/null
       echo "...performing yum update"
       $SUDO yum update -y> /dev/null
       if [ "$HOSTENV" == "rhel" ]
