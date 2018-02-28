@@ -553,9 +553,10 @@ fi
 # Install cinder client if k8-dev and cinder_client is listed
 if [ "$SETUP_TYPE" == "k8-dev" ] && [ "$CINDER_CLIENT" == "Y" ] && [ "$HOSTENV" == "centos" ]
 then
-  yum install epel-release -y
-  yum install python-pip -y
-  pip install python-cinderclient
+  yum install epel-release -y> /dev/null
+  yum install python-pip -y> /dev/null
+  pip install python-cinderclient> /dev/null
+  yum install ceph-common -y> /dev/null
 
   echo ""
   echo " *********************************************** "

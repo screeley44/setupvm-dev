@@ -1,0 +1,35 @@
+apiVersion: kubevirt.io/v1alpha1
+kind: VirtualMachine
+metadata:
+  name: demo-vm
+spec:
+  terminationGracePeriodSeconds: 0
+  domain:
+    resources:
+      requests:
+        memory: 64M
+    devices:
+      disks:
+      - name: mydisk
+        volumeName: pvcvolume
+        disk:
+          dev: vda
+  volumes:
+    - name: pvcvolume
+      persistentVolumeClaim:
+        claimName: demo-vm-cirros
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: demo-vm-cirros
+  annotations:
+    k8s.io/CloneRequest: cirros
+spec:
+  storageClassName: standalone-cinder
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
