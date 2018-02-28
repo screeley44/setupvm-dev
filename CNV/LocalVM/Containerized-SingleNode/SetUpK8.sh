@@ -532,6 +532,14 @@ then
     echo ""
   fi
 
+  # security stuff
+  echo ""
+  echo "Disable security features..."
+  $SUDO systemctl disable firewalld
+  $SUDO systemctl stop firewalld
+  $SUDO iptables -F
+  $SUDO setenforce 0
+
   echo ""
   echo " *********************************************** "
   echo "" 

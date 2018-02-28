@@ -113,54 +113,14 @@ spec:
       volumes:
       - name: scripts
         emptyDir: {}
-#      - name: scripts
-#        hostPath:
-#          path: "/etc/demo/scripts"
       - name: cinderetc
         emptyDir: {}
       - name: cephvarlib
         emptyDir: {}
       - name: cephetc
         emptyDir: {}
-#      - name: cephetc
-#        hostPath:
-#          path: "/etc/ceph"
       - name: mariadbdata
         emptyDir: {}
-#  volumeClaimTemplates:
-#  - metadata:
-#      name: cephetc
-#    spec:
-#      accessModes: [ "ReadWriteOnce" ]
-#      storageClassName: demo
-#      resources:
-#        requests:
-#          storage: 20Gi
-#  - metadata:
-#      name: cephvarlib
-#    spec:
-#      accessModes: [ "ReadWriteOnce" ]
-#      storageClassName: demo
-#      resources:
-#        requests:
-#          storage: 20Gi
-#  - metadata:
-#      name: cinderetc
-#    spec:
-#      accessModes: [ "ReadWriteOnce" ]
-#      storageClassName: demo
-#      resources:
-#        requests:
-#          storage: 20Gi
-#  - metadata:
-#      name: mariadbdata
-#    spec:
-#      accessModes: [ "ReadWriteOnce" ]
-#      storageClassName: demo
-#      resources:
-#        requests:
-#          storage: 80Gi
-
 ---
 kind: StorageClass
 apiVersion: storage.k8s.io/v1beta1
