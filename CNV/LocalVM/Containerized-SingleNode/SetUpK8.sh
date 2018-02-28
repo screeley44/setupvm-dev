@@ -556,8 +556,10 @@ then
   yum install epel-release -y> /dev/null
   yum install python-pip -y> /dev/null
   pip install python-cinderclient> /dev/null
-  yum install ceph-common -y> /dev/null
-
+  if [ "$INSTALL_COMMON_HOST" == "Y" ]
+  then
+    yum install ceph-common -y> /dev/null
+  fi
   echo ""
   echo " *********************************************** "
   echo "" 
