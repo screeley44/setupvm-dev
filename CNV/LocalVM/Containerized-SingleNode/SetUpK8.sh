@@ -183,6 +183,19 @@ then
     $SUDO chmod -R 777 $KUBEPATH
   fi
 
+  if [ ! -d "/var/run/libvirt" ]
+  then
+    mkdir -p /var/run/libvirt
+  fi
+  if [ ! -d "/var/run/kubevirt" ]
+  then
+    mkdir -p /var/run/kubevirt
+  fi
+  if [ ! -d "/var/run/kubevirt-private" ]
+  then
+    mkdir -p /var/run/kubevirt-private
+  fi
+
   echo ""
   echo " *********************************************** "
   echo "" 

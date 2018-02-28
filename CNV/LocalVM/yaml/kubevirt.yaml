@@ -253,41 +253,41 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
-#      volumes:
-#        - name: libvirt-runtime
-#          hostPath:
-#            path: /var/run/libvirt
-#        - name: virt-share-dir
-#          hostPath:
-#            path: /var/run/kubevirt
-#        - name: virt-private-dir
-#          hostPath:
-#            path: /var/run/kubevirt-private
-  volumeClaimTemplates:
-  - metadata:
-      name: libvirt-runtime
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: demo
-      resources:
-        requests:
-          storage: 50Gi
-  - metadata:
-      name: virt-share-dir
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: demo
-      resources:
-        requests:
-          storage: 50Gi
-  - metadata:
-      name: virt-private-dir
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: demo
-      resources:
-        requests:
-          storage: 50Gi
+      volumes:
+        - name: libvirt-runtime
+          hostPath:
+            path: /var/run/libvirt
+        - name: virt-share-dir
+          hostPath:
+            path: /var/run/kubevirt
+        - name: virt-private-dir
+          hostPath:
+            path: /var/run/kubevirt-private
+#  volumeClaimTemplates:
+#  - metadata:
+#      name: libvirt-runtime
+#    spec:
+#      accessModes: [ "ReadWriteOnce" ]
+#      storageClassName: demo
+#      resources:
+#        requests:
+#          storage: 50Gi
+#  - metadata:
+#      name: virt-share-dir
+#    spec:
+#      accessModes: [ "ReadWriteOnce" ]
+#      storageClassName: demo
+#      resources:
+#        requests:
+#          storage: 50Gi
+#  - metadata:
+#      name: virt-private-dir
+#    spec:
+#      accessModes: [ "ReadWriteOnce" ]
+#      storageClassName: demo
+#      resources:
+#        requests:
+#          storage: 50Gi
 
 
 
