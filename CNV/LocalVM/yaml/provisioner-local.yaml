@@ -1,3 +1,8 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: provisioner
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -18,8 +23,8 @@ spec:
         name: io.kubevirt.ceph-demo
         kubevirt.io: ""
     spec:
-      updateStrategy:
-        type: RollingUpdate
+#      updateStrategy:
+#        type: RollingUpdate
       serviceAccountName: provisioner
       nodeSelector:
           "storage": "yes"
