@@ -1,21 +1,40 @@
+#apiVersion: kubevirt.io/v1alpha1
+#kind: VirtualMachine
+#metadata:
+# name: demo-vm
+#spec:
+# terminationGracePeriodSeconds: 0
+# domain:
+#   resources:
+#     requests:
+#       memory: 64M
+#   devices:
+#     disks:
+#     - name: mydisk
+#       volumeName: pvcvolume
+#       disk:
+#         dev: vda
+# volumes:
+#   - name: pvcvolume
+#     persistentVolumeClaim:
+#       claimName: demo-vm-cirros
+---
+metadata:
+  name: testvm-ephemeral
 apiVersion: kubevirt.io/v1alpha1
 kind: VirtualMachine
-metadata:
- name: demo-vm
 spec:
- terminationGracePeriodSeconds: 0
- domain:
-   resources:
-     requests:
-       memory: 64M
-   devices:
-     disks:
-     - name: mydisk
-       volumeName: pvcvolume
-       disk:
-         dev: vda
- volumes:
-   - name: pvcvolume
-     persistentVolumeClaim:
-       claimName: demo-vm-cirros
+  domain:
+    resources:
+      requests:
+        memory: 64M
+    devices:
+      disks:
+      - name: registrydisk
+        volumeName: registryvolume
+        disk: {}
+  volumes:
+    - name: registryvolume
+      registryDisk:
+        image: kubevirt/alpine-registry-disk-demo:latest
 
