@@ -3,7 +3,7 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: kubevirt-controller
-  namespace: default
+  namespace: kube-system
   labels:
     kubevirt.io: ""
 rules:
@@ -32,6 +32,7 @@ rules:
     resources:
       - virtualmachines
       - virtualmachinereplicasets
+      - virtualmachinepresets
     verbs:
       - get
       - list
@@ -45,7 +46,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kubevirt-controller
-  namespace: default
+  namespace: kube-system
   labels:
     kubevirt.io: ""
 ---
@@ -53,7 +54,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kubevirt-privileged
-  namespace: default
+  namespace: kube-system
   labels:
     kubevirt.io: ""
 ---
@@ -61,7 +62,7 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
   name: kubevirt-controller
-  namespace: default
+  namespace: kube-system
   labels:
     kubevirt.io: ""
 roleRef:
@@ -71,13 +72,13 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: kubevirt-controller
-    namespace: default
+    namespace: kube-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
   name: kubevirt-controller-cluster-admin
-  namespace: default
+  namespace: kube-system
   labels:
     kubevirt.io: ""
 roleRef:
@@ -87,13 +88,13 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: kubevirt-controller
-    namespace: default
+    namespace: kube-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
   name: kubevirt-privileged-cluster-admin
-  namespace: default
+  namespace: kube-system
   labels:
     kubevirt.io: ""
 roleRef:
@@ -103,7 +104,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: kubevirt-privileged
-    namespace: default
+    namespace: kube-system
 ---
 # custom resource definitions
 apiVersion: apiextensions.k8s.io/v1beta1
@@ -147,11 +148,11 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: virt-controller
-  namespace: default
+  namespace: kube-system
   labels:
     kubevirt.io: "virt-controller"
 spec:
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -160,12 +161,12 @@ spec:
       serviceAccountName: kubevirt-controller
       containers:
         - name: virt-controller
-          image: kubevirt/virt-controller:v0.3.0-alpha.3
+          image: kubevirt/virt-controller:sprint5
           imagePullPolicy: IfNotPresent
           command:
               - "/virt-controller"
               - "--launcher-image"
-              - "kubevirt/virt-launcher:v0.3.0-alpha.3"
+              - "kubevirt/virt-launcher:sprint5"
               - "--port"
               - "8182"
           ports:
@@ -188,40 +189,19 @@ spec:
           securityContext:
             runAsNonRoot: true
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: kubevirt
-  labels:
-    app: virt-handler
-spec:
-  ports:
-  - port: 8185
-    name: vhandler
-  - port: 8182
-    name: vlauncher
-  clusterIP: None
-  selector:
-    app: virt-handler
----
-# virt-handler StatefulSet
-apiVersion: apps/v1
-kind: StatefulSet
+# virt-handler daemon set
+apiVersion: extensions/v1beta1
+kind: DaemonSet
 metadata:
   name: virt-handler
-  namespace: default
+  namespace: kube-system
   labels:
-    kubevirt.io: virt-handler
+    kubevirt.io: "virt-handler"
 spec:
-  selector:
-    matchLabels:
-      name: virt-handler
-  serviceName: kubevirt
-  replicas: 1
   template:
     metadata:
+      name: virt-handler
       labels:
-        name: virt-handler
         kubevirt.io: virt-handler
     spec:
       serviceAccountName: kubevirt-privileged
@@ -231,7 +211,7 @@ spec:
           ports:
             - containerPort: 8185
               hostPort: 8185
-          image: kubevirt/virt-handler:v0.3.0-alpha.3
+          image: kubevirt/virt-handler:sprint5
           imagePullPolicy: IfNotPresent
           command:
             - "/virt-handler"
@@ -263,31 +243,25 @@ spec:
         - name: virt-private-dir
           hostPath:
             path: /var/run/kubevirt-private
-#  volumeClaimTemplates:
-#  - metadata:
-#      name: libvirt-runtime
-#    spec:
-#      accessModes: [ "ReadWriteOnce" ]
-#      storageClassName: demo
-#      resources:
-#        requests:
-#          storage: 50Gi
-#  - metadata:
-#      name: virt-share-dir
-#    spec:
-#      accessModes: [ "ReadWriteOnce" ]
-#      storageClassName: demo
-#      resources:
-#        requests:
-#          storage: 50Gi
-#  - metadata:
-#      name: virt-private-dir
-#    spec:
-#      accessModes: [ "ReadWriteOnce" ]
-#      storageClassName: demo
-#      resources:
-#        requests:
-#          storage: 50Gi
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: virtualmachinepresets.kubevirt.io
+  labels:
+    kubevirt.io: ""
+spec:
+  group: kubevirt.io
+  version: v1alpha1
+  scope: Namespaced
+  names:
+    plural: virtualmachinepresets
+    singular: virtualmachinepreset
+    kind: VirtualMachinePreset
+    shortNames:
+      - vmpreset
+      - vmpresets
+
 
 
 
