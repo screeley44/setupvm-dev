@@ -121,8 +121,10 @@ then
   if [ "$GODEFAULT" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/home/centos" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
   then
     mkdir -p $GOLANGPATH/go/src/k8s.io
+    mkdir -p $GOLANGPATH/go/src/github.com/kubevirt
   else
     $SUDO mkdir -p $GOLANGPATH/go/src/k8s.io
+    $SUDO mkdir -p $GOLANGPATH/go/src/github.com/kubevirt
     $SUDO chmod -R 777 $GOLANGPATH
   fi
 
@@ -298,6 +300,13 @@ then
       git clone https://github.com/screeley44/setupvm-dev.git
     fi
 
+    echo "...Cloning CDI repo in $GOLANGPATH/go/src/github.com"
+    cd $GOLANGPATH/go/src/github.com/kubevirt
+    git clone https://github.com/kubevirt/containerized-data-importer.git
+    cd /root
+
+
+
   fi
 
   if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
@@ -460,7 +469,7 @@ then
   # export KPATH=$GOPATH/src/k8s.io/kubernetes
   # export PATH=$KPATH/_output/local/bin/linux/amd64:/home/tsclair/scripts/:$GOPATH/bin:$PATH
 
-  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:/usr/local/sbin:$GOLANGPATH/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
+  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin:/usr/local/go/bin:/usr/local/sbin:$GOLANGPATH/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
   echo "" >> newbashrc
   echo "export PATH" >> newbashrc
 
@@ -474,7 +483,7 @@ then
   # export KPATH=$GOPATH/src/k8s.io/kubernetes
   # export PATH=$KPATH/_output/local/bin/linux/amd64:/home/tsclair/scripts/:$GOPATH/bin:$PATH
   echo "" >> .bash_profile
-  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:/usr/local/sbin:$GOLANGPATH/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
+  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin:/usr/local/go/bin:/usr/local/sbin:$GOLANGPATH/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
   echo "" >> .bash_profile
   echo "export PATH" >> .bash_profile
 
@@ -507,7 +516,7 @@ then
     echo "$ZONE" >> myconf.txt
     echo "json" >> myconf.txt
     echo ""
-    aws configure < myconf.txt
+    /usr/local/bin/aws configure < myconf.txt
 
     echo "...creating aws.conf file"  
     cd /etc
