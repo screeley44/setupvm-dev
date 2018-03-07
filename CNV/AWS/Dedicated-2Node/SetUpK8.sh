@@ -121,8 +121,10 @@ then
   if [ "$GODEFAULT" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/home/centos" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
   then
     mkdir -p $GOLANGPATH/go/src/k8s.io
+    mkdir -p $GOLANGPATH/go/src/github.com/kubevirt
   else
     $SUDO mkdir -p $GOLANGPATH/go/src/k8s.io
+    $SUDO mkdir -p $GOLANGPATH/go/src/github.com/kubevirt
     $SUDO chmod -R 777 $GOLANGPATH
   fi
 
@@ -131,6 +133,7 @@ then
     mkdir -p $GOLANGPATH/dev-configs
     mkdir -p $GOLANGPATH/dev-configs/aws
     mkdir -p $GOLANGPATH/dev-configs/gce
+    mkdir -p $GOLANGPATH/dev-configs/hostpath
     mkdir -p $GOLANGPATH/dev-configs/nfs
     mkdir -p $GOLANGPATH/dev-configs/glusterfs
     mkdir -p $GOLANGPATH/dev-configs/cinder
@@ -142,6 +145,7 @@ then
     $SUDO mkdir -p $GOLANGPATH/dev-configs
     $SUDO mkdir -p $GOLANGPATH/dev-configs/aws
     $SUDO mkdir -p $GOLANGPATH/dev-configs/gce
+    $SUDO mkdir -p $GOLANGPATH/dev-configs/hostpath
     $SUDO mkdir -p $GOLANGPATH/dev-configs/nfs
     $SUDO mkdir -p $GOLANGPATH/dev-configs/glusterfs
     $SUDO mkdir -p $GOLANGPATH/dev-configs/cinder
@@ -161,6 +165,7 @@ then
     mkdir -p $KUBEPATH/dev-configs/nfs
     mkdir -p $KUBEPATH/dev-configs/glusterfs
     mkdir -p $KUBEPATH/dev-configs/cinder
+    mkdir -p $KUBEPATH/dev-configs/hostpath
     mkdir -p $KUBEPATH/dev-configs/cnv/aws
     mkdir -p $KUBEPATH/dev-configs/cnv/gce
     mkdir -p $KUBEPATH/dev-configs/cnv/local
@@ -171,12 +176,26 @@ then
     $SUDO mkdir -p $KUBEPATH/dev-configs/gce
     $SUDO mkdir -p $KUBEPATH/dev-configs/nfs
     $SUDO mkdir -p $KUBEPATH/dev-configs/glusterfs
+    $SUDO mkdir -p $KUBEPATH/dev-configs/hostpath
     $SUDO mkdir -p $KUBEPATH/dev-configs/cinder
     $SUDO mkdir -p $KUBEPATH/dev-configs/cnv/aws
     $SUDO mkdir -p $KUBEPATH/dev-configs/cnv/gce
     $SUDO mkdir -p $KUBEPATH/dev-configs/cnv/local
     $SUDO mkdir -p $KUBEPATH/dev-configs/cnv/data-importer
     $SUDO chmod -R 777 $KUBEPATH
+  fi
+
+  if [ ! -d "/var/run/libvirt" ]
+  then
+    mkdir -p /var/run/libvirt
+  fi
+  if [ ! -d "/var/run/kubevirt" ]
+  then
+    mkdir -p /var/run/kubevirt
+  fi
+  if [ ! -d "/var/run/kubevirt-private" ]
+  then
+    mkdir -p /var/run/kubevirt-private
   fi
 
   echo ""
@@ -261,15 +280,24 @@ then
   echo ""
   if [ "$SKIPSOURCECLONE" == "no" ]
   then
-    cd $GOLANGPATH/go/src/k8s.io
-    rm -rf kubernetes
-    echo "...Cloning Kubernetes in $GOLANGPATH"
-    echo ""
-    git clone https://github.com/kubernetes/kubernetes.git
-    # TODO: suggestion from Jon to avoid long clone operations
-    # kubDir="$GOLANGPATH/go/src/k8s.io/kubernetes"
-    # mkdir -p $kubDir
-    # curl -sSL https://github.com/kubernetes/kubernetes/archive/master.tar.gz | tar xvz --strip-components 1 -C $kubDir
+    if [ "$FAST_CLONE" == "N" ]
+    then
+      cd $GOLANGPATH/go/src/k8s.io
+      rm -rf kubernetes
+      echo "...Cloning Kubernetes in $GOLANGPATH"
+      echo ""
+      git clone https://github.com/kubernetes/kubernetes.git
+    else
+      # TODO: suggestion from Jon to avoid long clone operations
+      kubDir="$GOLANGPATH/go/src/k8s.io/kubernetes"
+      if [ -d $kubeDir ]
+      then
+        cd $GOLANGPATH/go/src/k8s.io
+        rm -rf kubernetes
+      fi
+      mkdir -p $kubDir
+      curl -sSL https://github.com/kubernetes/kubernetes/archive/master.tar.gz | tar xvz --strip-components 1 -C $kubDir
+    fi
 
     echo "...Cloning support repos in /root"
     cd /root
@@ -280,6 +308,13 @@ then
     then
       git clone https://github.com/screeley44/setupvm-dev.git
     fi
+
+    echo "...Cloning CDI repo in $GOLANGPATH/go/src/github.com"
+    cd $GOLANGPATH/go/src/github.com/kubevirt
+    git clone https://github.com/kubevirt/containerized-data-importer.git
+    cd /root
+
+
 
   fi
 
@@ -381,6 +416,7 @@ then
   echo "export LOG_LEVEL=5" >> newbashrc
   echo "export KUBE_ENABLE_CLUSTER_DNS=$KUBE_ENABLE_CLUSTER_DNS" >> newbashrc
   echo "export KUBE_DEFAULT_STORAGE_CLASS=$DEFAULT_STORAGECLASS" >> newbashrc
+  echo "export ENABLE_HOSTPATH_PROVISIONER=$ENABLE_HOSTPATH" >> newbashrc
   echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> newbashrc
   echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> newbashrc
   echo "export ZONE=$ZONE" >> newbashrc
@@ -407,8 +443,9 @@ then
   echo "export ALLOW_SECURITY_CONTEXT=true" >> .bash_profile
   echo "export ALLOW_PRIVILEGED=true" >> .bash_profile
   echo "export LOG_LEVEL=5" >> .bash_profile
-  echo "export KUBE_ENABLE_CLUSTER_DNS=$KUBE_ENABLE_CLUSTER_DNS" >> newbashrc
+  echo "export KUBE_ENABLE_CLUSTER_DNS=$KUBE_ENABLE_CLUSTER_DNS" >> .bash_profile
   echo "export KUBE_DEFAULT_STORAGE_CLASS=$DEFAULT_STORAGECLASS" >> .bash_profile
+  echo "export ENABLE_HOSTPATH_PROVISIONER=$ENABLE_HOSTPATH" >> .bash_profile
   echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> .bash_profile
   echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> .bash_profile
   echo "export ZONE=$ZONE" >> .bash_profile
@@ -441,7 +478,7 @@ then
   # export KPATH=$GOPATH/src/k8s.io/kubernetes
   # export PATH=$KPATH/_output/local/bin/linux/amd64:/home/tsclair/scripts/:$GOPATH/bin:$PATH
 
-  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:/usr/local/sbin:$GOLANGPATH/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
+  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin:/usr/local/go/bin:/usr/local/sbin:$GOLANGPATH/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> newbashrc
   echo "" >> newbashrc
   echo "export PATH" >> newbashrc
 
@@ -455,7 +492,7 @@ then
   # export KPATH=$GOPATH/src/k8s.io/kubernetes
   # export PATH=$KPATH/_output/local/bin/linux/amd64:/home/tsclair/scripts/:$GOPATH/bin:$PATH
   echo "" >> .bash_profile
-  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin/aws:/usr/local/go/bin:/usr/local/sbin:$GOLANGPATH/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
+  echo "PATH=\$PATH:$HOME/bin:/usr/local/bin:/usr/local/go/bin:/usr/local/sbin:$GOLANGPATH/go/bin:$GOLANGPATH/go/src/github.com/openshift/origin/_output/local/bin/linux/amd64:$GOLANGPATH/go/src/k8s.io/kubernetes/_output/local/bin/linux/amd64" >> .bash_profile
   echo "" >> .bash_profile
   echo "export PATH" >> .bash_profile
 
@@ -465,8 +502,9 @@ then
   $SUDO cp /root/setupvm-dev/CNV/yaml/* $KUBEPATH/dev-configs/cinder
   $SUDO cp /root/setupvm-dev/yaml/aws/* $KUBEPATH/dev-configs/aws
   $SUDO cp /root/setupvm-dev/yaml/gce/* $KUBEPATH/dev-configs/gce
-  $SUDO cp -R /root/setupvm-dev/CNV/aws/* $KUBEPATH/dev-configs/cnv/aws
-  $SUDO cp -R /root/setupvm-dev/CNV/aws/* $KUBEPATH/dev-configs/cnv/local
+  $SUDO cp /root/setupvm-dev/yaml/hostpath/* $KUBEPATH/dev-configs/hostpath
+  $SUDO cp -R /root/setupvm-dev/CNV/AWS/yaml/* $KUBEPATH/dev-configs/cnv/aws
+  $SUDO cp -R /root/setupvm-dev/CNV/LocalVM/yaml/* $KUBEPATH/dev-configs/cnv/local
 
   $SUDO cp /root/containerized-data-importer/manifests/importer/* $KUBEPATH/dev-configs/data-importer
   
@@ -487,7 +525,7 @@ then
     echo "$ZONE" >> myconf.txt
     echo "json" >> myconf.txt
     echo ""
-    aws configure < myconf.txt
+    /usr/local/bin/aws configure < myconf.txt
 
     echo "...creating aws.conf file"  
     cd /etc
@@ -512,6 +550,14 @@ then
     echo ""
   fi
 
+  # security stuff
+  echo ""
+  echo "Disable security features..."
+  $SUDO systemctl disable firewalld
+  $SUDO systemctl stop firewalld
+  $SUDO iptables -F
+  $SUDO setenforce 0
+
   echo ""
   echo " *********************************************** "
   echo "" 
@@ -525,9 +571,17 @@ fi
 # Install cinder client if k8-dev and cinder_client is listed
 if [ "$SETUP_TYPE" == "k8-dev" ] && [ "$CINDER_CLIENT" == "Y" ] && [ "$HOSTENV" == "centos" ]
 then
-  yum install epel-release -y
-  yum install python-pip -y
-  pip install python-cinderclient
+  echo ""
+  echo "Installing cinder client and add-ons..."
+  echo ""
+  if [ "$INSTALL_COMMON_HOST" == "Y" ]
+  then
+    yum install ceph-common -y> /dev/null
+  fi
+
+  yum install epel-release -y> /dev/null
+  yum install python-pip -y> /dev/null
+  pip install python-cinderclient> /dev/null
 
   echo ""
   echo " *********************************************** "

@@ -280,15 +280,24 @@ then
   echo ""
   if [ "$SKIPSOURCECLONE" == "no" ]
   then
-    cd $GOLANGPATH/go/src/k8s.io
-    rm -rf kubernetes
-    echo "...Cloning Kubernetes in $GOLANGPATH"
-    echo ""
-    git clone https://github.com/kubernetes/kubernetes.git
-    # TODO: suggestion from Jon to avoid long clone operations
-    # kubDir="$GOLANGPATH/go/src/k8s.io/kubernetes"
-    # mkdir -p $kubDir
-    # curl -sSL https://github.com/kubernetes/kubernetes/archive/master.tar.gz | tar xvz --strip-components 1 -C $kubDir
+    if [ "$FAST_CLONE" == "N" ]
+    then
+      cd $GOLANGPATH/go/src/k8s.io
+      rm -rf kubernetes
+      echo "...Cloning Kubernetes in $GOLANGPATH"
+      echo ""
+      git clone https://github.com/kubernetes/kubernetes.git
+    else
+      # TODO: suggestion from Jon to avoid long clone operations
+      kubDir="$GOLANGPATH/go/src/k8s.io/kubernetes"
+      if [ -d $kubeDir ]
+      then
+        cd $GOLANGPATH/go/src/k8s.io
+        rm -rf kubernetes
+      fi
+      mkdir -p $kubDir
+      curl -sSL https://github.com/kubernetes/kubernetes/archive/master.tar.gz | tar xvz --strip-components 1 -C $kubDir
+    fi
 
     echo "...Cloning support repos in /root"
     cd /root
