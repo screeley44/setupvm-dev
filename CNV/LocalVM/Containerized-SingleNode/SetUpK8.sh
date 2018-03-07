@@ -553,6 +553,9 @@ fi
 # Install cinder client if k8-dev and cinder_client is listed
 if [ "$SETUP_TYPE" == "k8-dev" ] && [ "$CINDER_CLIENT" == "Y" ] && [ "$HOSTENV" == "centos" ]
 then
+  echo ""
+  echo "Installing cinder client and add-ons..."
+  echo ""
   if [ "$INSTALL_COMMON_HOST" == "Y" ]
   then
     yum install ceph-common -y> /dev/null
