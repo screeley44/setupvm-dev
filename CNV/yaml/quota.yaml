@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: protect-golden
+spec:
+  hard:
+    standalone-cinder.storageclass.storage.k8s.io/persistentvolumeclaims: "0"
+
