@@ -586,7 +586,7 @@ then
   echo ""
   echo " *********************************************** "
   echo "" 
-  echo "     Kubernetes Setup Completed on host $HOSTNAME!"
+  echo "     Origin Setup Completed on host $HOSTNAME!"
   echo ""
   echo " *********************************************** "
 
