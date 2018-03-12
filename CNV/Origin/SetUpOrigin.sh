@@ -214,7 +214,7 @@ echo ""
 if [ "$SETUP_TYPE" == "cnv-origin" ]
 then
   echo ""
-  echo "Installing Kubernetes Setup..."
+  echo "Installing Origin Setup..."
   echo "...Installing various software..."
   echo ""
   yum install -y wget gcc python-virtualenv git net-tools unzip bash-completion telnet kexec-tools sos psacct> /dev/null
@@ -280,24 +280,6 @@ then
   echo ""
   if [ "$SKIPSOURCECLONE" == "no" ]
   then
-    if [ "$FAST_CLONE" == "N" ]
-    then
-      cd $GOLANGPATH/go/src/k8s.io
-      rm -rf kubernetes
-      echo "...Cloning Kubernetes in $GOLANGPATH"
-      echo ""
-      git clone https://github.com/kubernetes/kubernetes.git
-    else
-      # TODO: suggestion from Jon to avoid long clone operations
-      kubDir="$GOLANGPATH/go/src/k8s.io/kubernetes"
-      if [ -d $kubeDir ]
-      then
-        cd $GOLANGPATH/go/src/k8s.io
-        rm -rf kubernetes
-      fi
-      mkdir -p $kubDir
-      curl -sSL https://github.com/kubernetes/kubernetes/archive/master.tar.gz | tar xvz --strip-components 1 -C $kubDir
-    fi
 
     echo "...Cloning support repos in /root"
     cd /root
@@ -363,16 +345,16 @@ then
   fi
 
   # Docker storage-setup
-  cd /root
-  $SUDO wget https://github.com/projectatomic/docker-storage-setup/blob/master/docker-storage-setup.sh
-  $SUDO cp docker-storage-setup.sh /etc/sysconfig/
-  $SUDO chmod +x /etc/sysconfig/docker-storage-setup.sh
+  #cd /root
+  #$SUDO wget https://github.com/projectatomic/docker-storage-setup/blob/master/docker-storage-setup.sh
+  #$SUDO cp docker-storage-setup.sh /etc/sysconfig/
+  #$SUDO chmod +x /etc/sysconfig/docker-storage-setup.sh
 
   #$SUDO chmod +x /etc/sysconfig/docker-storage-setup
   #$SUDO ./etc/sysconfig/docker-storage-setup
   #$SUDO lvs
 
-  DoBlock
+  #DoBlock
 
   # Restart Docker
   echo "...Restarting Docker"
@@ -593,31 +575,9 @@ then
 
 fi
 
-DoBlock()
-{
-  $SUDO lsblk
-  echo "Based on output above, what block device should the registry be set up on?"
-  read block_device
-  if [ "$block_device" == "" ]
-  then
-    echo "no block device entered, default $DEFAULT_BLOCK will be used"
-    $SUDO sh -c "echo 'DEVS=$DEFAULT_BLOCK' >> /etc/sysconfig/docker-storage-setup"
-    $SUDO sh -c "echo 'VG=$VG' >> /etc/sysconfig/docker-storage-setup"
-  else
-    echo "block device /dev/$block_device will be used, is this acceptable? (y/n)"
-    read isaccepted
-    if [ "$isaccepted" == "$yval1" ] || [ "$isaccepted" == "$yval2" ]
-    then
-    $SUDO sh -c "echo 'DEVS=/dev/$block_device' >> /etc/sysconfig/docker-storage-setup"
-    $SUDO sh -c "echo 'VG=$VG' >> /etc/sysconfig/docker-storage-setup"
-      echo "docker-storage-setup file updated"
-    else
-      echo "Let's try again..."
-      echo ""
-      DoBlock
-    fi
-  fi
-}
+# Install lastest ansible
+yum install epel-release -y> /dev/null
+yum --enablerepo=epel-testing install ansible -y
 
 # Install cinder client if k8-dev and cinder_client is listed
 if [ "$SETUP_TYPE" == "cnv-origin" ] && [ "$CINDER_CLIENT" == "Y" ] && [ "$HOSTENV" == "centos" ]
@@ -630,7 +590,6 @@ then
     yum install ceph-common -y> /dev/null
   fi
 
-  yum install epel-release -y> /dev/null
   yum install python-pip -y> /dev/null
   pip install python-cinderclient> /dev/null
 
@@ -645,7 +604,7 @@ fi
 echo ""
 echo " *********************************************** "
 echo "" 
-echo "     Script Complete!  Kubernetes Setup Completed on host $HOSTNAME!"
+echo "     Script Complete!  Origin Setup Completed on host $HOSTNAME!"
 echo ""
 echo " *********************************************** "
 
