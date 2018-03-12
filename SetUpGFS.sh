@@ -38,6 +38,7 @@ then
       echo ""
       echo "Setting up subscription services from RHEL..."
       echo "Setting Up Host... ${gfs[index]}"
+      yum install subscription-manager -y> /dev/null
       subscription-manager register --username=$RHNUSER --password=$RHNPASS
       subscription-manager attach --pool=$POOLID
       subscription-manager repos --disable="*"> /dev/null
@@ -76,6 +77,7 @@ then
       
       echo "#! /bin/bash" > rmt-cmds.sh
       echo "" >> rmt-cmds.sh
+      echo "yum install subscription-manager -y> /dev/null" >> rmt-cmds.sh
       echo "subscription-manager register --username=$RHNUSER --password=$RHNPASS> /dev/null" >> rmt-cmds.sh
       echo "subscription-manager attach --pool=$POOLID> /dev/null" >> rmt-cmds.sh
       echo "subscription-manager repos --disable="*"> /dev/null" >> rmt-cmds.sh
