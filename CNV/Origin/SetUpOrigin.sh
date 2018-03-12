@@ -217,8 +217,12 @@ then
   echo "Installing Origin Setup..."
   echo "...Installing various software..."
   echo ""
-  yum install -y wget gcc python-virtualenv git net-tools unzip bash-completion telnet kexec-tools sos psacct> /dev/null
+  yum install -y wget gcc python-virtualenv git net-tools unzip bash-completion telnet kexec-tools sos psacct NetworkManager> /dev/null
 
+
+  # enable NetworkManager
+  systemctl enable NetworkManager
+  systemctl restart NetworkManager
 
   # Install Go and do other config
   # 1.6.1, 1.7.3, etc...
@@ -295,20 +299,6 @@ then
     cd $GOLANGPATH/go/src/github.com/kubevirt
     git clone https://github.com/kubevirt/containerized-data-importer.git
     cd /root
-
-    if [ "$INSTALL_ANSIBLE_RELEASE" == "yes" ]
-    then
-      echo "Installing latest ansible..."
-      if [ -d "/usr/share/ansible" ]; then $SUDO rm -rf /usr/share/ansible; fi
-      if [ -d "/usr/share/ansible_plugins" ]; then $SUDO rm -rf /usr/share/ansible_plugins; fi
-      echo ""
-      $SUDO rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-      $SUDO yum install ansible -y> /dev/null
-    else
-      cd $GOLANGPATH
-      rm -rf openshift-ansible
-      git clone https://github.com/openshift/openshift-ansible
-    fi
   fi
 
   if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
@@ -576,8 +566,22 @@ then
 fi
 
 # Install lastest ansible
+echo "Installing latest ansible..."
 yum install epel-release -y> /dev/null
 yum --enablerepo=epel-testing install ansible -y
+
+echo "Installing ansible github clone..."
+cd $GOLANGPATH
+rm -rf openshift-ansible
+git clone https://github.com/openshift/openshift-ansibl
+  
+  #if [ -d "/usr/share/ansible" ]; then $SUDO rm -rf /usr/share/ansible; fi
+  #if [ -d "/usr/share/ansible_plugins" ]; then $SUDO rm -rf /usr/share/ansible_plugins; fi
+  #echo ""
+  #$SUDO rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  #$SUDO yum install ansible -y> /dev/null
+
+
 
 # Install cinder client if k8-dev and cinder_client is listed
 if [ "$SETUP_TYPE" == "cnv-origin" ] && [ "$CINDER_CLIENT" == "Y" ] && [ "$HOSTENV" == "centos" ]
