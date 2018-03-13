@@ -1251,11 +1251,11 @@ else
     # krb5-devel - been reported that this is needed for OCP
     if [ "$OCPVERSION" == "3.7" ] && [ "$HOSTENV" == "rhel" ]
     then
-      $SUDO yum instll krb5-devel -y> /dev/null
+      $SUDO yum install krb5-devel -y> /dev/null
     fi
     if [ "$OCPVERSION" == "3.9" ] && [ "$HOSTENV" == "rhel" ]
     then
-      $SUDO yum instll krb5-devel -y> /dev/null
+      $SUDO yum install krb5-devel -y> /dev/null
     fi
 
     echo "...performing yum update"
