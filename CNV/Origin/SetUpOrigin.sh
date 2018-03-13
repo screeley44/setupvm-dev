@@ -299,6 +299,10 @@ then
     cd $GOLANGPATH/go/src/github.com/kubevirt
     git clone https://github.com/kubevirt/containerized-data-importer.git
     cd /root
+
+    echo "...Cloning kubevirt in $GOLANGPATH/go/src/github.com"
+    cd $GOLANGPATH
+    git clone https://github.com/kubevirt/kubevirt-ansible.git 
   fi
 
   if [ "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
@@ -575,7 +579,7 @@ yum --enablerepo=epel-testing install ansible -y
 echo "Installing ansible github clone..."
 cd $GOLANGPATH
 rm -rf openshift-ansible
-git clone https://github.com/openshift/openshift-ansibl
+git clone https://github.com/openshift/openshift-ansible.git
   
   #if [ -d "/usr/share/ansible" ]; then $SUDO rm -rf /usr/share/ansible; fi
   #if [ -d "/usr/share/ansible_plugins" ]; then $SUDO rm -rf /usr/share/ansible_plugins; fi
