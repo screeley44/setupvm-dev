@@ -63,9 +63,11 @@ GOLANGPATH=""
       KUBEPATH=$WORKDIR
       echo "Setting Kube Working Directory to $KUBEPATH"
     elif [ "$APP_TYPE" == "origin" ]
+    then
       OSEPATH=$WORKDIR
       echo "Setting Origin Working Directory to $OSEPATH"
     elif [ "$APP_TYPE" == "dev" ]
+    then
       OSEPATH=$WORKDIR/openshift-dev
       KUBEPATH=$WORKDIR/kubernetes-dev
       echo "Setting Origin Working Directory to $OSEPATH"
