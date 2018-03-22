@@ -55,19 +55,19 @@ source $CONFIG_HOME/../../lib/rhsm.sh
 source $CONFIG_HOME/../../lib/yum-rhel-install.sh
 
 # Install core software (go, etcd, docker, etc...)
-# source $CONFIG_HOME/../../lib/install-go.sh
-# source $CONFIG_HOME/../../lib/install-etcd.sh
-# source $CONFIG_HOME/../../lib/docker-base.sh
+source $CONFIG_HOME/../../lib/install-go.sh
+source $CONFIG_HOME/../../lib/install-etcd.sh
+source $CONFIG_HOME/../../lib/docker-base.sh
 
-# if [ "$APP_TYPE" == "origin" ] && [ "$HOSTENV" == "rhel" ]
-# then
-#  source $CONFIG_HOME/../../lib/docker-registry.sh
-# fi
-# source $CONFIG_HOME/../../lib/docker-restart.sh
+if [ "$APP_TYPE" == "origin" ] && [ "$HOSTENV" == "rhel" ]
+then
+  source $CONFIG_HOME/../../lib/docker-registry.sh
+fi
+source $CONFIG_HOME/../../lib/docker-restart.sh
 
 
 # Clone Repos
-# source $CONFIG_HOME/../../lib/clone-repos.sh
+source $CONFIG_HOME/../../lib/clone-repos.sh
 
 # Create Profiles
 source $CONFIG_HOME/../../lib/bash-profile.sh

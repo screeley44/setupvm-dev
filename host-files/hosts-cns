@@ -67,33 +67,33 @@ openshift_storageclass_default=false
 
 # BEGIN CUSTOM SETTINGS
 [masters]
-ip-172-18-15-58.ec2.internal
+ip-172-18-5-18.ec2.internal
 
 [etcd]
-ip-172-18-15-58.ec2.internal
+ip-172-18-5-18.ec2.internal
 
 # For CNS, all storage nodes must also be listed under the "nodes" group
 [nodes]
-ip-172-18-15-58.ec2.internal
-ip-172-18-5-161.ec2.internal openshift_node_labels="{'role': 'app'}"
-ip-172-18-5-161.ec2.internal openshift_node_labels="{'role': 'app'}"
-ip-172-18-5-161.ec2.internal openshift_node_labels="{'role': 'app'}"
-ip-172-18-5-161.ec2.internal openshift_node_labels="{'role': 'infra'}"
-ip-172-18-5-161.ec2.internal openshift_node_labels="{'role': 'infra'}"
-ip-172-18-5-161.ec2.internal openshift_node_labels="{'role': 'infra'}"
+ip-172-18-5-18.ec2.internal
+ip-172-18-6-118.ec2.internal openshift_node_labels="{'role': 'app'}"
+ip-172-18-10-151.ec2.internal openshift_node_labels="{'role': 'app'}"
+ip-172-18-0-67.ec2.internal openshift_node_labels="{'role': 'app'}"
+ip-172-18-12-154.ec2.internal openshift_node_labels="{'role': 'infra'}"
+ip-172-18-4-72.ec2.internal openshift_node_labels="{'role': 'infra'}"
+ip-172-18-5-45.ec2.internal openshift_node_labels="{'role': 'infra'}"
 
 # Specify the storage nodes along with the devices attached to them.
 # The [glusterfs] group represents the CNS nodes for application storage.
 # The [glusterfs_registry] group represents the CNS nodes for infra storage.
 [glusterfs]
-ip-172-18-5-161.ec2.internal glusterfs_devices='[ "/dev/xvde", "/dev/xvdf" ]'
-ip-172-18-5-161.ec2.internal glusterfs_devices='[ "/dev/xvde", "/dev/xvdf" ]'
-ip-172-18-5-161.ec2.internal glusterfs_devices='[ "/dev/xvde", "/dev/xvdf" ]'
+ip-172-18-6-118.ec2.internal glusterfs_devices='[ "/dev/xvdc" ]'
+ip-172-18-10-151.ec2.internal glusterfs_devices='[ "/dev/xvdc" ]'
+ip-172-18-0-67.ec2.internal glusterfs_devices='[ "/dev/xvdc" ]'
 
 [glusterfs_registry]
-ip-172-18-5-161.ec2.internal glusterfs_devices='[ "/dev/xvdf" ]'
-ip-172-18-5-161.ec2.internal glusterfs_devices='[ "/dev/xvdf" ]'
-ip-172-18-5-161.ec2.internal glusterfs_devices='[ "/dev/xvdf" ]'
+ip-172-18-12-154.ec2.internal glusterfs_devices='[ "/dev/xvdc" ]'
+ip-172-18-4-72.ec2.internal glusterfs_devices='[ "/dev/xvdc" ]'
+ip-172-18-5-45.ec2.internal glusterfs_devices='[ "/dev/xvdc" ]'
 
 
 # END CUSTOM SETTINGS
