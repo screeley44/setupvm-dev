@@ -22,6 +22,8 @@
   $SUDO cp -R /root/setupvm-dev/CNV/LocalVM/yaml/* $OSEPATH/dev-configs/cnv/local
   $SUDO cp /root/containerized-data-importer/manifests/importer/* $OSEPATH/dev-configs/data-importer
 
+  $SUDO cp /root/setupvm-dev/host-files/* /root
+
   # security stuff
   if [ "$HOSTENV" == "centos" ]
   then

@@ -1,0 +1,100 @@
+[OSEv3:children]
+masters
+nodes
+etcd
+glusterfs
+glusterfs_registry
+
+
+[OSEv3:vars]
+openshift_deployment_type=origin
+containerized=true
+openshift_image_tag=v3.9.0-alpha.4
+openshift_clock_enabled=true
+ansible_ssh_user=root
+openshift_master_identity_providers=[{'name': 'allow_all_auth', 'login': 'true', 'challenge': 'true', 'kind': 'AllowAllPasswordIdentityProvider'}]
+openshift_disable_check=memory_availability,disk_availability,docker_storage,package_availability,docker_image_availability
+openshift_enable_excluders=false
+template_service_broker_install=false
+openshift_use_manageiq=false
+openshift_install_examples=false
+
+
+## registry
+openshift_hosted_registry_storage_kind=glusterfs
+
+## metrics
+# Will be uncommented for Metrics deployment
+#openshift_metrics_storage_kind=dynamic
+
+## logging
+# the size of each PersistentVolume of the ElasticSearch pods (modify as desired)
+# Logging requires a PVC size for installation
+openshift_logging_es_pvc_size=10Gi
+# Will be uncommented for Logging deployment
+#openshift_logging_storage_kind=dynamic
+
+## this is required otherwise it will fail openshift_sanitize_inventory
+## cloud provider is not configured but dynamic is set
+dynamic_volumes_check=False
+
+## First CNS storage cluster for applications
+# Namespace for CNS pods (will be created)
+openshift_storage_glusterfs_namespace=app-storage
+# Automatically create a StorageClass referencing this CNS cluster
+openshift_storage_glusterfs_storageclass=true
+# glusterblock functionality is not supported outside of Logging/Metrics
+openshift_storage_glusterfs_block_deploy=false
+
+## Second CNS storage cluster for OpenShift infrastructure
+# Namespace for CNS pods (will be created)
+openshift_storage_glusterfs_registry_namespace=infra-storage
+# No StorageClass; this cluster should not need to provide dynamic provisioning
+openshift_storage_glusterfs_registry_storageclass=false
+openshift_storage_glusterfs_registry_block_deploy=true
+# Size of automatically created block-hosting volumes,
+# must be at least the size of your largest desired block volume
+openshift_storage_glusterfs_registry_block_host_vol_size=50
+# Create StorageClass, used by Logging and Metrics
+
+openshift_storage_glusterfs_registry_block_storageclass=true
+# StorageClass needs to be cluster default for Logging/Metrics provisioning
+openshift_storage_glusterfs_registry_block_storageclass_default=true
+
+# Disable any other default StorageClass
+openshift_storageclass_default=false
+
+
+# BEGIN CUSTOM SETTINGS
+[masters]
+ip-172-18-15-58.ec2.internal
+
+[etcd]
+ip-172-18-15-58.ec2.internal
+
+# For CNS, all storage nodes must also be listed under the "nodes" group
+[nodes]
+ip-172-18-15-58.ec2.internal
+ip-172-18-5-161.ec2.internal openshift_node_labels="{'role': 'app'}"
+ip-172-18-5-161.ec2.internal openshift_node_labels="{'role': 'app'}"
+ip-172-18-5-161.ec2.internal openshift_node_labels="{'role': 'app'}"
+ip-172-18-5-161.ec2.internal openshift_node_labels="{'role': 'infra'}"
+ip-172-18-5-161.ec2.internal openshift_node_labels="{'role': 'infra'}"
+ip-172-18-5-161.ec2.internal openshift_node_labels="{'role': 'infra'}"
+
+# Specify the storage nodes along with the devices attached to them.
+# The [glusterfs] group represents the CNS nodes for application storage.
+# The [glusterfs_registry] group represents the CNS nodes for infra storage.
+[glusterfs]
+ip-172-18-5-161.ec2.internal glusterfs_devices='[ "/dev/xvde", "/dev/xvdf" ]'
+ip-172-18-5-161.ec2.internal glusterfs_devices='[ "/dev/xvde", "/dev/xvdf" ]'
+ip-172-18-5-161.ec2.internal glusterfs_devices='[ "/dev/xvde", "/dev/xvdf" ]'
+
+[glusterfs_registry]
+ip-172-18-5-161.ec2.internal glusterfs_devices='[ "/dev/xvdf" ]'
+ip-172-18-5-161.ec2.internal glusterfs_devices='[ "/dev/xvdf" ]'
+ip-172-18-5-161.ec2.internal glusterfs_devices='[ "/dev/xvdf" ]'
+
+
+# END CUSTOM SETTINGS
+
