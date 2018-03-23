@@ -50,12 +50,16 @@
       git clone https://github.com/screeley44/setupvm-dev.git
     fi
 
-    echo "...Cloning CDI repo in $GOLANGPATH/go/src/github.com"
+    echo "...Cloning CDI repo in $GOLANGPATH/go/src/github.com/kubevirt"
     cd $GOLANGPATH/go/src/github.com/kubevirt
     git clone https://github.com/kubevirt/containerized-data-importer.git
     cd /root
 
-    echo "...Cloning kubevirt in $GOLANGPATH/go/src/github.com"
+    echo "...Cloning kubevirt in $GOLANGPATH"
     cd $GOLANGPATH
     git clone https://github.com/kubevirt/kubevirt-ansible.git 
+
+    echo "...Cloning openshift-ansible in $GOLANGPATH"
+    cd $GOLANGPATH
+    git clone https://github.com/openshift/openshift-ansible.git  
   fi
