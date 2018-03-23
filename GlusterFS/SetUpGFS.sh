@@ -158,6 +158,7 @@ else
       echo "#! /bin/bash" > rmt-cmds.sh
       echo "" >> rmt-cmds.sh
 
+      echo "Gluster Installation Stuff"
       echo "yum install -y wget telnet> /dev/null" >> rmt-cmds.sh
       echo "yum install -y centos-release-gluster> /dev/null" >> rmt-cmds.sh    
       echo "yum install epel-release -y> /dev/null" >> rmt-cmds.sh
@@ -189,8 +190,6 @@ else
       echo ""
     fi
   done
-  
-
 fi
 
 if [ "$SETUP_TYPE" == "gluster" ] && [ "$GFS_LIST" != "" ]
@@ -201,7 +200,21 @@ then
   echo ""
   echo "Configuring GlusterFS..."
 
+  # create volume list
+  VOLLIST = ""
+  GVDIR = "$GFS_DIR$GFS_BRICK"
+  IFS=':' read -r -a gfs <<< "$GFS_LIST"
+  for index in "${!gfs[@]}"
+  do
+    if [ "$index" == 0 ]
+    then
+      VOLLIST = "${gfs[index]}:$GVDIR$index" 
+    else
+      VOLLIST = "$VOLLIST ${gfs[index]}:$GVDIR$index" 
+    fi
+  done
 
+  # Peer Probe
   IFS=':' read -r -a gfs <<< "$GFS_LIST"
   for index in "${!gfs[@]}"
   do
@@ -221,7 +234,57 @@ then
   echo ""
   echo ""
   gluster pool list
+  echo ""
+  echo ""
 
+  # CREATE VOLUME SETUP
+  if [ "$CREATE_VOL" == "Y" ]
+  then
+    echo "***********************"
+    echo "   Volume Mgmt Setup"
+    IFS=':' read -r -a gfs <<< "$GFS_LIST"
+    for index in "${!gfs[@]}"
+    do
+      if [ "$index" == 0 ]
+      then
+      
+        result=`eval mkfs.ext4 $GFS_DEVICE`
+        mkdir -p $GFS_DIR
+        echo '/dev/$GFS_DEVICE $GFS_DIR xfs defaults 0 0' >> /etc/fstab
+        mount -a
+        mkdir -p $GFS_DIR$GFS_BRICK$index
+      else
+        echo "#! /bin/bash" > rmt-cmds2.sh
+        echo "" >> rmt-cmds2.sh
+      
+        echo "mkfs.ext4 $GFS_DEVICE" >> rmt-cmds2.sh
+        echo "mkdir -p $GFS_DIR" >> rmt-cmds2.sh
+        echo "echo '/dev/$GFS_DEVICE $GFS_DIR xfs defaults 0 0' >> /etc/fstab" >> rmt-cmds2.sh
+        echo "mount -a" >> rmt-cmds2.sh
+        echo "mkdir -p $GFS_DIR$GFS_BRICK$index" >> rmt-cmds2.sh
+        scp rmt-cmds.sh root@"${gfs[index]}":~
+        echo "chmod +x rmt-cmds2.sh;./rmt-cmds.sh" | ssh -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      fi
+    done
+  fi
+
+  # CREATE VOLUME AND START
+  if [ "$CREATE_VOL" == "Y" ]
+  then
+    echo "***********************"
+    echo "     Volume Start"
+    IFS=':' read -r -a gfs <<< "$GFS_LIST"
+    for index in "${!gfs[@]}"
+    do
+      if [ "$index" == 0 ]
+      then
+        result=`eval gluster volume create $GFS_VOLNAME replica $REPLICA_COUNT $VOLLIST force`
+        wait
+        result=`eval gluster volume start $GFS_VOLNAME`
+        wait
+      fi
+    done
+  fi
 fi
 echo ""
 echo ""
