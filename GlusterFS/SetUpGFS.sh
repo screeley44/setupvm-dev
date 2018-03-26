@@ -201,16 +201,16 @@ then
   echo "Configuring GlusterFS..."
 
   # create volume list
-  VOLLIST = ""
-  GVDIR = "$GFS_DIR$GFS_BRICK"
+  VOLLIST=""
+  GVDIR="$GFS_DIR$GFS_BRICK"
   IFS=':' read -r -a gfs <<< "$GFS_LIST"
   for index in "${!gfs[@]}"
   do
     if [ "$index" == 0 ]
     then
-      VOLLIST = "${gfs[index]}:$GVDIR$index" 
+      VOLLIST="${gfs[index]}:$GVDIR$index" 
     else
-      VOLLIST = "$VOLLIST ${gfs[index]}:$GVDIR$index" 
+      VOLLIST="$VOLLIST ${gfs[index]}:$GVDIR$index" 
     fi
   done
 
@@ -250,7 +250,7 @@ then
       
         result=`eval mkfs.ext4 $GFS_DEVICE`
         mkdir -p $GFS_DIR
-        echo '/dev/$GFS_DEVICE $GFS_DIR xfs defaults 0 0' >> /etc/fstab
+        echo '$GFS_DEVICE $GFS_DIR xfs defaults 0 0' >> /etc/fstab
         mount -a
         mkdir -p $GFS_DIR$GFS_BRICK$index
       else
@@ -259,11 +259,11 @@ then
       
         echo "mkfs.ext4 $GFS_DEVICE" >> rmt-cmds2.sh
         echo "mkdir -p $GFS_DIR" >> rmt-cmds2.sh
-        echo "echo '/dev/$GFS_DEVICE $GFS_DIR xfs defaults 0 0' >> /etc/fstab" >> rmt-cmds2.sh
+        echo "echo '$GFS_DEVICE $GFS_DIR xfs defaults 0 0' >> /etc/fstab" >> rmt-cmds2.sh
         echo "mount -a" >> rmt-cmds2.sh
         echo "mkdir -p $GFS_DIR$GFS_BRICK$index" >> rmt-cmds2.sh
-        scp rmt-cmds.sh root@"${gfs[index]}":~
-        echo "chmod +x rmt-cmds2.sh;./rmt-cmds.sh" | ssh -o StrictHostKeyChecking=no root@"${gfs[index]}"
+        scp rmt-cmds2.sh root@"${gfs[index]}":~
+        echo "chmod +x rmt-cmds2.sh;./rmt-cmds2.sh" | ssh -o StrictHostKeyChecking=no root@"${gfs[index]}"
       fi
     done
   fi
