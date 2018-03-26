@@ -237,6 +237,45 @@ then
   echo ""
   echo ""
 
+  # CREATE VOLUME SETUP
+  if [ "$CREATE_VOL" == "Y" ]
+  then
+    echo "***********************"
+    echo "   Volume Mgmt Setup"
+    IFS=':' read -r -a gfs <<< "$GFS_LIST"
+    for index in "${!gfs[@]}"
+    do
+      if [ "$index" == 0 ]
+      then
+      
+        mkfs.ext4 $GFS_DEVICE
+        wait
+        mkdir -p $GFS_DIR
+        mkdir -p $GFS_DIR$GFS_BRICK$index
+        mkdir -p $FUSE_BASE$GFS_VOLNAME
+        echo '$GFS_DEVICE $GFS_DIR$GFS_BRICK$index ext4 defaults 0 0' >> /etc/fstab
+        echo '${gfs[index]}:$GFS_VOLNAME $FUSE_BASE$GFS_VOLNAME glusterfs defaults,_netdev 0 0' >> etc/fstab
+        mount -a
+      else
+        echo "#! /bin/bash" > rmt-cmds2.sh
+        echo "" >> rmt-cmds2.sh
+      
+        echo "mkfs.ext4 $GFS_DEVICE" >> rmt-cmds2.sh
+        echo "wait" >> rmt-cmds2.sh
+        echo "mkdir -p $GFS_DIR" >> rmt-cmds2.sh
+        echo "mkdir -p $GFS_DIR$GFS_BRICK$index" >> rmt-cmds2.sh
+        echo "mkdir -p $FUSE_BASE$GFS_VOLNAME" >> rmt-cmds2.sh
+        echo "echo '$GFS_DEVICE $GFS_DIR$GFS_BRICK$index ext4 defaults 0 0' >> /etc/fstab" >> rmt-cmds2.sh
+        echo "echo '${gfs[index]}:$GFS_VOLNAME $FUSE_BASE$GFS_VOLNAME glusterfs defaults,_netdev 0 0' >> etc/fstab" >> rmt-cmds2.sh
+        # echo "mount -t glusterfs  ${gfs[index]}:$GFS_VOLNAME $FUSE_BASE$GFS_VOLNAME" >> rmt-cmds2.sh
+        echo "mount -a" >> rmt-cmds2.sh
+
+        scp rmt-cmds2.sh root@"${gfs[index]}":~
+        echo "chmod +x rmt-cmds2.sh;./rmt-cmds2.sh" | ssh -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      fi
+    done
+  fi
+
   # CREATE VOLUME AND START
   if [ "$CREATE_VOL" == "Y" ]
   then
@@ -254,44 +293,6 @@ then
       fi
     done
   fi
-
-  # CREATE VOLUME SETUP
-  if [ "$CREATE_VOL" == "Y" ]
-  then
-    echo "***********************"
-    echo "   Volume Mgmt Setup"
-    IFS=':' read -r -a gfs <<< "$GFS_LIST"
-    for index in "${!gfs[@]}"
-    do
-      if [ "$index" == 0 ]
-      then
-      
-        result=`eval mkfs.ext4 $GFS_DEVICE`
-        wait
-        mkdir -p $GFS_DIR
-        mkdir -p $GFS_DIR$GFS_BRICK$index
-        echo '$GFS_DEVICE $GFS_DIR$GFS_BRICK$index ext4 defaults 0 0' >> /etc/fstab
-        echo '${gfs[index]}:$GFS_VOLNAME $FUSE_BASE$GFS_VOLNAME glusterfs defaults,_netdev 0 0' >> etc/fstab
-        mount -a
-      else
-        echo "#! /bin/bash" > rmt-cmds2.sh
-        echo "" >> rmt-cmds2.sh
-      
-        echo "result=`eval mkfs.ext4 $GFS_DEVICE`" >> rmt-cmds2.sh
-        echo "wait" >> rmt-cmds2.sh
-        echo "mkdir -p $GFS_DIR" >> rmt-cmds2.sh
-        echo "mkdir -p $GFS_DIR$GFS_BRICK$index" >> rmt-cmds2.sh
-        echo "echo '$GFS_DEVICE $GFS_DIR$GFS_BRICK$index ext4 defaults 0 0' >> /etc/fstab" >> rmt-cmds2.sh
-        echo "echo '${gfs[index]}:$GFS_VOLNAME $FUSE_BASE$GFS_VOLNAME glusterfs defaults,_netdev 0 0' >> etc/fstab" >> rmt-cmds2.sh
-        # echo "mount -t glusterfs  ${gfs[index]}:$GFS_VOLNAME $FUSE_BASE$GFS_VOLNAME" >> rmt-cmds2.sh
-        echo "mount -a" >> rmt-cmds2.sh
-
-        scp rmt-cmds2.sh root@"${gfs[index]}":~
-        echo "chmod +x rmt-cmds2.sh;./rmt-cmds2.sh" | ssh -o StrictHostKeyChecking=no root@"${gfs[index]}"
-      fi
-    done
-  fi
-
 
 fi
 echo ""
