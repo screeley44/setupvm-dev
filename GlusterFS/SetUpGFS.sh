@@ -250,18 +250,18 @@ then
       
         result=`eval mkfs.ext4 $GFS_DEVICE`
         mkdir -p $GFS_DIR
-        echo '$GFS_DEVICE $GFS_DIR xfs defaults 0 0' >> /etc/fstab
-        mount -a
         mkdir -p $GFS_DIR$GFS_BRICK$index
+        echo '$GFS_DEVICE $GFS_DIR$GFS_BRICK$index xfs defaults 0 0' >> /etc/fstab
+        mount -a
       else
         echo "#! /bin/bash" > rmt-cmds2.sh
         echo "" >> rmt-cmds2.sh
       
         echo "mkfs.ext4 $GFS_DEVICE" >> rmt-cmds2.sh
         echo "mkdir -p $GFS_DIR" >> rmt-cmds2.sh
-        echo "echo '$GFS_DEVICE $GFS_DIR xfs defaults 0 0' >> /etc/fstab" >> rmt-cmds2.sh
-        echo "mount -a" >> rmt-cmds2.sh
         echo "mkdir -p $GFS_DIR$GFS_BRICK$index" >> rmt-cmds2.sh
+        echo "echo '$GFS_DEVICE $GFS_DIR$GFS_BRICK$index xfs defaults 0 0' >> /etc/fstab" >> rmt-cmds2.sh
+        echo "mount -a" >> rmt-cmds2.sh
         scp rmt-cmds2.sh root@"${gfs[index]}":~
         echo "chmod +x rmt-cmds2.sh;./rmt-cmds2.sh" | ssh -o StrictHostKeyChecking=no root@"${gfs[index]}"
       fi
