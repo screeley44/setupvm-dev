@@ -259,7 +259,7 @@ then
         echo "" >> rmt-cmds2.sh
       
         echo "mkfs.ext4 $GFS_DEVICE" >> rmt-cmds2.sh
-        wait
+        echo "wait" >> rmt-cmds2.sh
         echo "mkdir -p $GFS_DIR" >> rmt-cmds2.sh
         echo "mkdir -p $GFS_DIR$GFS_BRICK$index" >> rmt-cmds2.sh
         echo "echo '$GFS_DEVICE $GFS_DIR$GFS_BRICK$index ext4 defaults 0 0' >> /etc/fstab" >> rmt-cmds2.sh
