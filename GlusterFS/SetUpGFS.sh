@@ -258,7 +258,7 @@ then
         echo "#! /bin/bash" > rmt-cmds2.sh
         echo "" >> rmt-cmds2.sh
       
-        echo "mkfs.ext4 $GFS_DEVICE" >> rmt-cmds2.sh
+        echo "eval `mkfs.ext4 $GFS_DEVICE`" >> rmt-cmds2.sh
         echo "wait" >> rmt-cmds2.sh
         echo "mkdir -p $GFS_DIR" >> rmt-cmds2.sh
         echo "mkdir -p $GFS_DIR$GFS_BRICK$index" >> rmt-cmds2.sh
