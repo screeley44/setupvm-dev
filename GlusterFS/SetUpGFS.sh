@@ -159,7 +159,7 @@ else
       echo "" >> rmt-cmds.sh
 
       echo "Gluster Installation Stuff"
-      echo "yum install -y wget telnet> /dev/null" >> rmt-cmds.sh
+      echo "yum install -y wget git telnet> /dev/null" >> rmt-cmds.sh
       echo "yum install -y centos-release-gluster> /dev/null" >> rmt-cmds.sh    
       echo "yum install epel-release -y> /dev/null" >> rmt-cmds.sh
       echo "yum install glusterfs-server -y> /dev/null" >> rmt-cmds.sh
@@ -249,6 +249,7 @@ then
       then
       
         result=`eval mkfs.ext4 $GFS_DEVICE`
+        wait
         mkdir -p $GFS_DIR
         mkdir -p $GFS_DIR$GFS_BRICK$index
         echo '$GFS_DEVICE $GFS_DIR$GFS_BRICK$index ext4 defaults 0 0' >> /etc/fstab
@@ -258,6 +259,7 @@ then
         echo "" >> rmt-cmds2.sh
       
         echo "mkfs.ext4 $GFS_DEVICE" >> rmt-cmds2.sh
+        wait
         echo "mkdir -p $GFS_DIR" >> rmt-cmds2.sh
         echo "mkdir -p $GFS_DIR$GFS_BRICK$index" >> rmt-cmds2.sh
         echo "echo '$GFS_DEVICE $GFS_DIR$GFS_BRICK$index ext4 defaults 0 0' >> /etc/fstab" >> rmt-cmds2.sh
