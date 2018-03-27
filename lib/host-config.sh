@@ -38,7 +38,8 @@ GOLANGPATH=""
   OSEDEFAULT=""
   if [[ -z "$ORIGINWORKDIR" ]]
   then
-    echo "No ORIGINWORKDIR present...skipping"
+    echo "No ORIGINWORKDIR present...setting default"
+    OSEPATH="/etc/openshift-dev"
   else
     OSEPATH=$ORIGINWORKDIR
     echo "Setting Origin Working Directory to $OSEPATH"
@@ -47,7 +48,8 @@ GOLANGPATH=""
   KUBEDEFAULT=""
   if [[ -z "$KUBEWORKDIR" ]]
   then
-    echo "No KUBEWORKDIR present...skipping"
+    echo "No KUBEWORKDIR present...setting default"
+    KUBEPATH="/etc/kubernetes-dev"
   else
     KUBEPATH=$KUBEWORKDIR
     echo "Setting Kube Working Directory to $KUBEPATH"
@@ -114,16 +116,26 @@ GOLANGPATH=""
   then
     mkdir -p $KUBEPATH
   else
-    $SUDO mkdir -p $KUBEPATH
-    $SUDO chmod -R 777 $KUBEPATH
+    if [ "$KUBEPATH" == "" ]
+    then
+      echo "...skipping chmod for KUBEPATH"
+    else
+      $SUDO mkdir -p $KUBEPATH
+      $SUDO chmod -R 777 $KUBEPATH
+    fi
   fi
 
   if [ "$OSEDEFAULt" == "yes" ] || [ "$OSEPATH" == "/home/ec2-user" ] || [ "$OSEPATH" == "/root" ] || [[ "$OSEPATH" =~ /home ]] 
   then
     mkdir -p $OSEPATH
   else
-    $SUDO mkdir -p $OSEPATH
-    $SUDO chmod -R 777 $OSEPATH
+    if [ "$OSEPATH" == "" ]
+    then
+      echo "...skipping chmod for OSEPATH"
+    else
+      $SUDO mkdir -p $OSEPATH
+      $SUDO chmod -R 777 $OSEPATH
+    fi
   fi
 
   echo ""
@@ -213,6 +225,10 @@ GOLANGPATH=""
     mkdir -p $OSEPATH/dev-configs/cnv/local
     mkdir -p $OSEPATH/dev-configs/cnv/data-importer
   else
+    if [ "$OSEPATH" == "" ]
+    then
+      echo "...skipping"
+    else
     $SUDO mkdir -p $OSEPATH/dev-configs
     $SUDO mkdir -p $OSEPATH/dev-configs/aws
     $SUDO mkdir -p $OSEPATH/dev-configs/gce
@@ -225,6 +241,7 @@ GOLANGPATH=""
     $SUDO mkdir -p $OSEPATH/dev-configs/cnv/local
     $SUDO mkdir -p $OSEPATH/dev-configs/cnv/data-importer
     $SUDO chmod -R 777 $OSEPATH
+    fi
   fi
 
   if [ ! -d "/var/run/libvirt" ]
