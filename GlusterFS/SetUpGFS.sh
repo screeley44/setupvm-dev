@@ -302,11 +302,13 @@ then
       if [ "$index" == 0 ]
       then
         echo "${gfs[index]}:$GFS_VOLNAME $FUSE_BASE/$GFS_VOLNAME glusterfs defaults,_netdev 0 0" >> /etc/fstab
+        wait
         mount -a
       else
         echo "#! /bin/bash" > rmt-cmds3.sh
         echo "" >> rmt-cmds3.sh
         echo "echo '${gfs[index]}:$GFS_VOLNAME $FUSE_BASE/$GFS_VOLNAME glusterfs defaults,_netdev 0 0' >> /etc/fstab" >> rmt-cmds3.sh
+        echo "wait" >> rmt-cmds3.sh
         echo "mount -a" >> rmt-cmds3.sh
 
         scp rmt-cmds3.sh root@"${gfs[index]}":~
