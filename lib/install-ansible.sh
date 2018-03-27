@@ -2,7 +2,7 @@
 # Some automation to setting up OSE/K8 VM's
 
   # Ansible
-  if [ "$INSTALL_ANSIBLE" == "yes" ]
+  if [ "$INSTALL_ANSIBLE" == "Y" ]
   then
     if [ "$HOSTENV" == "fedora" ]
     then

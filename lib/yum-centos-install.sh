@@ -25,7 +25,7 @@ then
 
   echo "...performing yum update"
   $SUDO yum update -y> /dev/null
-  if [ "$HOSTENV" == "rhel" ] && [ "$APP_TYPE == "Origin" ]
+  if [ "$APP_TYPE" == "Origin" ]
   then
       echo "...Installing openshift utils for DEV setup type..."
       $SUDO yum install atomic-openshift-utils -y> /dev/null
