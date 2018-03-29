@@ -181,7 +181,7 @@ else
 
       scp rmt-cmds.sh root@"${gfs[index]}":~
 
-      echo "chmod +x rmt-cmds.sh;./rmt-cmds.sh" | ssh -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      echo "chmod +x rmt-cmds.sh;./rmt-cmds.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
 
       ssh-copy-id -i /etc/heketi/heketi_key.pub root@"${gfs[index]}"
 
@@ -268,7 +268,7 @@ then
         echo "mount -a" >> rmt-cmds2.sh
 
         scp rmt-cmds2.sh root@"${gfs[index]}":~
-        echo "chmod +x rmt-cmds2.sh;./rmt-cmds2.sh" | ssh -o StrictHostKeyChecking=no root@"${gfs[index]}"
+        echo "chmod +x rmt-cmds2.sh;./rmt-cmds2.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
       fi
     done
   fi
@@ -312,7 +312,7 @@ then
         echo "mount -a" >> rmt-cmds3.sh
 
         scp rmt-cmds3.sh root@"${gfs[index]}":~
-        echo "chmod +x rmt-cmds3.sh;./rmt-cmds3.sh" | ssh -o StrictHostKeyChecking=no root@"${gfs[index]}"
+        echo "chmod +x rmt-cmds3.sh;./rmt-cmds3.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
       fi
     done
   fi
