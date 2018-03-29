@@ -124,6 +124,22 @@ else
       yum install heketi -y> /dev/null
       yum install heketi-client -y> /dev/null
 
+# Setting up gluster 3.12
+# rpm --import https://raw.githubusercontent.com/CentOS-Storage-SIG/centos-release-storage-common/master/RPM-GPG-KEY-CentOS-SIG-Storage
+# vi /etc/yum.repos.d/redhat.repo (on AWS and Azure)
+# vi /etc/yum.repos.d/epel.repo (on GCE)
+
+# [centos-gluster312]
+# name=CentOS-$releasever - Gluster 3.12
+# baseurl=http://mirror.centos.org/centos/7/storage/$basearch/gluster-3.12/
+# gpgcheck=1
+# enabled=1
+# gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-Storage
+
+# yum install glusterfs-server -y
+
+
+
       echo ""
       echo "Enabling and starting GlusterFS..."
       systemctl start glusterd
@@ -290,6 +306,10 @@ then
       fi
     done
   fi
+
+# Strange the above works without adding bricks, I guess because my initial volume assumes BRICK??
+# for reference command to add brick
+#  gluster volume add-brick gv0 replica 3 aze-storage1:/data/brick1/gv0 aze-storage2:/data/brick1/gv0 aze-storage3:/data/brick1/gv0
 
   # PERFORM FUSE MOUNT
   if [ "$CREATE_VOL" == "Y" ]
