@@ -124,7 +124,12 @@ else
       yum install heketi -y> /dev/null
       yum install heketi-client -y> /dev/null
 
+
+
 # Setting up gluster 3.12
+
+# # yum install centos-release-gluster  (does this give me 3.12 ???)
+
 # rpm --import https://raw.githubusercontent.com/CentOS-Storage-SIG/centos-release-storage-common/master/RPM-GPG-KEY-CentOS-SIG-Storage
 # vi /etc/yum.repos.d/redhat.repo (on AWS and Azure)
 # vi /etc/yum.repos.d/epel.repo (on GCE)
