@@ -17,7 +17,17 @@
 #   GFS_LIST="glusterfs1.rhs:glusterfs2.rhs:glusterfs.rhs3"
 #
 
-source setupvm.config
+SCRIPT_HOME="$(realpath $(dirname $0))"
+CONFIG_HOME=""
+
+if [ -f "$SCRIPT_HOME/setupvm.config" ]
+then
+  CONFIG_HOME=$SCRIPT_HOME
+else
+  CONFIG_HOME="/root/setupvm-dev/GlusterFS"
+fi
+
+source $CONFIG_HOME/setupvm.config
 
 HCLI=""
 
