@@ -124,6 +124,27 @@ else
       yum install heketi -y> /dev/null
       yum install heketi-client -y> /dev/null
 
+
+
+# Setting up gluster 3.12
+
+# # yum install centos-release-gluster  (does this give me 3.12 ???)
+
+# rpm --import https://raw.githubusercontent.com/CentOS-Storage-SIG/centos-release-storage-common/master/RPM-GPG-KEY-CentOS-SIG-Storage
+# vi /etc/yum.repos.d/redhat.repo (on AWS and Azure)
+# vi /etc/yum.repos.d/epel.repo (on GCE)
+
+# [centos-gluster312]
+# name=CentOS-$releasever - Gluster 3.12
+# baseurl=http://mirror.centos.org/centos/7/storage/$basearch/gluster-3.12/
+# gpgcheck=1
+# enabled=1
+# gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-Storage
+
+# yum install glusterfs-server -y
+
+
+
       echo ""
       echo "Enabling and starting GlusterFS..."
       systemctl start glusterd
@@ -158,7 +179,8 @@ else
       echo "#! /bin/bash" > rmt-cmds.sh
       echo "" >> rmt-cmds.sh
 
-      echo "yum install -y wget telnet> /dev/null" >> rmt-cmds.sh
+      echo "Gluster Installation Stuff"
+      echo "yum install -y wget git telnet> /dev/null" >> rmt-cmds.sh
       echo "yum install -y centos-release-gluster> /dev/null" >> rmt-cmds.sh    
       echo "yum install epel-release -y> /dev/null" >> rmt-cmds.sh
       echo "yum install glusterfs-server -y> /dev/null" >> rmt-cmds.sh
@@ -180,7 +202,7 @@ else
 
       scp rmt-cmds.sh root@"${gfs[index]}":~
 
-      echo "chmod +x rmt-cmds.sh;./rmt-cmds.sh" | ssh -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      echo "chmod +x rmt-cmds.sh;./rmt-cmds.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
 
       ssh-copy-id -i /etc/heketi/heketi_key.pub root@"${gfs[index]}"
 
@@ -189,8 +211,6 @@ else
       echo ""
     fi
   done
-  
-
 fi
 
 if [ "$SETUP_TYPE" == "gluster" ] && [ "$GFS_LIST" != "" ]
@@ -201,7 +221,21 @@ then
   echo ""
   echo "Configuring GlusterFS..."
 
+  # create volume list
+  VOLLIST=""
+  GVDIR="$GFS_DIR$GFS_BRICK"
+  IFS=':' read -r -a gfs <<< "$GFS_LIST"
+  for index in "${!gfs[@]}"
+  do
+    if [ "$index" == 0 ]
+    then
+      VOLLIST="${gfs[index]}:$GVDIR$index" 
+    else
+      VOLLIST="$VOLLIST ${gfs[index]}:$GVDIR$index" 
+    fi
+  done
 
+  # Peer Probe
   IFS=':' read -r -a gfs <<< "$GFS_LIST"
   for index in "${!gfs[@]}"
   do
@@ -221,6 +255,92 @@ then
   echo ""
   echo ""
   gluster pool list
+  echo ""
+  echo ""
+
+  # CREATE VOLUME SETUP
+  if [ "$CREATE_VOL" == "Y" ]
+  then
+    echo "***********************"
+    echo "   Volume Mgmt Setup"
+    IFS=':' read -r -a gfs <<< "$GFS_LIST"
+    for index in "${!gfs[@]}"
+    do
+      if [ "$index" == 0 ]
+      then
+      
+        mkfs.ext4 $GFS_DEVICE
+        wait
+        mkdir -p $GFS_DIR
+        mkdir -p $GFS_DIR$GFS_BRICK$index
+        mkdir -p $FUSE_BASE/$GFS_VOLNAME
+        echo "$GFS_DEVICE $GFS_DIR$GFS_BRICK$index ext4 defaults 0 0" >> /etc/fstab
+        mount -a
+      else
+        echo "#! /bin/bash" > rmt-cmds2.sh
+        echo "" >> rmt-cmds2.sh
+      
+        echo "mkfs.ext4 $GFS_DEVICE" >> rmt-cmds2.sh
+        echo "wait" >> rmt-cmds2.sh
+        echo "mkdir -p $GFS_DIR" >> rmt-cmds2.sh
+        echo "mkdir -p $GFS_DIR$GFS_BRICK$index" >> rmt-cmds2.sh
+        echo "mkdir -p $FUSE_BASE/$GFS_VOLNAME" >> rmt-cmds2.sh
+        echo "echo '$GFS_DEVICE $GFS_DIR$GFS_BRICK$index ext4 defaults 0 0' >> /etc/fstab" >> rmt-cmds2.sh
+        echo "mount -a" >> rmt-cmds2.sh
+
+        scp rmt-cmds2.sh root@"${gfs[index]}":~
+        echo "chmod +x rmt-cmds2.sh;./rmt-cmds2.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      fi
+    done
+  fi
+
+  # CREATE VOLUME AND START
+  if [ "$CREATE_VOL" == "Y" ]
+  then
+    echo "***********************"
+    echo "     Volume Start"
+    IFS=':' read -r -a gfs <<< "$GFS_LIST"
+    for index in "${!gfs[@]}"
+    do
+      if [ "$index" == 0 ]
+      then
+        result=`eval gluster volume create $GFS_VOLNAME replica $REPLICA_COUNT $VOLLIST force`
+        wait
+        result=`eval gluster volume start $GFS_VOLNAME`
+        wait
+      fi
+    done
+  fi
+
+# Strange the above works without adding bricks, I guess because my initial volume assumes BRICK??
+# for reference command to add brick
+#  gluster volume add-brick gv0 replica 3 aze-storage1:/data/brick1/gv0 aze-storage2:/data/brick1/gv0 aze-storage3:/data/brick1/gv0
+
+  # PERFORM FUSE MOUNT
+  if [ "$CREATE_VOL" == "Y" ]
+  then
+    echo "***********************"
+    echo "   Volume Mgmt Setup"
+    IFS=':' read -r -a gfs <<< "$GFS_LIST"
+    for index in "${!gfs[@]}"
+    do
+      if [ "$index" == 0 ]
+      then
+        echo "${gfs[index]}:$GFS_VOLNAME $FUSE_BASE/$GFS_VOLNAME glusterfs defaults,_netdev 0 0" >> /etc/fstab
+        wait
+        mount -a
+      else
+        echo "#! /bin/bash" > rmt-cmds3.sh
+        echo "" >> rmt-cmds3.sh
+        echo "echo '${gfs[index]}:$GFS_VOLNAME $FUSE_BASE/$GFS_VOLNAME glusterfs defaults,_netdev 0 0' >> /etc/fstab" >> rmt-cmds3.sh
+        echo "wait" >> rmt-cmds3.sh
+        echo "mount -a" >> rmt-cmds3.sh
+
+        scp rmt-cmds3.sh root@"${gfs[index]}":~
+        echo "chmod +x rmt-cmds3.sh;./rmt-cmds3.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      fi
+    done
+  fi
 
 fi
 echo ""

@@ -37,3 +37,6 @@
     $SUDO setenforce 0
     $SUDO iptables -F
   fi
+
+  # restart docker
+  systemctl restart docker
