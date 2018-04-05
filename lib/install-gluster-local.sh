@@ -43,7 +43,7 @@ then
     # install gluster
     yum install glusterfs-server -y  
 
-  elif [ "$GFS_VERSION" == "" ]
+  elif [ "$GFS_VERSION" == "" ] || [ "$GFS_VERSION" == "default" ] || [ "$GFS_VERSION" == "official" ]
   then
     #default - just normal rhel gluster repo or centos release repo
     # enable default repo from RH and install
@@ -103,7 +103,7 @@ then
     yum install epel-release -y> /dev/null
     yum install glusterfs-server -y> /dev/null 
 
-  elif [ "$GFS_VERSION" == "" ]
+  elif [ "$GFS_VERSION" == "" ] || [ "$GFS_VERSION" == "default" ] || [ "$GFS_VERSION" == "official" ]
   then
     yum install -y centos-release-gluster> /dev/null    
     yum install epel-release -y> /dev/null

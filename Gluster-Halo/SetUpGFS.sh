@@ -47,7 +47,7 @@ then
       echo "****************"
       echo ""
       echo "Setting up subscription services from RHEL..."
-      echo "Setting Up Host... ${gfs[index]}"
+      echo "Setting Up Local Host... ${gfs[index]}"
       yum install subscription-manager -y> /dev/null
       subscription-manager register --username=$RHNUSER --password=$RHNPASS
       subscription-manager attach --pool=$POOLID
@@ -76,9 +76,10 @@ then
       echo "****************"
       echo ""
       echo "Setting up subscription services from RHEL..."
-      echo "Setting Up Host... ${gfs[index]}"
+      echo "Setting Up Remote Host... ${gfs[index]}"
 
       # base remote commands
+      echo " ... Remotely Installing Base Software on ${gfs[index]}"
       echo "#! /bin/bash" > rmt-cmds.sh
       echo "" >> rmt-cmds.sh
       echo "yum install subscription-manager -y> /dev/null" >> rmt-cmds.sh
@@ -97,6 +98,7 @@ then
 
 
       # Gluster and Heketi specific remote commands
+      echo " ... Remotely Installing GlusterFS and/or Heketi on ${gfs[index]}"
       source $CONFIG_HOME/../lib/install-gluster-remote.sh
       scp rmt-gluster.sh root@"${gfs[index]}":~
       echo "chmod +x rmt-gluster.sh;./rmt-gluster.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
@@ -148,6 +150,7 @@ else
 
       
       # Install base remote gluster
+      echo " ... Remotely Installing Base Software on ${gfs[index]}"
       echo "#! /bin/bash" > rmt-cmds.sh
       echo "" >> rmt-cmds.sh
       #echo ""
@@ -159,6 +162,7 @@ else
       echo "chmod +x rmt-cmds.sh;./rmt-cmds.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
 
       # Gluster and Heketi specific remote commands
+      echo " ... Remotely Installing GlusterFS and/or Heketi on ${gfs[index]}"
       source $CONFIG_HOME/../lib/install-gluster-remote.sh
       scp rmt-gluster.sh root@"${gfs[index]}":~
       echo "chmod +x rmt-gluster.sh;./rmt-gluster.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
