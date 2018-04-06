@@ -66,9 +66,9 @@ then
     fi
 
     
-    echo "[gluster$GFS_VERSION]" > /etc/yum.repos.d/Gluster.repo
-    echo "name=Gluster $GFS_VERSION" >> /etc/yum.repos.d/Gluster.repo
-    echo "baseurl=http://mirror.centos.org/centos/7/storage/$basearch/gluster-$GFS_VERSION/">> /etc/yum.repos.d/Gluster.repo
+    echo "[gluster-$GFS_VERSION]" > /etc/yum.repos.d/Gluster.repo
+    echo "name=Gluster" >> /etc/yum.repos.d/Gluster.repo
+    echo "baseurl=http://mirror.centos.org/centos/7/storage/\$basearch/gluster-$GFS_VERSION/">> /etc/yum.repos.d/Gluster.repo
     if [ "$NO_GPG" == "N" ]
     then
       echo "gpgcheck=0" >> /etc/yum.repos.d/Gluster.repo
@@ -79,7 +79,8 @@ then
     echo "enabled=1" >> /etc/yum.repos.d/Gluster.repo
 
     # install gluster
-    yum --enablerepo=Gluster install glusterfs-server -y
+    yum --enablerepo=gluster-$GFS_VERSION install glusterfs-server -y
+    wait
 
   fi
 

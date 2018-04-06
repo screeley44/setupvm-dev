@@ -75,11 +75,10 @@ then
       echo ""
       echo "****************"
       echo ""
-      echo "Setting up subscription services from RHEL..."
       echo "Setting Up Remote Host... ${gfs[index]}"
 
       # base remote commands
-      echo " ... Remotely Installing Base Software on ${gfs[index]}"
+      echo " ... Remotely Installing Subscription and Base Software on ${gfs[index]}"
       echo "#! /bin/bash" > rmt-cmds.sh
       echo "" >> rmt-cmds.sh
       echo "yum install subscription-manager -y> /dev/null" >> rmt-cmds.sh
@@ -102,13 +101,6 @@ then
       source $CONFIG_HOME/../lib/install-gluster-remote.sh
       scp rmt-gluster.sh root@"${gfs[index]}":~
       echo "chmod +x rmt-gluster.sh;./rmt-gluster.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
-
-
-      # copy heketi keys
-      if [ "$INSTALL_HEKETI" == "Y" ]
-      then  
-        ssh-copy-id -i /etc/heketi/heketi_key.pub root@"${gfs[index]}"
-      fi
 
       echo ""
       echo "   ...Remote RHEL System attached and repo'd and Software Installed!!!"
@@ -166,12 +158,6 @@ else
       source $CONFIG_HOME/../lib/install-gluster-remote.sh
       scp rmt-gluster.sh root@"${gfs[index]}":~
       echo "chmod +x rmt-gluster.sh;./rmt-gluster.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
-
-      # copy heketi keys
-      if [ "$INSTALL_HEKETI" == "Y" ]
-      then  
-        ssh-copy-id -i /etc/heketi/heketi_key.pub root@"${gfs[index]}"
-      fi
 
       echo ""
       echo "   ...Remote CentOS System attached and Software Installed!!!"

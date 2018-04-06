@@ -5,15 +5,6 @@
 echo "#! /bin/bash" > rmt-gluster.sh
 echo "" >> rmt-gluster.sh
 
-echo "Gluster Installation Stuff"
-echo "yum install -y wget git telnet> /dev/null" >> rmt-gluster.sh
-echo "yum install -y centos-release-gluster> /dev/null" >> rmt-gluster.sh    
-echo "yum install epel-release -y> /dev/null" >> rmt-gluster.sh
-echo "yum install glusterfs-server -y> /dev/null" >> rmt-gluster.sh
-echo "yum install heketi -y> /dev/null" >> rmt-gluster.sh
-echo "yum install heketi-client -y> /dev/null" >> rmt-gluster.sh
-
-
 
 if [ "$DO_GPG" == "Y" ]
 then
@@ -62,9 +53,9 @@ then
     fi
 
     
-    echo "echo \"[gluster$GFS_VERSION]\" > /etc/yum.repos.d/Gluster.repo" >> rmt-gluster.sh
+    echo "echo \"[gluster-$GFS_VERSION]\" > /etc/yum.repos.d/Gluster.repo" >> rmt-gluster.sh
     echo "echo \"name=Gluster $GFS_VERSION\" >> /etc/yum.repos.d/Gluster.repo" >> rmt-gluster.sh
-    echo "echo \"baseurl=http://mirror.centos.org/centos/7/storage/$basearch/gluster-$GFS_VERSION/\">> /etc/yum.repos.d/Gluster.repo" >> rmt-gluster.sh
+    echo "echo \"baseurl=http://mirror.centos.org/centos/7/storage/\$basearch/gluster-$GFS_VERSION/\">> /etc/yum.repos.d/Gluster.repo" >> rmt-gluster.sh
     if [ "$NO_GPG" == "N" ]
     then
       echo "echo \"gpgcheck=0\" >> /etc/yum.repos.d/Gluster.repo" >> rmt-gluster.sh
@@ -75,7 +66,7 @@ then
     echo "echo \"enabled=1\" >> /etc/yum.repos.d/Gluster.repo" >> rmt-gluster.sh
 
     # install gluster
-    echo "yum --enablerepo=Gluster install glusterfs-server -y" >> rmt-gluster.sh
+    echo "yum --enablerepo=gluster-$GFS_VERSION install glusterfs-server -y" >> rmt-gluster.sh
 
   fi
 
