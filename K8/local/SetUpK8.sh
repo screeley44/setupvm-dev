@@ -23,8 +23,17 @@ SUDO=""
 source $CONFIG_HOME/../../lib/host-config.sh
 
 
-# Install Centos base software
-source $CONFIG_HOME/../../lib/yum-centos-install.sh
+# Install base software
+if [ "$HOSTENV" == "centos" ]
+then
+  source $CONFIG_HOME/../../lib/yum-centos-install.sh
+elif [ "$HOSTENV" == "rhel" ]
+then
+  source $CONFIG_HOME/../../lib/yum-rhel-install.sh
+else
+  echo "Unsupported Operating System [HOSTENV - centos or rhel]"
+  exit 1 
+fi
 
 # Install core software (go, etcd, docker, etc...)
 source $CONFIG_HOME/../../lib/install-go.sh
