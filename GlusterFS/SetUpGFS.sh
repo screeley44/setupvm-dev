@@ -315,7 +315,7 @@ echo "--------------------"
 if [ "$CREATE_VOL" == "Y" ]
 then
   echo "Initial Gluster Volume $GFS_VOLNAME was created with Replica Count of $REPLICA_COUNT and can be accessed from: "
-  echo "  $FUSE_BASE"
+  echo "  $FUSE_BASE/$GFS_VOLNAME"
   echo ""
   echo " -------------"
   echo " -- VERSION --"
@@ -367,6 +367,7 @@ echo "--------------------"
 if [ "$CREATE_VOL" == "Y" ]
 then
   echo "None at this time - you can manually add volumes and peers"
+  echo ""
 else
   echo "Initial Gluster Volume WAS NOT created per configuration setting of CREATE_VOL=N"
   echo ""

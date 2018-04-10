@@ -44,7 +44,7 @@ then
     # install gluster
     yum install glusterfs-server -y  
 
-  elif [ "$GFS_VERSION" == "" ] || [ "$GFS_VERSION" == "default" ] || [ "$GFS_VERSION" == "official" ]
+  elif [ "$GFS_VERSION" == "" ] || [ "$GFS_VERSION" == "default" ] || [ "$GFS_VERSION" == "official" ] || [ "$GFS_VERSION" == "latest" ]
   then
     #default - just normal rhel gluster repo or centos release repo
     # enable default repo from RH and install
