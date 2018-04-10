@@ -65,7 +65,10 @@ then
       rpm --import https://raw.githubusercontent.com/CentOS-Storage-SIG/centos-release-storage-common/master/RPM-GPG-KEY-CentOS-SIG-Storage
     fi
 
-    
+    # get $basearch
+    basearch=$(rpm -q --qf "%{arch}" -f /etc/$distro)
+
+    # set up the Gluster.repo
     echo "[gluster-$GFS_VERSION]" > /etc/yum.repos.d/Gluster.repo
     echo "name=Gluster" >> /etc/yum.repos.d/Gluster.repo
     echo "baseurl=http://mirror.centos.org/centos/7/storage/\$basearch/gluster-$GFS_VERSION/">> /etc/yum.repos.d/Gluster.repo
