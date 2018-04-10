@@ -52,6 +52,10 @@ then
       echo "rpm --import https://raw.githubusercontent.com/CentOS-Storage-SIG/centos-release-storage-common/master/RPM-GPG-KEY-CentOS-SIG-Storage" >> rmt-gluster.sh
     fi
     echo "basearch=$(rpm -q --qf \"%{arch}\" -f /etc/$distro)" >> rmt-gluster.sh
+    echo "if [ \"$basearch\" == \"\" ]" >> rmt-gluster.sh
+    echo "then" >> rmt-gluster.sh
+    echo "  basearch=\"x86_64\"" >> rmt-gluster.sh
+    echo "fi" >> rmt-gluster.sh
     echo "echo \"[gluster-$GFS_VERSION]\" > /etc/yum.repos.d/Gluster.repo" >> rmt-gluster.sh
     echo "echo \"name=Gluster $GFS_VERSION\" >> /etc/yum.repos.d/Gluster.repo" >> rmt-gluster.sh
     echo "echo \"baseurl=http://mirror.centos.org/centos/7/storage/\$basearch/gluster-$GFS_VERSION/\">> /etc/yum.repos.d/Gluster.repo" >> rmt-gluster.sh

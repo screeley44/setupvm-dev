@@ -67,6 +67,10 @@ then
 
     # get $basearch
     basearch=$(rpm -q --qf "%{arch}" -f /etc/$distro)
+    if [ "$basearch" == "" ]
+    then
+      basearch="x86_64"
+    fi
 
     # set up the Gluster.repo
     echo "[gluster-$GFS_VERSION]" > /etc/yum.repos.d/Gluster.repo
