@@ -108,7 +108,7 @@ then
     #specific version is specified, i.e. 3.12
     echo "yum install -y centos-release-gluster> /dev/null" >> rmt-gluster.sh
     echo "yum install epel-release -y> /dev/null" >> rmt-gluster.sh
-    echo "yum install glusterfs-server-$GFS_VERSION -y> /dev/null" >> rmt-gluster.sh
+    echo "yum install glusterfs-server -y> /dev/null" >> rmt-gluster.sh
   fi
 
   if [ "$GFS_VERSION" == "no-install" ]

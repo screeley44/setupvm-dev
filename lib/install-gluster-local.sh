@@ -18,6 +18,7 @@
 
 # yum install glusterfs-server -y
 
+latestVer="3.12"
 
 if [ "$DO_GPG" == "Y" ]
 then
@@ -106,13 +107,14 @@ then
   if [ "$GFS_VERSION" == "epel" ]
   then
     # latest epel repo
-
+    echo " ... Installing Latest Gluster Version"
     yum install -y centos-release-gluster> /dev/null    
     yum install epel-release -y> /dev/null
     yum install glusterfs-server -y> /dev/null 
 
-  elif [ "$GFS_VERSION" == "" ] || [ "$GFS_VERSION" == "default" ] || [ "$GFS_VERSION" == "official" ]
+  elif [ "$GFS_VERSION" == "" ] || [ "$GFS_VERSION" == "default" ] || [ "$GFS_VERSION" == "official" ] || [ "$GFS_VERSION" == "latest" ]
   then
+    echo " ... Installing Default Gluster Version"
     yum install -y centos-release-gluster> /dev/null    
     yum install epel-release -y> /dev/null
     yum install glusterfs-server -y> /dev/null
@@ -120,14 +122,16 @@ then
   elif [ "$GFS_VERSION" == "no-install" ]
   then
     # enable repos but do not install
+    echo " ... Not Installing Gluster $GFS_VERSION"
     yum install -y centos-release-gluster> /dev/null    
     yum install epel-release -y> /dev/null
 
   else
     #specific version is specified, i.e. 3.12
+    echo " ... Installing latest version of Gluster 3.12"
     yum install -y centos-release-gluster> /dev/null    
     yum install epel-release -y> /dev/null
-    yum install glusterfs-server-$GFS_VERSION -y> /dev/null
+    yum install glusterfs-server -y> /dev/null
 
   fi
 
