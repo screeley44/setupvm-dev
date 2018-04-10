@@ -317,8 +317,14 @@ then
   echo "Initial Gluster Volume $GFS_VOLNAME was created with Replica Count of $REPLICA_COUNT and can be accessed from: "
   echo "  $FUSE_BASE"
   echo ""
+  echo " -------------"
+  echo " -- VERSION --"
+  echo " -------------"
   gluster --version
   echo ""
+  echo " --------------"
+  echo " -- VOL INFO --"
+  echo " --------------"
   gluster volume info
 else
   echo "Initial Gluster Volume WAS NOT created per configuration setting of CREATE_VOL=N"
@@ -360,10 +366,7 @@ echo "ADDITIONAL GLUSTER CONFIGURATION"
 echo "--------------------"
 if [ "$CREATE_VOL" == "Y" ]
 then
-  echo "Initial Gluster Volume $GFS_VOLNAME was created with Replica Count of $REPLICA_COUNT and can be accessed from: "
-  echo "  $FUSE_BASE"
-  echo ""
-  gluster volume info
+  echo "None at this time - you can manually add volumes and peers"
 else
   echo "Initial Gluster Volume WAS NOT created per configuration setting of CREATE_VOL=N"
   echo ""
