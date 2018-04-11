@@ -5,7 +5,7 @@ then
   echo "...Remotely Installing OpenStack Swift and Clients"
 
   # enable full OSE repos for Swift
-  echo "subscription-manager repos --enable=\"rhel-7-server-ose-$OCPVERSION-rpms\"> /dev/null" >> rmt-swift.sh 
+  echo "subscription-manager repos --enable=\"rhel-7-server-ose-$OCPVERSION-rpms\"> /dev/null" > rmt-swift.sh 
 
   echo "yum install openstack-swift-* -y> /dev/null" >> rmt-swift.sh
   echo "yum install python-scandir python-prettytable git -y> /dev/null" >> rmt-swift.sh

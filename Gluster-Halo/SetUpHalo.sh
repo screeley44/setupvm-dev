@@ -220,7 +220,45 @@ then
   done
 fi
 
+# Docker, GO, ETCD
+if [ "$INSTALL_PREREQ" == "Y" ] && [ "$RERUN" == "Y" ] && [ "$GFS_LIST" != "" ]
+then
+  IFS=':' read -r -a gfs <<< "$GFS_LIST"
+  for index in "${!gfs[@]}"
+  do
+    if [ "$index" == 0 ]
+    then
+      # Install core software (go, etcd, docker, etc...)
+      source $CONFIG_HOME/../lib/install-go.sh
+      source $CONFIG_HOME/../lib/install-etcd.sh
+      source $CONFIG_HOME/../lib/docker-base.sh
 
+      # restart docker
+      source $CONFIG_HOME/../lib/docker-restart.sh
+    else
+      echo " ... Remotely Installing PreReqs (Docker, Go, ETCD) on ${gfs[index]}"
+      source $CONFIG_HOME/../lib/install-go-remote.sh
+      scp rmt-go.sh root@"${gfs[index]}":~
+      echo "chmod +x rmt-go.sh;./rmt-go.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+
+      source $CONFIG_HOME/../lib/install-docker-remote.sh
+      scp rmt-docker.sh root@"${gfs[index]}":~
+      echo "chmod +x rmt-docker.sh;./rmt-docker.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+
+      source $CONFIG_HOME/../lib/install-etcd-remote.sh
+      scp rmt-etcd.sh root@"${gfs[index]}":~
+      echo "chmod +x rmt-etcd.sh;./rmt-etcd.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+
+      source $CONFIG_HOME/../lib/docker-restart-remote.sh
+      scp rmt-docker-restart.sh root@"${gfs[index]}":~
+      echo "chmod +x rmt-docker-restart.sh;./rmt-docker-restart.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+    fi
+  done
+fi
+
+
+
+# Initial Volume Management OR rerun scenario (installing in staggered or post base install order)
 if [ "$SETUP_TYPE" == "gluster" ] && [ "$GFS_LIST" != "" ]
 then
   echo ""
