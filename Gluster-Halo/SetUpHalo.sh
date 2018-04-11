@@ -31,7 +31,7 @@ source $CONFIG_HOME/setupvm.config
 
 HCLI=""
 
-if [ "$HOSTENV" == "rhel" ] && [ "$RERUN" == "N" ]
+if [ "$HOSTENV" == "rhel" ]
 then
   echo " *** INSTALLING GLUSTERFS CLUSTER ON RHEL ***"
   echo ""
@@ -82,18 +82,16 @@ then
       echo ""
 
       echo "Installing GlusterFS Server and Heketi..."
-      source $CONFIG_HOME/../lib/install-gluster-local.sh
+      if [ "$RERUN_GLUSTER" == "Y" ] || [ "$RERUN" == "N" ]
+      then
+        source $CONFIG_HOME/../lib/install-gluster-local.sh
+      fi
 
       # Swift specific remote commands
-      if [ "$INSTALL_SWIFT_LOCAL" == "Y" ]
+      if [ "$INSTALL_SWIFT_LOCAL" == "Y" ] && [ "$RERUN" == "N" ]
       then
         echo " ... Installing Swift and Clients on local node ${gfs[index]}"
         source $CONFIG_HOME/../lib/install-swift-local.sh
-      fi
-
-      if [ "$INSTALL_HEKETI" == "Y" ]
-      then
-        source $CONFIG_HOME/../lib/install-heketi.sh
       fi
       
     else
@@ -147,12 +145,15 @@ then
 
       # Gluster and Heketi specific remote commands
       echo " ... Remotely Installing GlusterFS and/or Heketi on ${gfs[index]}"
-      source $CONFIG_HOME/../lib/install-gluster-remote.sh
-      scp rmt-gluster.sh root@"${gfs[index]}":~
-      echo "chmod +x rmt-gluster.sh;./rmt-gluster.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      if [ "$RERUN_GLUSTER" == "Y" ] || [ "$RERUN" == "N" ]
+      then
+        source $CONFIG_HOME/../lib/install-gluster-remote.sh
+        scp rmt-gluster.sh root@"${gfs[index]}":~
+        echo "chmod +x rmt-gluster.sh;./rmt-gluster.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      fi
 
       # Swift specific remote commands
-      if [ "$INSTALL_SWIFT_REMOTE" == "Y" ]
+      if [ "$INSTALL_SWIFT_REMOTE" == "Y" ] && [ "$RERUN" == "N" ]
       then
         echo " ... Remotely Installing Swift and Clients on ${gfs[index]}"
         source $CONFIG_HOME/../lib/install-swift-remote.sh
