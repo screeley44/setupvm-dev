@@ -49,8 +49,23 @@ then
       echo "Setting up subscription services from RHEL..."
       echo "Setting Up Local Host... ${gfs[index]}"
       yum install subscription-manager -y> /dev/null
-      subscription-manager register --username=$RHNUSER --password=$RHNPASS
-      subscription-manager attach --pool=$POOLID
+      #subscription-manager register --username=$RHNUSER --password=$RHNPASS
+      if (subscription-manager register --username=$RHNUSER --password=$RHNPASS | grep -q "system has been registered")
+      then
+        echo ""
+      else
+        echo "!!!! System Not Registered with RHSM - maybe invalid username or password OR RHSM could be down?  !!!!!"
+        exit 1
+      fi
+
+      #subscription-manager attach --pool=$POOLID
+      if (subscription-manager attach --pool=$POOLID | grep -q "Successfully attached")
+      then
+        echo ""
+      else
+        echo "!!!! Invalid POOLID - $POOLID  !!!!!"
+        exit 1
+      fi
       subscription-manager repos --disable="*"> /dev/null
 
 

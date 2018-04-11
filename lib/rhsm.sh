@@ -15,7 +15,14 @@ then
   then
     # Subscription Manager Stuffs - for RHEL 7.X devices
     echo "Setting up subscription services from RHEL..."
-    $SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS
+    #subscription-manager register --username=$RHNUSER --password=$RHNPASS
+    if ($SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS | grep -q "system has been registered")
+    then
+      echo ""
+    else
+      echo "!!!! System Not Registered with RHSM - maybe invalid username or password OR RHSM could be down?  !!!!!"
+      exit 1
+    fi
 
 
     if [ "$POOLID" == "" ]
@@ -24,7 +31,14 @@ then
        $SUDO subscription-manager list --available | sed -n '/OpenShift Container Platform/,/Pool ID/p' | sed -n '/Pool ID/ s/.*\://p' | sed -e 's/^[ \t]*//' | xargs -i{} $SUDO subscription-manager attach --pool={}
     else
        echo "Using Predefined POOLID..."
-       $SUDO subscription-manager attach --pool=$POOLID
+      #subscription-manager attach --pool=$POOLID
+      if ($SUDO subscription-manager attach --pool=$POOLID | grep -q "Successfully attached")
+      then
+        echo ""
+      else
+        echo "!!!! Invalid POOLID - $POOLID  !!!!!"
+        exit 1
+      fi
     fi
   fi
 fi
