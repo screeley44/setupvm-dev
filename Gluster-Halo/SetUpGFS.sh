@@ -31,7 +31,7 @@ source $CONFIG_HOME/setupvm.config
 
 HCLI=""
 
-if [ "$HOSTENV" == "rhel" ]
+if [ "$HOSTENV" == "rhel" ] && [ "$RERUN" == "N" ]
 then
   echo " *** INSTALLING GLUSTERFS CLUSTER ON RHEL ***"
   echo ""
@@ -65,6 +65,13 @@ then
       echo "Installing GlusterFS Server and Heketi..."
       source $CONFIG_HOME/../lib/install-gluster-local.sh
 
+      # Swift specific remote commands
+      if [ "$INSTALL_SWIFT_LOCAL" == "Y" ]
+      then
+        echo " ... Installing Swift and Clients on local node ${gfs[index]}"
+        source $CONFIG_HOME/../lib/install-swift-remote.sh
+      fi
+
       if [ "$INSTALL_HEKETI" == "Y" ]
       then
         source $CONFIG_HOME/../lib/install-heketi.sh
@@ -75,10 +82,11 @@ then
       echo ""
       echo "****************"
       echo ""
+      echo "Setting up subscription services from RHEL..."
       echo "Setting Up Remote Host... ${gfs[index]}"
 
       # base remote commands
-      echo " ... Remotely Installing Subscription and Base Software on ${gfs[index]}"
+      echo " ... Remotely Installing Base Software on ${gfs[index]}"
       echo "#! /bin/bash" > rmt-cmds.sh
       echo "" >> rmt-cmds.sh
       echo "yum install subscription-manager -y> /dev/null" >> rmt-cmds.sh
@@ -102,12 +110,22 @@ then
       scp rmt-gluster.sh root@"${gfs[index]}":~
       echo "chmod +x rmt-gluster.sh;./rmt-gluster.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
 
+      # Swift specific remote commands
+      if [ "$INSTALL_SWIFT_REMOTE" == "Y" ]
+      then
+        echo " ... Remotely Installing Swift and Clients on ${gfs[index]}"
+        source $CONFIG_HOME/../lib/install-swift-remote.sh
+        scp rmt-swift.sh root@"${gfs[index]}":~
+        echo "chmod +x rmt-swift.sh;./rmt-swift.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      fi
+
       echo ""
       echo "   ...Remote RHEL System attached and repo'd and Software Installed!!!"
       echo ""
     fi
   done
-else
+elif [ "$HOSTENV" == "centos" ] && [ "$RERUN" == "N" ]
+then
   echo " *** INSTALLING GLUSTERFS CLUSTER ON CentOS ***"
   echo ""
   echo ""
@@ -117,8 +135,11 @@ else
   do
     if [ "$index" == 0 ]
     then
-
-      echo "Installing GlusterFS Server and Heketi..."
+      echo ""
+      echo "****************"
+      echo ""
+      echo "Setting Up Local Host... ${gfs[index]}"
+      echo " ... Installing GlusterFS Server and Heketi..."
       source $CONFIG_HOME/../lib/install-gluster-local.sh
 
       if [ "$INSTALL_HEKETI" == "Y" ]
@@ -138,7 +159,7 @@ else
       echo ""
       echo "****************"
       echo ""
-      echo "Setting Up Host... ${gfs[index]}"
+      echo "Setting Up Remote Host... ${gfs[index]}"
 
       
       # Install base remote gluster
@@ -152,19 +173,26 @@ else
       chmod +x rmt-cmds.sh
       scp rmt-cmds.sh root@"${gfs[index]}":~
       echo "chmod +x rmt-cmds.sh;./rmt-cmds.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      wait
 
-      # Gluster and Heketi specific remote commands
-      echo " ... Remotely Installing GlusterFS and/or Heketi on ${gfs[index]}"
+      # Installing Gluster and Heketi specific remote commands
+      echo " ... Remotely Installing Gluster and/or Heketi on ${gfs[index]}"
       source $CONFIG_HOME/../lib/install-gluster-remote.sh
       scp rmt-gluster.sh root@"${gfs[index]}":~
       echo "chmod +x rmt-gluster.sh;./rmt-gluster.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      wait
 
       echo ""
       echo "   ...Remote CentOS System attached and Software Installed!!!"
       echo ""
     fi
   done
+else
+  echo "RERUNNING SCRIPT FOR PROBE AND VOLUME CONFIGURATION"
+  echo "     or HOSTENV is misconfigured - $HOSTENV"
+  echo "==================================================="
 fi
+
 
 if [ "$SETUP_TYPE" == "gluster" ] && [ "$GFS_LIST" != "" ]
 then
@@ -173,6 +201,12 @@ then
   echo "********************"
   echo ""
   echo "Configuring GlusterFS..."
+
+  if [ "$CREATE_VOL" == "Y" ] && [ "$PEER_PROBE" == "N" ]
+  then
+    echo "!!!!  MISCONFIGURATION - can't create volumes without peer probe first to create TSP !!!!"
+    exit 1
+  fi
 
   # create volume list
   VOLLIST=""
@@ -189,27 +223,30 @@ then
   done
 
   # Peer Probe
-  IFS=':' read -r -a gfs <<< "$GFS_LIST"
-  for index in "${!gfs[@]}"
-  do
-    if [ "$index" == 0 ]
-    then
-      echo ""
-      echo "first host ${gfs[index]} ... skipping peer probe"
-      echo ""
-    else
-      gluster peer probe "${gfs[index]}"
-      echo ""
-    fi
-  done
+  if [ "$PEER_PROBE" == "Y" ]
+  then
+    IFS=':' read -r -a gfs <<< "$GFS_LIST"
+    for index in "${!gfs[@]}"
+    do
+      if [ "$index" == 0 ]
+      then
+        echo ""
+        echo "first host ${gfs[index]} ... skipping peer probe"
+        echo ""
+      else
+        gluster peer probe "${gfs[index]}"
+        echo ""
+      fi
+    done
 
-  echo ""
-  gluster peer status
-  echo ""
-  echo ""
-  gluster pool list
-  echo ""
-  echo ""
+    echo ""
+    gluster peer status
+    echo ""
+    echo ""
+    gluster pool list
+    echo ""
+    echo ""
+  fi
 
   # CREATE VOLUME SETUP
   if [ "$CREATE_VOL" == "Y" ]
@@ -240,6 +277,26 @@ then
         echo "mkdir -p $FUSE_BASE/$GFS_VOLNAME" >> rmt-cmds2.sh
         echo "echo '$GFS_DEVICE $GFS_DIR$GFS_BRICK$index ext4 defaults 0 0' >> /etc/fstab" >> rmt-cmds2.sh
         echo "mount -a" >> rmt-cmds2.sh
+
+        scp rmt-cmds2.sh root@"${gfs[index]}":~
+        echo "chmod +x rmt-cmds2.sh;./rmt-cmds2.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      fi
+    done
+  else
+    IFS=':' read -r -a gfs <<< "$GFS_LIST"
+    for index in "${!gfs[@]}"
+    do
+      if [ "$index" == 0 ]
+      then
+        mkdir -p $GFS_DIR
+        mkdir -p $GFS_DIR$GFS_BRICK$index
+        mkdir -p $FUSE_BASE/$GFS_VOLNAME
+      else
+        echo "#! /bin/bash" > rmt-cmds2.sh
+        echo "" >> rmt-cmds2.sh
+        echo "mkdir -p $GFS_DIR" >> rmt-cmds2.sh
+        echo "mkdir -p $GFS_DIR$GFS_BRICK$index" >> rmt-cmds2.sh
+        echo "mkdir -p $FUSE_BASE/$GFS_VOLNAME" >> rmt-cmds2.sh
 
         scp rmt-cmds2.sh root@"${gfs[index]}":~
         echo "chmod +x rmt-cmds2.sh;./rmt-cmds2.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
@@ -303,42 +360,86 @@ echo "================================================="
 echo "    Installation complete..."
 echo "================================================="
 echo ""
-echo " Should have a functioning cluster now, just setup your Trusted Storage Pool manually or using heketi"
+echo "--------------------"
+echo "GLUSTER INFORMATION"
+echo "--------------------"
+if [ "$CREATE_VOL" == "Y" ]
+then
+  echo "Initial Gluster Volume $GFS_VOLNAME was created with Replica Count of $REPLICA_COUNT and can be accessed from: "
+  echo "  $FUSE_BASE/$GFS_VOLNAME"
+  echo ""
+  echo " -------------"
+  echo " -- VERSION --"
+  echo " -------------"
+  gluster --version
+  echo ""
+  echo " --------------"
+  echo " -- VOL INFO --"
+  echo " --------------"
+  gluster volume info
+else
+  echo "Initial Gluster Volume WAS NOT created per configuration setting of CREATE_VOL=N"
+  echo ""
+  gluster --version
+  echo ""
+  gluster volume info
+fi
 echo ""
-echo "Do not forget (if using heketi and heketi-client) to perform any additional"
-echo "configurations (modifying heketi.json, etc...) and restart after you make changes"
-echo "    executor: ssh"
+echo "--------------------"
+echo "HEKETI CONFIGURATION"
+echo "--------------------"
+if [ "$INSTALL_HEKETI" == "Y" ]
+then
+  echo "Do not forget (if using heketi and heketi-client) to perform any additional"
+  echo "configurations (modifying heketi.json, etc...) and restart after you make changes"
+  echo "    executor: ssh"
+  echo ""
+  echo "    sshexec: {"
+  echo "      keyfile: \"/etc/heketi/heketi_key\","
+  echo "      user: \"root\","
+  echo "      port: \"22\","
+  echo "      fstab: \"/etc/fstab\""
+  echo ""
+  echo ""
+  echo " export the HEKETI_CLI_SERVER: "
+  echo ""
+  echo "     export HEKETI_CLI_SERVER=$HCLI"
+  echo ""
+  echo " To Verify - curl $HCLI/hello"
+  echo ""
+else
+  echo "Heketi Not Installed per configuration option INSTALL_HEKETI=N"
+  echo "If you need Heketi, you should install manually"
+fi
 echo ""
-echo "    sshexec: {"
-echo "      keyfile: \"/etc/heketi/heketi_key\","
-echo "      user: \"root\","
-echo "      port: \"22\","
-echo "      fstab: \"/etc/fstab\""
-echo ""
-echo ""
-echo " export the HEKETI_CLI_SERVER: "
-echo ""
-echo "     export HEKETI_CLI_SERVER=$HCLI"
-echo ""
-echo " To Verify - curl $HCLI/hello"
-echo ""
-echo "If you want to manually create your gluster volumes and such here are some examples:"
-echo "  lsblk - to show available devices"
-echo "  fdisk /dev/xvdb  - this will create partition and prompt you for some stuff"
-echo "  mkfs.ext4 /dev/xvdb1"
-echo ""
-echo "  mkdir -p /data/gluster"
-echo "  mount \/dev\/xvdb1 \/data/gluster"
-echo ""
-echo "  mkdir -p /data/gluster/gv0"
-echo "  gluster volume create gv0 replica 3 ip-172-18-15-138.ec2.internal:/data/gluster/gv0 ip-172-18-13-134.ec2.internal:/data/gluster/gv0 ip-172-18-0-125.ec2.internal:/data/gluster/gv0"
-echo "  gluster volume start gv0"
-echo ""
-echo " Alternatively you can use heketi-cli after loading topology file to define your cluster (see Heketi docs for that)"
-echo "   heketi-cli volume create --size=10 --replica=3"
-echo ""
-echo "   ** You may need to export the heketi-cli path for CentOS installations:"
-echo ""
-echo "          # export PATH=$PATH:/etc/heketi/heketi-client/bin"
-echo "	        # heketi-cli --version"
-echo ""
+echo "--------------------"
+echo "ADDITIONAL GLUSTER CONFIGURATION"
+echo "--------------------"
+if [ "$CREATE_VOL" == "Y" ]
+then
+  echo "None at this time - you can manually add volumes and peers"
+  echo ""
+else
+  echo "Initial Gluster Volume WAS NOT created per configuration setting of CREATE_VOL=N"
+  echo ""
+  echo "If you want to manually create additonal gluster volumes and such here are some examples:"
+  echo "  lsblk - to show available devices"
+  echo "  fdisk /dev/xvdb  - this will create partition and prompt you for some stuff"
+  echo "  mkfs.ext4 /dev/xvdb1"
+  echo ""
+  echo "  mkdir -p /data/gluster"
+  echo "  mount \/dev\/xvdb1 \/data/gluster"
+  echo ""
+  echo "  mkdir -p /data/gluster/gv0"
+  echo "  gluster volume create gv0 replica 3 ip-172-18-15-138.ec2.internal:/data/gluster/gv0 ip-172-18-13-134.ec2.internal:/data/gluster/gv0 ip-172-18-0-125.ec2.internal:/data/gluster/gv0"
+  echo "  gluster volume start gv0"
+  echo ""
+  echo " Alternatively you can use heketi-cli after loading topology file to define your cluster (see Heketi docs for that)"
+  echo "   heketi-cli volume create --size=10 --replica=3"
+  echo ""
+  echo "   ** You may need to export the heketi-cli path for CentOS installations:"
+  echo ""
+  echo "          # export PATH=$PATH:/etc/heketi/heketi-client/bin"
+  echo "	        # heketi-cli --version"
+  echo ""
+fi

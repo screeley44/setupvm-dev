@@ -40,7 +40,7 @@ then
   then
     # enable default repo from RH and install
     subscription-manager repos --enable="rh-gluster-3-for-rhel-7-server-rpms" --enable="rhel-7-fast-datapath-rpms"
-    
+
     # install gluster
     yum install glusterfs-server -y  
 
@@ -49,7 +49,7 @@ then
     #default - just normal rhel gluster repo or centos release repo
     # enable default repo from RH and install
     subscription-manager repos --enable="rh-gluster-3-for-rhel-7-server-rpms" --enable="rhel-7-fast-datapath-rpms"
-    
+
     # install gluster
     yum install glusterfs-server -y  
 
