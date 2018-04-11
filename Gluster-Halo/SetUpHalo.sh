@@ -46,10 +46,10 @@ then
       echo ""
       echo "****************"
       echo ""
-      echo "Setting up subscription services from RHEL..."
-      echo "Setting Up Local Host... ${gfs[index]}"
       if [ "$RERUN" == "N" ]
       then
+        echo "Setting up subscription services from RHEL..."
+        echo "Setting Up Local Host... ${gfs[index]}"
         yum install subscription-manager -y> /dev/null
 
         #subscription-manager register --username=$RHNUSER --password=$RHNPASS
