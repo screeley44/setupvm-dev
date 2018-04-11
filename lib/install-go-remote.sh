@@ -1,4 +1,5 @@
   echo "#! /bin/bash" > rmt-go.sh
+  echo "yum install wget -y> /dev/null" >> rmt-go.sh
   echo "if [ \"$GOVERSION\" == \"yum\" ] || [ \"$GOVERSION\" == \"\" ]" >> rmt-go.sh
   echo "then" >> rmt-go.sh
   echo "  yum install go -y> /dev/null" >> rmt-go.sh

@@ -132,7 +132,7 @@ SETUP_TYPE="gluster"
 HOSTENV=rhel
 OCPVERSION="3.7"
 GFS_VERSION="3.12"
-DO_GPG=N
+DO_GPG=Y
 RHNUSER=rhn-support-myaccount
 RHNPASS=rhn-mypassword
 POOLID="8a85f9833e1404a9013e3cddf95a0599"
@@ -148,9 +148,6 @@ GFS_DEVICE="/dev/xvdb"
 FUSE_BASE="/mnt/glusterfs-storage"
 REPLICA_COUNT=3
 
-# Heketi
-INSTALL_HEKETI=N
-HEKETI_VERSION="default"
 
 # OpenStack Swift
 INSTALL_SWIFT_LOCAL=Y

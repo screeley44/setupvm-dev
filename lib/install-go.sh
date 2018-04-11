@@ -3,6 +3,7 @@
 
   # Install Go and do other config
   # 1.6.1, 1.7.3, etc...
+  yum install wget -y> /dev/null
   if [ "$GOVERSION" == "yum" ] || [ "$GOVERSION" == "" ]
   then
     echo "Installing go1.X whatever version yum installs..."
