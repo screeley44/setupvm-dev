@@ -69,7 +69,7 @@ then
       if [ "$INSTALL_SWIFT_LOCAL" == "Y" ]
       then
         echo " ... Installing Swift and Clients on local node ${gfs[index]}"
-        source $CONFIG_HOME/../lib/install-swift-remote.sh
+        source $CONFIG_HOME/../lib/install-swift-local.sh
       fi
 
       if [ "$INSTALL_HEKETI" == "Y" ]
@@ -191,6 +191,33 @@ else
   echo "RERUNNING SCRIPT FOR PROBE AND VOLUME CONFIGURATION"
   echo "     or HOSTENV is misconfigured - $HOSTENV"
   echo "==================================================="
+fi
+
+
+
+# Swift Reruns
+if [ "$INSTALL_SWIFT_LOCAL" == "Y" ] && [ "$RERUN" == "Y" ]
+then
+  echo " ... Installing Swift and Clients on local node ${gfs[index]}"
+  source $CONFIG_HOME/../lib/install-swift-local.sh
+fi
+
+# Swift Reruns
+if [ "$INSTALL_SWIFT_REMOTE" == "Y" ] && [ "$RERUN" == "Y" ] && [ "$GFS_LIST" != "" ]
+then
+  IFS=':' read -r -a gfs <<< "$GFS_LIST"
+  for index in "${!gfs[@]}"
+  do
+    if [ "$index" == 0 ]
+    then
+      echo "skipping local host..."
+    else
+      echo " ... Remotely Installing Swift and Clients on ${gfs[index]}"
+      source $CONFIG_HOME/../lib/install-swift-remote.sh
+      scp rmt-swift.sh root@"${gfs[index]}":~
+      echo "chmod +x rmt-swift.sh;./rmt-swift.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+    fi
+  done
 fi
 
 
@@ -351,7 +378,6 @@ then
       fi
     done
   fi
-
 fi
 echo ""
 echo ""
