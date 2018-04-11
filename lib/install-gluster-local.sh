@@ -60,7 +60,11 @@ then
 
   else
     #specific version is specified, i.e. 3.12
-
+    # not sure about the GPG KEY STUFF
+    if [ "$DO_GPG" == "N" ]
+    then
+      DO_GPG=Y
+    fi
     if [ "$DO_GPG" == "Y" ]
     then
       rpm --import https://raw.githubusercontent.com/CentOS-Storage-SIG/centos-release-storage-common/master/RPM-GPG-KEY-CentOS-SIG-Storage
