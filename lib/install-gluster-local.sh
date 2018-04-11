@@ -67,16 +67,16 @@ then
     fi
 
     # get $basearch
-    basearch=$(rpm -q --qf "%{arch}" -f /etc/$distro)
-    if [ "$basearch" == "" ]
+    mybasearch=$(rpm -q --qf "%{arch}" -f /etc/$distro)
+    if [ "$mybasearch" == "" ]
     then
-      basearch="x86_64"
+      mybasearch="x86_64"
     fi
 
     # set up the Gluster.repo
     echo "[gluster-$GFS_VERSION]" > /etc/yum.repos.d/Gluster.repo
     echo "name=Gluster" >> /etc/yum.repos.d/Gluster.repo
-    echo "baseurl=http://mirror.centos.org/centos/7/storage/\$basearch/gluster-$GFS_VERSION/">> /etc/yum.repos.d/Gluster.repo
+    echo "baseurl=http://mirror.centos.org/centos/7/storage/$mybasearch/gluster-$GFS_VERSION/">> /etc/yum.repos.d/Gluster.repo
     if [ "$NO_GPG" == "N" ]
     then
       echo "gpgcheck=0" >> /etc/yum.repos.d/Gluster.repo
