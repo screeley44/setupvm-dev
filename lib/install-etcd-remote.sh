@@ -11,9 +11,9 @@
   echo "      rm -rf /usr/bin/etcd" >> rmt-etcd.sh
   echo "      yum install etcd -y> /dev/null" >> rmt-etcd.sh
   echo "  else" >> rmt-etcd.sh
-  echo "      wget https://github.com/coreos/etcd/releases/download/v$ETCD_VER/etcd-v$ETCD_VER-linux-amd64.tar.gz" >> rmt-etcd.sh
+  echo "      wget https://github.com/coreos/etcd/releases/download/v$ETCD_VER/etcd-v$ETCD_VER-linux-amd64.tar.gz> /dev/null" >> rmt-etcd.sh
   echo "      rm -rf /usr/bin/etcd" >> rmt-etcd.sh
-  echo "      tar -zxvf etcd-v$ETCD_VER-linux-amd64.tar.gz" >> rmt-etcd.sh
+  echo "      tar -zxvf etcd-v$ETCD_VER-linux-amd64.tar.gz> /dev/null" >> rmt-etcd.sh
   echo "      cp etcd-v$ETCD_VER-linux-amd64/etcd /usr/bin" >> rmt-etcd.sh
   echo "  fi" >> rmt-etcd.sh
   echo "fi" >> rmt-etcd.sh

@@ -16,6 +16,6 @@ then
   $SUDO curl -fsSL https://get.docker.com/ | sh    
 else
   echo " ... installing Docker version $DOCKERVER"
-  $SUDO yum install docker-$DOCKERVER -y
+  $SUDO yum install docker-$DOCKERVER -y> /dev/null
 fi
 

@@ -21,9 +21,9 @@
         $SUDO yum install etcd -y> /dev/null
       else
         echo "installing specific etcd version - etcd-v$ETCD_VER..."
-        $SUDO wget https://github.com/coreos/etcd/releases/download/v$ETCD_VER/etcd-v$ETCD_VER-linux-amd64.tar.gz
+        $SUDO wget https://github.com/coreos/etcd/releases/download/v$ETCD_VER/etcd-v$ETCD_VER-linux-amd64.tar.gz> /dev/null
         $SUDO rm -rf /usr/bin/etcd
-        $SUDO tar -zxvf etcd-v$ETCD_VER-linux-amd64.tar.gz
+        $SUDO tar -zxvf etcd-v$ETCD_VER-linux-amd64.tar.gz> /dev/null
         $SUDO cp etcd-v$ETCD_VER-linux-amd64/etcd /usr/bin
       fi
     fi
@@ -36,9 +36,9 @@
       $SUDO yum install etcd -y> /dev/null
     else
       echo "installing specific etcd version - etcd-v$ETCD_VER..."
-      $SUDO wget https://github.com/coreos/etcd/releases/download/v$ETCD_VER/etcd-v$ETCD_VER-linux-amd64.tar.gz
+      $SUDO wget https://github.com/coreos/etcd/releases/download/v$ETCD_VER/etcd-v$ETCD_VER-linux-amd64.tar.gz> /dev/null
       $SUDO rm -rf /usr/bin/etcd
-      $SUDO tar -zxvf etcd-v$ETCD_VER-linux-amd64.tar.gz
+      $SUDO tar -zxvf etcd-v$ETCD_VER-linux-amd64.tar.gz> /dev/null
       $SUDO cp etcd-v$ETCD_VER-linux-amd64/etcd /usr/bin
     fi
   fi

@@ -274,11 +274,19 @@ then
     then
       # Install core software (go, etcd, docker, etc...)
       source $CONFIG_HOME/../lib/install-go.sh
+      echo " ....."
+      echo ""
       source $CONFIG_HOME/../lib/install-etcd.sh
+      echo " ....."
+      echo ""
       source $CONFIG_HOME/../lib/docker-base.sh
+      echo " ....."
+      echo ""
 
       # restart docker
       source $CONFIG_HOME/../lib/docker-restart.sh
+      echo " ....."
+      echo ""
     else
       echo " ... Remotely Installing PreReqs (Docker, Go, ETCD) on ${gfs[index]}"
       source $CONFIG_HOME/../lib/install-go-remote.sh
@@ -288,14 +296,20 @@ then
       source $CONFIG_HOME/../lib/install-docker-remote.sh
       scp rmt-docker.sh root@"${gfs[index]}":~
       echo "chmod +x rmt-docker.sh;./rmt-docker.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      echo " ....."
+      echo ""
 
       source $CONFIG_HOME/../lib/install-etcd-remote.sh
       scp rmt-etcd.sh root@"${gfs[index]}":~
       echo "chmod +x rmt-etcd.sh;./rmt-etcd.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      echo " ....."
+      echo ""
 
       source $CONFIG_HOME/../lib/docker-restart-remote.sh
       scp rmt-docker-restart.sh root@"${gfs[index]}":~
       echo "chmod +x rmt-docker-restart.sh;./rmt-docker-restart.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      echo " ....."
+      echo ""
     fi
   done
 fi
