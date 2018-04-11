@@ -31,7 +31,7 @@ source $CONFIG_HOME/setupvm.config
 
 HCLI=""
 
-if [ "$HOSTENV" == "rhel" ]
+if [ "$HOSTENV" == "rhel" ] && [ "$RERUN" == "N" ]
 then
   echo " *** INSTALLING GLUSTERFS CLUSTER ON RHEL ***"
   echo ""
@@ -108,7 +108,8 @@ then
       echo ""
     fi
   done
-else
+elif [ "$HOSTENV" == "centos" ] && [ "$RERUN" == "N" ]
+then
   echo " *** INSTALLING GLUSTERFS CLUSTER ON CentOS ***"
   echo ""
   echo ""
@@ -170,6 +171,10 @@ else
       echo ""
     fi
   done
+else
+  echo "RERUNNING SCRIPT FOR PROBE AND VOLUME CONFIGURATION"
+  echo "     or HOSTENV is misconfigured - $HOSTENV"
+  echo "==================================================="
 fi
 
 if [ "$SETUP_TYPE" == "gluster" ] && [ "$GFS_LIST" != "" ]
@@ -179,6 +184,12 @@ then
   echo "********************"
   echo ""
   echo "Configuring GlusterFS..."
+
+  if [ "$CREATE_VOL" == "Y" ] && [ "$PEER_PROBE" == "N" ]
+  then
+    echo "!!!!  MISCONFIGURATION - can't create volumes without peer probe first to create TSP !!!!"
+    exit 1
+  fi
 
   # create volume list
   VOLLIST=""
