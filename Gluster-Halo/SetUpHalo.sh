@@ -81,9 +81,9 @@ then
       echo " RHEL System attached and repo'd"
       echo ""
 
-      echo "Installing GlusterFS Server and Heketi..."
       if [ "$RERUN_GLUSTER" == "Y" ] || [ "$RERUN" == "N" ]
       then
+        echo "Installing GlusterFS Server and Heketi..."
         source $CONFIG_HOME/../lib/install-gluster-local.sh
       fi
 
@@ -99,54 +99,56 @@ then
       echo ""
       echo "****************"
       echo ""
-      echo "Setting up subscription services from RHEL..."
       echo "Setting Up Remote Host... ${gfs[index]}"
 
       # base remote commands
-      echo " ... Remotely Installing Base Software on ${gfs[index]}"
-      echo "#! /bin/bash" > rmt-cmds.sh
-      echo "" >> rmt-cmds.sh
-      echo "if [ \"$RERUN\" == \"N\" ]" >> rmt-cmds.sh
-      echo "then" >> rmt-cmds.sh
-      echo "  yum install subscription-manager -y> /dev/null" >> rmt-cmds.sh
+      if [ "$RERUN" == "N" ]
+      then
+        echo "Setting up subscription services from RHEL..."
+        echo " ... Remotely Installing Base Software on ${gfs[index]}"
+        echo "#! /bin/bash" > rmt-cmds.sh
+        echo "" >> rmt-cmds.sh
+        echo "if [ \"$RERUN\" == \"N\" ]" >> rmt-cmds.sh
+        echo "then" >> rmt-cmds.sh
+        echo "  yum install subscription-manager -y> /dev/null" >> rmt-cmds.sh
 
-      echo "  if (subscription-manager register --username=$RHNUSER --password=$RHNPASS | grep -q \"system has been registered\")" >> rmt-cmds.sh
-      echo "  then" >> rmt-cmds.sh
-      echo "    echo \"\"" >> rmt-cmds.sh
-      echo "  else" >> rmt-cmds.sh
-      echo "    echo \"!!!! System Not Registered with RHSM - maybe invalid username or password OR RHSM could be down?  !!!!!\"" >> rmt-cmds.sh
-      echo "    exit 1" >> rmt-cmds.sh
-      echo "  fi" >> rmt-cmds.sh
+        echo "  if (subscription-manager register --username=$RHNUSER --password=$RHNPASS | grep -q \"system has been registered\")" >> rmt-cmds.sh
+        echo "  then" >> rmt-cmds.sh
+        echo "    echo \"\"" >> rmt-cmds.sh
+        echo "  else" >> rmt-cmds.sh
+        echo "    echo \"!!!! System Not Registered with RHSM - maybe invalid username or password OR RHSM could be down?  !!!!!\"" >> rmt-cmds.sh
+        echo "    exit 1" >> rmt-cmds.sh
+        echo "  fi" >> rmt-cmds.sh
 
-      echo "  if (subscription-manager attach --pool=$POOLID | grep -q \"Successfully attached\")" >> rmt-cmds.sh
-      echo "  then" >> rmt-cmds.sh
-      echo "    echo \"\"" >> rmt-cmds.sh
-      echo "  else" >> rmt-cmds.sh
-      echo "    echo \"!!!! Invalid POOLID - $POOLID  !!!!!\"" >> rmt-cmds.sh
-      echo "    exit 1" >> rmt-cmds.sh
-      echo "  fi" >> rmt-cmds.sh
-      echo "  subscription-manager repos --disable=\"*\"> /dev/null" >> rmt-cmds.sh
-      echo "fi" >> rmt-cmds.sh
+        echo "  if (subscription-manager attach --pool=$POOLID | grep -q \"Successfully attached\")" >> rmt-cmds.sh
+        echo "  then" >> rmt-cmds.sh
+        echo "    echo \"\"" >> rmt-cmds.sh
+        echo "  else" >> rmt-cmds.sh
+        echo "    echo \"!!!! Invalid POOLID - $POOLID  !!!!!\"" >> rmt-cmds.sh
+        echo "    exit 1" >> rmt-cmds.sh
+        echo "  fi" >> rmt-cmds.sh
+        echo "  subscription-manager repos --disable=\"*\"> /dev/null" >> rmt-cmds.sh
+        echo "fi" >> rmt-cmds.sh
 
-      #echo "yum install subscription-manager -y> /dev/null" >> rmt-cmds.sh
-      #echo "subscription-manager register --username=$RHNUSER --password=$RHNPASS> /dev/null" >> rmt-cmds.sh
-      #echo "subscription-manager attach --pool=$POOLID> /dev/null" >> rmt-cmds.sh
-      #echo "subscription-manager repos --disable="*"> /dev/null" >> rmt-cmds.sh
-      echo "for i in {1..5}; do subscription-manager repos --enable=\"rhel-7-server-rpms\" --enable=\"rhel-7-server-extras-rpms\" --enable=\"rhel-7-server-optional-rpms\"> /dev/null && break || sleep 15; done" >> rmt-cmds.sh  
+        #echo "yum install subscription-manager -y> /dev/null" >> rmt-cmds.sh
+        #echo "subscription-manager register --username=$RHNUSER --password=$RHNPASS> /dev/null" >> rmt-cmds.sh
+        #echo "subscription-manager attach --pool=$POOLID> /dev/null" >> rmt-cmds.sh
+        #echo "subscription-manager repos --disable="*"> /dev/null" >> rmt-cmds.sh
+        echo "for i in {1..5}; do subscription-manager repos --enable=\"rhel-7-server-rpms\" --enable=\"rhel-7-server-extras-rpms\" --enable=\"rhel-7-server-optional-rpms\"> /dev/null && break || sleep 15; done" >> rmt-cmds.sh  
 
-      #echo ""
-      #echo " Testing Connection to Remote Node..."
-      #echo "hostname" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
-      #echo ""
-      chmod +x rmt-cmds.sh
-      scp rmt-cmds.sh root@"${gfs[index]}":~
-      echo "chmod +x rmt-cmds.sh;./rmt-cmds.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
-
+        #echo ""
+        #echo " Testing Connection to Remote Node..."
+        #echo "hostname" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+        #echo ""
+        chmod +x rmt-cmds.sh
+        scp rmt-cmds.sh root@"${gfs[index]}":~
+        echo "chmod +x rmt-cmds.sh;./rmt-cmds.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
+      fi
 
       # Gluster and Heketi specific remote commands
-      echo " ... Remotely Installing GlusterFS and/or Heketi on ${gfs[index]}"
       if [ "$RERUN_GLUSTER" == "Y" ] || [ "$RERUN" == "N" ]
       then
+        echo " ... Remotely Installing GlusterFS and/or Heketi on ${gfs[index]}"
         source $CONFIG_HOME/../lib/install-gluster-remote.sh
         scp rmt-gluster.sh root@"${gfs[index]}":~
         echo "chmod +x rmt-gluster.sh;./rmt-gluster.sh" | ssh -T -o StrictHostKeyChecking=no root@"${gfs[index]}"
@@ -309,7 +311,7 @@ then
   echo ""
   echo "Configuring GlusterFS..."
 
-  if [ "$CREATE_VOL" == "Y" ] && [ "$PEER_PROBE" == "N" ]
+  if [ "$CREATE_VOL" == "Y" ] && [ "$PEER_PROBE" == "N" ] && [ "$RERUN" == "N" ]
   then
     echo "!!!!  MISCONFIGURATION - can't create volumes without peer probe first to create TSP !!!!"
     exit 1
