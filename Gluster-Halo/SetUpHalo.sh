@@ -48,26 +48,29 @@ then
       echo ""
       echo "Setting up subscription services from RHEL..."
       echo "Setting Up Local Host... ${gfs[index]}"
-      yum install subscription-manager -y> /dev/null
-
-      #subscription-manager register --username=$RHNUSER --password=$RHNPASS
-      if (subscription-manager register --username=$RHNUSER --password=$RHNPASS | grep -q "system has been registered")
+      if [ "$RERUN" == "N" ]
       then
-        echo ""
-      else
-        echo "!!!! System Not Registered with RHSM - maybe invalid username or password OR RHSM could be down?  !!!!!"
-        exit 1
-      fi
+        yum install subscription-manager -y> /dev/null
 
-      #subscription-manager attach --pool=$POOLID
-      if (subscription-manager attach --pool=$POOLID | grep -q "Successfully attached")
-      then
-        echo ""
-      else
-        echo "!!!! Invalid POOLID - $POOLID  !!!!!"
-        exit 1
+        #subscription-manager register --username=$RHNUSER --password=$RHNPASS
+        if (subscription-manager register --username=$RHNUSER --password=$RHNPASS | grep -q "system has been registered")
+        then
+          echo ""
+        else
+          echo "!!!! System Not Registered with RHSM - maybe invalid username or password OR RHSM could be down?  !!!!!"
+          exit 1
+        fi
+
+        #subscription-manager attach --pool=$POOLID
+        if (subscription-manager attach --pool=$POOLID | grep -q "Successfully attached")
+        then
+          echo ""
+        else
+          echo "!!!! Invalid POOLID - $POOLID  !!!!!"
+          exit 1
+        fi
+        subscription-manager repos --disable="*"> /dev/null
       fi
-      subscription-manager repos --disable="*"> /dev/null
 
 
       # retrying 5 times, unless success
@@ -105,10 +108,32 @@ then
       echo " ... Remotely Installing Base Software on ${gfs[index]}"
       echo "#! /bin/bash" > rmt-cmds.sh
       echo "" >> rmt-cmds.sh
-      echo "yum install subscription-manager -y> /dev/null" >> rmt-cmds.sh
-      echo "subscription-manager register --username=$RHNUSER --password=$RHNPASS> /dev/null" >> rmt-cmds.sh
-      echo "subscription-manager attach --pool=$POOLID> /dev/null" >> rmt-cmds.sh
-      echo "subscription-manager repos --disable="*"> /dev/null" >> rmt-cmds.sh
+      echo "if [ \"$RERUN\" == \"N\" ]" >> rmt-cmds.sh
+      echo "then" >> rmt-cmds.sh
+      echo "  yum install subscription-manager -y> /dev/null" >> rmt-cmds.sh
+
+      echo "  if (subscription-manager register --username=$RHNUSER --password=$RHNPASS | grep -q \"system has been registered\")" >> rmt-cmds.sh
+      echo "  then" >> rmt-cmds.sh
+      echo "    echo \"\"" >> rmt-cmds.sh
+      echo "  else" >> rmt-cmds.sh
+      echo "    echo \"!!!! System Not Registered with RHSM - maybe invalid username or password OR RHSM could be down?  !!!!!\"" >> rmt-cmds.sh
+      echo "    exit 1" >> rmt-cmds.sh
+      echo "  fi" >> rmt-cmds.sh
+
+      echo "  if (subscription-manager attach --pool=$POOLID | grep -q \"Successfully attached\")" >> rmt-cmds.sh
+      echo "  then" >> rmt-cmds.sh
+      echo "    echo \"\"" >> rmt-cmds.sh
+      echo "  else" >> rmt-cmds.sh
+      echo "    echo \"!!!! Invalid POOLID - $POOLID  !!!!!\"" >> rmt-cmds.sh
+      echo "    exit 1" >> rmt-cmds.sh
+      echo "  fi" >> rmt-cmds.sh
+      echo "  subscription-manager repos --disable=\"*\"> /dev/null" >> rmt-cmds.sh
+      echo "fi" >> rmt-cmds.sh
+
+      #echo "yum install subscription-manager -y> /dev/null" >> rmt-cmds.sh
+      #echo "subscription-manager register --username=$RHNUSER --password=$RHNPASS> /dev/null" >> rmt-cmds.sh
+      #echo "subscription-manager attach --pool=$POOLID> /dev/null" >> rmt-cmds.sh
+      #echo "subscription-manager repos --disable="*"> /dev/null" >> rmt-cmds.sh
       echo "for i in {1..5}; do subscription-manager repos --enable=\"rhel-7-server-rpms\" --enable=\"rhel-7-server-extras-rpms\" --enable=\"rhel-7-server-optional-rpms\"> /dev/null && break || sleep 15; done" >> rmt-cmds.sh  
 
       #echo ""
