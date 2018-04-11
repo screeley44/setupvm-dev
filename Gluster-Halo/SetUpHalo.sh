@@ -262,7 +262,7 @@ then
 fi
 
 # Docker, GO, ETCD
-if [ "$INSTALL_PREREQ" == "Y" ] && [ "$RERUN" == "Y" ] && [ "$GFS_LIST" != "" ]
+if [ "$INSTALL_PREREQ" == "Y" ] && [ "$GFS_LIST" != "" ]
 then
   IFS=':' read -r -a gfs <<< "$GFS_LIST"
   for index in "${!gfs[@]}"
