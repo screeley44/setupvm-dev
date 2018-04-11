@@ -206,27 +206,31 @@ then
   done
 
   # Peer Probe
-  IFS=':' read -r -a gfs <<< "$GFS_LIST"
-  for index in "${!gfs[@]}"
-  do
-    if [ "$index" == 0 ]
-    then
-      echo ""
-      echo "first host ${gfs[index]} ... skipping peer probe"
-      echo ""
-    else
-      gluster peer probe "${gfs[index]}"
-      echo ""
-    fi
-  done
+  if [ "$PEER_PROBE" == "Y" ]
+  then
+    IFS=':' read -r -a gfs <<< "$GFS_LIST"
+    for index in "${!gfs[@]}"
+    do
+      if [ "$index" == 0 ]
+      then
+        echo ""
+        echo "first host ${gfs[index]} ... skipping peer probe"
+        echo ""
+      else
+        gluster peer probe "${gfs[index]}"
+        echo ""
+      fi
+    done
 
-  echo ""
-  gluster peer status
-  echo ""
-  echo ""
-  gluster pool list
-  echo ""
-  echo ""
+    echo ""
+    gluster peer status
+    echo ""
+    echo ""
+    gluster pool list
+    echo ""
+    echo ""
+  fi
+
 
   # CREATE VOLUME SETUP
   if [ "$CREATE_VOL" == "Y" ]
