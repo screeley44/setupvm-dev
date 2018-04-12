@@ -57,6 +57,7 @@ else
 fi
 
 # Install core software (go, etcd, docker, etc...)
+echo ""
 echo "................................."
 echo "  Installing Host PreReqs"
 echo "................................."
@@ -77,22 +78,22 @@ echo ""
 echo "................................."
 echo "      Cloning Repos"
 echo "................................."
-echo ""
 source $CONFIG_HOME/../../lib/clone-repos.sh
+echo ""
 
 # Create Profiles
 echo "................................."
 echo "   Setting Bash Environment"
 echo "................................."
-echo ""
 source $CONFIG_HOME/../../lib/bash-profile.sh
+echo ""
 
 # Cloud Config
 if [  "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
 then
   echo " ... Performing Cloud Configurations"
-  echo ""
   source $CONFIG_HOME/../../lib/cloud-config.sh
+  echo ""
 fi
 
 # Ansible
@@ -101,17 +102,16 @@ then
   echo "................................."
   echo "      Installing Ansible"
   echo "................................."
-  echo ""
   source $CONFIG_HOME/../../lib/install-ansible.sh
+  echo ""
 fi
 
 # Post Install
 echo "................................."
 echo " Performing Post Configurations"
 echo "................................."
-echo ""
 source $CONFIG_HOME/../../lib/post-install.sh
-
+echo ""
 
   # This is a common issue I've run into 
   # export PATH=$PATH:$GOPATH/bin; go get -u github.com/cloudflare/cfssl/cmd/...

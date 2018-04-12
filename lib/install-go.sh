@@ -9,9 +9,9 @@
     $SUDO yum install go -y> /dev/null
   else
     cd ~
-    $SUDO wget https://storage.googleapis.com/golang/go$GOVERSION.linux-amd64.tar.gz> /dev/null
+    $SUDO wget https://storage.googleapis.com/golang/go$GOVERSION.linux-amd64.tar.gz
     $SUDO rm -rf /usr/local/go
     $SUDO rm -rf /bin/go		
-    $SUDO tar -C /usr/local -xzf go$GOVERSION.linux-amd64.tar.gz>/ dev/null
+    $SUDO tar -C /usr/local -xzf go$GOVERSION.linux-amd64.tar.gz
   fi
 

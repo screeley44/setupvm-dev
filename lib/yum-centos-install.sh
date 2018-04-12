@@ -23,12 +23,11 @@ then
     fi
   fi
 
-  echo "...performing yum update"
+  echo " ... ... ...performing yum update"
   $SUDO yum update -y> /dev/null
   if [ "$APP_TYPE" == "Origin" ]
   then
-      echo "...Installing openshift utils for DEV setup type..."
+      echo "... ... ...Installing openshift utils for DEV setup type..."
       $SUDO yum install atomic-openshift-utils -y> /dev/null
   fi
-  echo "... ... CentOS Base Software Installed"
 fi

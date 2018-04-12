@@ -139,9 +139,7 @@ GOLANGPATH=""
     fi
   fi
 
-  echo ""
   echo " ... ... Creating Directory Structure for: $USER"
-  echo ""
   if [ "$GODEFAULT" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/home/centos" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
   then
     mkdir -p $GOLANGPATH/go/src/k8s.io
@@ -257,8 +255,6 @@ GOLANGPATH=""
     mkdir -p /var/run/kubevirt-private
   fi
 
-  echo "" 
-  echo " ... ... ...Configuration and Directory Setup Completed on host $HOSTNAME!"
-  echo ""
+  echo " ... ...Configuration and Directory Setup Completed on host $HOSTNAME!"
 
 
