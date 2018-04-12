@@ -27,10 +27,9 @@
   # security stuff
   if [ "$HOSTENV" == "centos" ]
   then
-    echo ""
-    echo "Disable security features..."
-    $SUDO systemctl disable firewalld
-    $SUDO systemctl stop firewalld
+    echo " ... ...Disable security features..."
+    $SUDO systemctl disable firewalld> /dev/null
+    $SUDO systemctl stop firewalld> /dev/null
     $SUDO iptables -F
     $SUDO setenforce 0
   else
