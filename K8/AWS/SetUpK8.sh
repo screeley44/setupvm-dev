@@ -22,7 +22,7 @@ SUDO=""
 #Perform Basic Host Configuration
 source $CONFIG_HOME/../../lib/host-config.sh
 
-# Install Centos base software
+# configure rhel rhsm
 if [ "$HOSTENV" == "rhel" ]
 then
   source $CONFIG_HOME/../../lib/rhsm.sh
