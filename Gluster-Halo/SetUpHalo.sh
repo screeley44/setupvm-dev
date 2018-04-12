@@ -102,7 +102,7 @@ then
       echo "Setting Up Remote Host... ${gfs[index]}"
 
       # base remote commands
-      if [ "$RERUN" == "N" ]
+      if [ "$RERUN" == "N" ] || [ "$RERUN" == "add" ]
       then
         echo "Setting up subscription services from RHEL..."
         echo " ... Remotely Installing Base Software on ${gfs[index]}"
@@ -146,7 +146,7 @@ then
       fi
 
       # Gluster and Heketi specific remote commands
-      if [ "$RERUN_GLUSTER" == "Y" ] || [ "$RERUN" == "N" ]
+      if [ "$RERUN_GLUSTER" == "Y" ] || [ "$RERUN" == "N" ] || [ "$RERUN" == "add" ]
       then
         echo " ... Remotely Installing GlusterFS and/or Heketi on ${gfs[index]}"
         source $CONFIG_HOME/../lib/install-gluster-remote.sh
@@ -155,7 +155,7 @@ then
       fi
 
       # Swift specific remote commands
-      if [ "$INSTALL_SWIFT_REMOTE" == "Y" ] && [ "$RERUN" == "N" ]
+      if [ "$INSTALL_SWIFT_REMOTE" == "Y" ] && ([ "$RERUN" == "N" ] || [ "$RERUN" == "add" ])
       then
         echo " ... Remotely Installing Swift and Clients on ${gfs[index]}"
         source $CONFIG_HOME/../lib/install-swift-remote.sh
@@ -273,20 +273,25 @@ then
     if [ "$index" == 0 ]
     then
       # Install core software (go, etcd, docker, etc...)
-      source $CONFIG_HOME/../lib/install-go.sh
-      echo " ....."
-      echo ""
-      source $CONFIG_HOME/../lib/install-etcd.sh
-      echo " ....."
-      echo ""
-      source $CONFIG_HOME/../lib/docker-base.sh
-      echo " ....."
-      echo ""
+      if [ "$RERUN" == "add" ]
+      then
+        echo "..."
+      else
+        source $CONFIG_HOME/../lib/install-go.sh
+        echo " ....."
+        echo ""
+        source $CONFIG_HOME/../lib/install-etcd.sh
+        echo " ....."
+        echo ""
+        source $CONFIG_HOME/../lib/docker-base.sh
+        echo " ....."
+        echo ""
 
-      # restart docker
-      source $CONFIG_HOME/../lib/docker-restart.sh
-      echo " ....."
-      echo ""
+        # restart docker
+        source $CONFIG_HOME/../lib/docker-restart.sh
+        echo " ....."
+        echo ""
+      fi
     else
       echo " ... Remotely Installing PreReqs (Docker, Go, ETCD) on ${gfs[index]}"
       source $CONFIG_HOME/../lib/install-go-remote.sh
@@ -441,6 +446,11 @@ then
         wait
         result=`eval gluster volume start $GFS_VOLNAME`
         wait
+        if [ "$INSTALL_SWIFT_LOCAL" == "Y" ]
+        then
+          cd /etc/swift; gluster-swift-gen-builders $GFS_VOLNAME
+          swift-init main start
+        fi
       fi
     done
   fi
