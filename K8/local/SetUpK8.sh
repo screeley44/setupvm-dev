@@ -67,8 +67,6 @@ echo " ... ... Installing etcd-$ETCD_VER"
 source $CONFIG_HOME/../../lib/install-etcd.sh
 echo " ... ... Installing Docker-$DOCKERVER"
 source $CONFIG_HOME/../../lib/docker-base.sh
-echo ""
-
 # restart docker
 source $CONFIG_HOME/../../lib/docker-restart.sh
 echo ""

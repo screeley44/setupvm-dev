@@ -255,6 +255,6 @@ GOLANGPATH=""
     mkdir -p /var/run/kubevirt-private
   fi
 
-  echo " ... ...Configuration and Directory Setup Completed on host $HOSTNAME!"
+  echo " ... ... Configuration and Directory Setup Completed on host $HOSTNAME!"
 
 

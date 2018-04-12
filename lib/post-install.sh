@@ -2,6 +2,7 @@
 # Some automation to setting up OSE/K8 VM's
 
   # source testfiles.sh
+  echo " ... ... Copying Dev Configs to Working Dir"
   $SUDO cp /root/setupvm-dev/CNV/Origin/config-ocp.sh $KUBEPATH
   $SUDO cp /root/setupvm-dev/CNV/Origin/aws-hosts /root
   $SUDO cp /root/setupvm-dev/CNV/yaml/* $KUBEPATH/dev-configs/cinder
@@ -27,9 +28,9 @@
   # security stuff
   if [ "$HOSTENV" == "centos" ]
   then
-    echo " ... ...Disable security features..."
-    $SUDO systemctl disable firewalld> /dev/null
-    $SUDO systemctl stop firewalld> /dev/null
+    echo " ... ... Disable security features"
+    $SUDO systemctl disable firewalld >/dev/null 2>&1
+    $SUDO systemctl stop firewalld >/dev/null 2>&1
     $SUDO iptables -F
     $SUDO setenforce 0
   else
@@ -38,4 +39,5 @@
   fi
 
   # restart docker
-  systemctl restart docker
+  echo " ... ... Restarting Docker"
+  systemctl restart docker >/dev/null 2>&1

@@ -2,9 +2,6 @@
 # Some automation to setting up OSE/K8 VM's
 
   # Creating and Updating Profiles
-  echo ""
-  echo "Creating Profiles and Exports..."
-  echo ""
   if [ "$SUDO" == "sudo" ] 
   then  
     cd /home/$USER
@@ -109,21 +106,18 @@
 
   if [ "$FEATURE_GATES" == "" ]
   then
-    echo "No Alpha Features Enabled..."
+    echo " ... ... No Alpha Features Enabled"
   else
-    echo ""
-    echo "Enabled Alpha Feature Gates $FEATURE_GATES"
+    echo " ... ... Enabled Alpha Feature Gates $FEATURE_GATES"
     echo "export FEATURE_GATES=$FEATURE_GATES" >> newbashrc
     echo "export FEATURE_GATES=$FEATURE_GATES" >> .bash_profile
     echo "export KUBE_FEATURE_GATES=$FEATURE_GATES" >> newbashrc
     echo "export KUBE_FEATURE_GATES=$FEATURE_GATES" >> .bash_profile
-    echo ""  
   fi
 
 
 
   echo "" >> newbashrc
-  echo ""
   echo "#go environment" >> newbashrc
   echo "export GOPATH=$GOLANGPATH/go" >> newbashrc
   echo "GOPATH1=/usr/local/go" >> newbashrc
@@ -138,7 +132,6 @@
   echo "export PATH" >> newbashrc
 
   echo "" >> .bash_profile
-  echo ""
   echo "#go environment" >> .bash_profile
   echo "export GOPATH=$GOLANGPATH/go" >> .bash_profile
   echo "GOPATH1=/usr/local/go" >> .bash_profile

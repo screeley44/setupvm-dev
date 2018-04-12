@@ -6,7 +6,6 @@
   then
     if [ "$HOSTENV" == "fedora" ]
     then
-      echo "Installing latest ansible..."
       if [ -d "/usr/share/ansible" ]; then $SUDO rm -rf /usr/share/ansible; fi
       if [ -d "/usr/share/ansible_plugins" ]; then $SUDO rm -rf /usr/share/ansible_plugins; fi
       echo ""
@@ -16,7 +15,6 @@
 
     if [ "$HOSTENV" == "centos" ]
     then
-      echo "Installing latest ansible..."
       yum install epel-release -y >/dev/null 2>&1
       yum --enablerepo=epel-testing install ansible -y >/dev/null 2>&1
     fi
