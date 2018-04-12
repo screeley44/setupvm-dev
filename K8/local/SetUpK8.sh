@@ -23,8 +23,8 @@ SUDO=""
 echo "................................."
 echo "     Configuring Host Env"
 echo "................................."
-echo ""
 source $CONFIG_HOME/../../lib/host-config.sh
+echo ""
 
 # Configure RHSM if RHEL
 if [ "$HOSTENV" == "rhel" ]
@@ -32,8 +32,8 @@ then
   echo "................................."
   echo "      Setting up RHSM"
   echo "................................."
-  echo ""
   source $CONFIG_HOME/../../lib/rhsm.sh
+  echo ""
 fi
 
 # Install base software
@@ -42,15 +42,15 @@ then
   echo "................................."
   echo " Installing CentOS Base Software"
   echo "................................."
-  echo ""
   source $CONFIG_HOME/../../lib/yum-centos-install.sh
+  echo ""
 elif [ "$HOSTENV" == "rhel" ]
 then
   echo "................................."
   echo "... Installing RHEL Base Software"
   echo "................................."
-  echo ""
   source $CONFIG_HOME/../../lib/yum-rhel-install.sh
+  echo ""
 else
   echo "!!!! Unsupported Operating System [HOSTENV - centos or rhel] - exiting !!!!"
   exit 1 
@@ -61,7 +61,6 @@ echo ""
 echo "................................."
 echo "  Installing Host PreReqs"
 echo "................................."
-echo ""
 echo " ... ... Installing Go-$GOVERSION"
 source $CONFIG_HOME/../../lib/install-go.sh
 echo " ... ... Installing etcd-$ETCD_VER"

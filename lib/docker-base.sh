@@ -8,8 +8,8 @@ then
 elif [ "$DOCKERVER" == "ce" ] 
 then
   $SUDO yum check-update
-  $SUDO curl -fsSL https://get.docker.com/ | sh    
+  $SUDO curl -fsSL https://get.docker.com/ | sh >/dev/null 2>&1    
 else
-  $SUDO yum install docker-$DOCKERVER -y> /dev/null
+  $SUDO yum install docker-$DOCKERVER -y >/dev/null 2>&1
 fi
 
