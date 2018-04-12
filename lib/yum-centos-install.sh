@@ -3,7 +3,7 @@
 
 if [ "$HOSTENV" == "centos" ]
 then  
-  echo "...Installing base software for CentOS ... this will take several minutes"
+  echo " ... ... Installing base software for CentOS ... this will take several minutes"
   yum install -y wget gcc python-virtualenv git net-tools unzip bash-completion telnet kexec-tools sos psacct NetworkManager> /dev/null
 
   # enable NetworkManager
@@ -30,8 +30,5 @@ then
       echo "...Installing openshift utils for DEV setup type..."
       $SUDO yum install atomic-openshift-utils -y> /dev/null
   fi
-  echo ""
-  echo "  ************************************"
-  echo "  *  YUM SOFTWARE INSTALLED FOR CENTOS *"
-  echo "  ************************************"
+  echo "... ... CentOS Base Software Installed"
 fi

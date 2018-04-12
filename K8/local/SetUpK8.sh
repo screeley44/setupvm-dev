@@ -20,14 +20,18 @@ SUDO=""
 
 
 #Perform Basic Host Configuration
-echo "... Configuring Host Env"
+echo "................................."
+echo "     Configuring Host Env"
+echo "................................."
 echo ""
 source $CONFIG_HOME/../../lib/host-config.sh
 
 # Configure RHSM if RHEL
 if [ "$HOSTENV" == "rhel" ]
 then
-  echo "... Setting up RHSM"
+  echo "................................."
+  echo "      Setting up RHSM"
+  echo "................................."
   echo ""
   source $CONFIG_HOME/../../lib/rhsm.sh
 fi
@@ -35,43 +39,51 @@ fi
 # Install base software
 if [ "$HOSTENV" == "centos" ]
 then
-  echo "... Installing CentOS Base Software"
+  echo "................................."
+  echo " Installing CentOS Base Software"
+  echo "................................."
   echo ""
   source $CONFIG_HOME/../../lib/yum-centos-install.sh
 elif [ "$HOSTENV" == "rhel" ]
 then
+  echo "................................."
   echo "... Installing RHEL Base Software"
+  echo "................................."
   echo ""
   source $CONFIG_HOME/../../lib/yum-rhel-install.sh
 else
-  echo "!!!! Unsupported Operating System [HOSTENV - centos or rhel] !!!!"
+  echo "!!!! Unsupported Operating System [HOSTENV - centos or rhel] - exiting !!!!"
   exit 1 
 fi
 
 # Install core software (go, etcd, docker, etc...)
-echo "... Installing Host PreReqs"
+echo "................................."
+echo "  Installing Host PreReqs"
+echo "................................."
 echo ""
 echo " ... ... Installing Go-$GOVERSION"
-echo ""
 source $CONFIG_HOME/../../lib/install-go.sh
 echo " ... ... Installing etcd-$ETCD_VER"
-echo ""
 source $CONFIG_HOME/../../lib/install-etcd.sh
-echo " ... ... Installing Docker-$DOCKER_VER"
-echo ""
+echo " ... ... Installing Docker-$DOCKERVER"
 source $CONFIG_HOME/../../lib/docker-base.sh
+echo ""
 
 # restart docker
 source $CONFIG_HOME/../../lib/docker-restart.sh
 echo ""
 
 # Clone Repos
-echo " ...Cloning Repos"
+echo "................................."
+echo "      Cloning Repos"
+echo "................................."
 echo ""
 source $CONFIG_HOME/../../lib/clone-repos.sh
 
 # Create Profiles
-echo " ...Setting Bash Environment"
+echo "................................."
+echo "   Setting Bash Environment"
+echo "................................."
 echo ""
 source $CONFIG_HOME/../../lib/bash-profile.sh
 
@@ -86,13 +98,17 @@ fi
 # Ansible
 if [ "$INSTALL_ANSIBLE" == "Y" ]
 then
-  echo " ...Installing Ansible"
+  echo "................................."
+  echo "      Installing Ansible"
+  echo "................................."
   echo ""
   source $CONFIG_HOME/../../lib/install-ansible.sh
 fi
 
 # Post Install
-echo " ...Performing Post Configurations"
+echo "................................."
+echo " Performing Post Configurations"
+echo "................................."
 echo ""
 source $CONFIG_HOME/../../lib/post-install.sh
 

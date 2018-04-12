@@ -1,18 +1,14 @@
 #! /bin/bash
 # Some automation to setting up OSE/K8 VM's
-echo " ********************************"
-echo " *    CLONING REPOS             *"
-echo " ********************************"
-echo ""
+
 if [ "$SKIPSOURCECLONE" == "N" ]
 then
   if [ "$FAST_CLONE" == "N" ]
   then
     cd $GOLANGPATH/go/src/k8s.io
     rm -rf kubernetes
-    echo "...Cloning Kubernetes in $GOLANGPATH"
-    echo ""
-    git clone https://github.com/kubernetes/kubernetes.git
+    echo " ... ... Cloning Kubernetes in $GOLANGPATH"
+    git clone https://github.com/kubernetes/kubernetes.git> /dev/null
   else
    # TODO: suggestion from Jon to avoid long clone operations
     kubDir="$GOLANGPATH/go/src/k8s.io/kubernetes"
@@ -22,12 +18,12 @@ then
       rm -rf kubernetes
     fi
     mkdir -p $kubDir
-    curl -sSL https://github.com/kubernetes/kubernetes/archive/master.tar.gz | tar xvz --strip-components 1 -C $kubDir
+    curl -sSL https://github.com/kubernetes/kubernetes/archive/master.tar.gz | tar xvz --strip-components 1 -C $kubDir> /dev/null
   fi
 
   if [ "$FAST_CLONE" == "N" ]
   then
-    echo "...Cloning OpenShift in $GOLANGPATH"
+    echo " ... ... Cloning OpenShift in $GOLANGPATH"
     cd $GOLANGPATH/go/src/github.com/openshift
     rm -rf origin
     git clone https://github.com/openshift/origin.git
@@ -39,29 +35,29 @@ then
       rm -rf origin
     fi
     mkdir -p $oseDir
-    curl -sSL https://github.com/openshift/origin/archive/master.tar.gz | tar xvz --strip-components 1 -C $oseDir
+    curl -sSL https://github.com/openshift/origin/archive/master.tar.gz | tar xvz --strip-components 1 -C $oseDir> /dev/null
   fi
 
-  echo "...Cloning support repos in /root"
+  echo " ... ... Cloning support repos in /root"
   cd /root
   rm -rf containerized-data-importer
-  git clone https://github.com/kubevirt/containerized-data-importer.git
+  git clone https://github.com/kubevirt/containerized-data-importer.git> /dev/null
 
   if [ ! -d "/root/setupvm-dev" ]
   then
-    git clone https://github.com/screeley44/setupvm-dev.git
+    git clone https://github.com/screeley44/setupvm-dev.git> /dev/null
   fi
 
-  echo "...Cloning CDI repo in $GOLANGPATH/go/src/github.com/kubevirt"
+  echo " ... ... Cloning CDI repo in $GOLANGPATH/go/src/github.com/kubevirt"
   cd $GOLANGPATH/go/src/github.com/kubevirt
   git clone https://github.com/kubevirt/containerized-data-importer.git
   cd /root
 
-  echo "...Cloning kubevirt in $GOLANGPATH"
+  echo " ... ... Cloning kubevirt in $GOLANGPATH"
   cd $GOLANGPATH
   git clone https://github.com/kubevirt/kubevirt-ansible.git 
 
-  echo "...Cloning openshift-ansible in $GOLANGPATH"
+  echo " ... ... Cloning openshift-ansible in $GOLANGPATH"
   cd $GOLANGPATH
   git clone https://github.com/openshift/openshift-ansible.git  
 fi

@@ -38,44 +38,45 @@ GOLANGPATH=""
   OSEDEFAULT=""
   if [[ -z "$ORIGINWORKDIR" ]]
   then
-    echo "No ORIGINWORKDIR present...setting default"
+    echo " ... ... No ORIGINWORKDIR present...setting default"
     OSEPATH="/etc/openshift-dev"
   else
     OSEPATH=$ORIGINWORKDIR
-    echo "Setting Origin Working Directory to $OSEPATH"
+    echo " ... ... Setting Origin Working Directory to $OSEPATH"
   fi
 
   KUBEDEFAULT=""
   if [[ -z "$KUBEWORKDIR" ]]
   then
-    echo "No KUBEWORKDIR present...setting default"
+    echo " ... ... No KUBEWORKDIR present...setting default"
     KUBEPATH="/etc/kubernetes-dev"
   else
     KUBEPATH=$KUBEWORKDIR
-    echo "Setting Kube Working Directory to $KUBEPATH"
+    echo " ... ... Setting Kube Working Directory to $KUBEPATH"
   fi
 
   KUBEDEFAULT=""
   if [[ -z "$WORKDIR" ]]
   then
-    echo "No WORKDIR present...skipping"
+    echo " ... ... No WORKDIR present...skipping"
   else
     if [ "$APP_TYPE" == "kube" ]
     then
       KUBEPATH=$WORKDIR
-      echo "Setting Kube Working Directory to $KUBEPATH"
+      echo " ... ... Setting Kube Working Directory to $KUBEPATH"
     elif [ "$APP_TYPE" == "origin" ]
     then
       OSEPATH=$WORKDIR
-      echo "Setting Origin Working Directory to $OSEPATH"
+      echo " ... ... Setting Origin Working Directory to $OSEPATH"
     elif [ "$APP_TYPE" == "dev" ]
     then
       OSEPATH=$WORKDIR/openshift-dev
       KUBEPATH=$WORKDIR/kubernetes-dev
-      echo "Setting Origin Working Directory to $OSEPATH"
-      echo "Setting Kubernetes Working Directory to $KUBEPATH"
+      echo " ... ... Setting Origin Working Directory to $OSEPATH"
+      echo " ... ... Setting Kubernetes Working Directory to $KUBEPATH"
     else
-      echo " INVALID APP TYPE MAYBE?? "
+      echo " !!!! INVALID APP TYPE MAYBE?? !!!!!"
+      exit 1
     fi    
   fi
 
@@ -94,11 +95,11 @@ GOLANGPATH=""
     else
       GOLANGPATH=~
     fi
-    echo "Setting GOLANG Default (GOPATH) Working Directory to $GOLANGPATH/go"
+    echo " ... ... Setting GOLANG Default (GOPATH) Working Directory to $GOLANGPATH/go"
     GODEFAULT="yes"
   else
     GOLANGPATH=$SOURCEDIR
-    echo "Setting GOLANG (GOPATH) Working Directory to $GOLANGPATH/go"
+    echo " ... ... Setting GOLANG (GOPATH) Working Directory to $GOLANGPATH/go"
   fi
   echo ""
 
@@ -118,7 +119,7 @@ GOLANGPATH=""
   else
     if [ "$KUBEPATH" == "" ]
     then
-      echo "...skipping chmod for KUBEPATH"
+      echo " ... ... skipping chmod for KUBEPATH"
     else
       $SUDO mkdir -p $KUBEPATH
       $SUDO chmod -R 777 $KUBEPATH
@@ -131,7 +132,7 @@ GOLANGPATH=""
   else
     if [ "$OSEPATH" == "" ]
     then
-      echo "...skipping chmod for OSEPATH"
+      echo " ... ... skipping chmod for OSEPATH"
     else
       $SUDO mkdir -p $OSEPATH
       $SUDO chmod -R 777 $OSEPATH
@@ -139,8 +140,7 @@ GOLANGPATH=""
   fi
 
   echo ""
-  echo "...Creating Directory Structure for: $USER"
-  echo "... ... Creating directory structure and workspace..."
+  echo " ... ... Creating Directory Structure for: $USER"
   echo ""
   if [ "$GODEFAULT" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/home/centos" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
   then
@@ -257,11 +257,8 @@ GOLANGPATH=""
     mkdir -p /var/run/kubevirt-private
   fi
 
-  echo ""
-  echo " *********************************************** "
   echo "" 
-  echo "     Configuration and Directory Setup Completed on host $HOSTNAME!"
+  echo " ... ... ...Configuration and Directory Setup Completed on host $HOSTNAME!"
   echo ""
-  echo " *********************************************** "
 
 

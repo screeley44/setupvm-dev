@@ -5,6 +5,7 @@
   if rpm -qa | grep etcd >/dev/null 2>&1
   then
     echo ""
+    echo ""
     echo " --- etcd version info ---"
     etcd --version
     echo " -------------------------"
@@ -15,12 +16,10 @@
     then
       if [ "$ETCD_VER" == "default" ] || [ "$ETCD_VER" == "" ]
       then
-        echo "installing default etcd per rhel repo configuration..."
         $SUDO yum remove etcd -y> /dev/null
         $SUDO rm -rf /usr/bin/etcd
         $SUDO yum install etcd -y> /dev/null
       else
-        echo "installing specific etcd version - etcd-v$ETCD_VER..."
         $SUDO wget https://github.com/coreos/etcd/releases/download/v$ETCD_VER/etcd-v$ETCD_VER-linux-amd64.tar.gz> /dev/null
         $SUDO rm -rf /usr/bin/etcd
         $SUDO tar -zxvf etcd-v$ETCD_VER-linux-amd64.tar.gz> /dev/null
@@ -30,12 +29,10 @@
   else
     if [ "$ETCD_VER" == "default" ] || [ "$ETCD_VER" == "" ]
     then
-      echo "installing default etcd per rhel repo configuration..."
       $SUDO yum remove etcd -y> /dev/null
       $SUDO rm -rf /usr/bin/etcd
       $SUDO yum install etcd -y> /dev/null
     else
-      echo "installing specific etcd version - etcd-v$ETCD_VER..."
       $SUDO wget https://github.com/coreos/etcd/releases/download/v$ETCD_VER/etcd-v$ETCD_VER-linux-amd64.tar.gz> /dev/null
       $SUDO rm -rf /usr/bin/etcd
       $SUDO tar -zxvf etcd-v$ETCD_VER-linux-amd64.tar.gz> /dev/null
