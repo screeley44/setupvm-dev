@@ -88,7 +88,9 @@ echo ""
 # Cloud Config
 if [  "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
 then
-  echo " ... Performing Cloud Configurations"
+  echo "................................."
+  echo " Performing Cloud Configurations"
+  echo "................................."
   source $CONFIG_HOME/../../lib/cloud-config.sh
   echo ""
 fi
