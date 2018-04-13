@@ -21,21 +21,24 @@ then
     curl -sSL https://github.com/kubernetes/kubernetes/archive/master.tar.gz | tar xvz --strip-components 1 -C $kubDir >/dev/null 2>&1
   fi
 
-  if [ "$FAST_CLONE" == "N" ]
+  if [ "$SETUP_TYPE" == "origin" ]
   then
-    echo " ... ... Cloning OpenShift in $GOLANGPATH"
-    cd $GOLANGPATH/go/src/github.com/openshift
-    rm -rf origin
-    git clone https://github.com/openshift/origin.git >/dev/null 2>&1
-  else
-    oseDir="$GOLANGPATH/go/src/github.com/openshift"
-    if [ -d $oseDir ]
+    if [ "$FAST_CLONE" == "N" ]
     then
+      echo " ... ... Cloning OpenShift in $GOLANGPATH"
       cd $GOLANGPATH/go/src/github.com/openshift
       rm -rf origin
+      git clone https://github.com/openshift/origin.git >/dev/null 2>&1
+    else
+      oseDir="$GOLANGPATH/go/src/github.com/openshift"
+      if [ -d $oseDir ]
+      then
+        cd $GOLANGPATH/go/src/github.com/openshift
+        rm -rf origin
+      fi
+      mkdir -p $oseDir
+      curl -sSL https://github.com/openshift/origin/archive/master.tar.gz | tar xvz --strip-components 1 -C $oseDir >/dev/null 2>&1
     fi
-    mkdir -p $oseDir
-    curl -sSL https://github.com/openshift/origin/archive/master.tar.gz | tar xvz --strip-components 1 -C $oseDir >/dev/null 2>&1
   fi
 
   echo " ... ... Cloning support repos in /root"
