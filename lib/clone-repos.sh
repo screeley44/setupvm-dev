@@ -3,25 +3,30 @@
 
 if [ "$SKIPSOURCECLONE" == "N" ]
 then
-  if [ "$FAST_CLONE" == "N" ]
+  if [ "$APP_TYPE" == "origin" ] || [ "$SETUP_TYPE" == "origin" ]
   then
-    cd $GOLANGPATH/go/src/k8s.io
-    rm -rf kubernetes
-    echo " ... ... Cloning Kubernetes in $GOLANGPATH"
-    git clone https://github.com/kubernetes/kubernetes.git >/dev/null 2>&1
+    echo " ... ... Skipping Kubernetes Clone"
   else
-   # TODO: suggestion from Jon to avoid long clone operations
-    kubDir="$GOLANGPATH/go/src/k8s.io/kubernetes"
-    if [ -d $kubeDir ]
+    if [ "$FAST_CLONE" == "N" ]
     then
       cd $GOLANGPATH/go/src/k8s.io
       rm -rf kubernetes
+      echo " ... ... Cloning Kubernetes in $GOLANGPATH"
+      git clone https://github.com/kubernetes/kubernetes.git >/dev/null 2>&1
+    else
+     # TODO: suggestion from Jon to avoid long clone operations
+      kubDir="$GOLANGPATH/go/src/k8s.io/kubernetes"
+      if [ -d $kubeDir ]
+      then
+        cd $GOLANGPATH/go/src/k8s.io
+        rm -rf kubernetes
+      fi
+      mkdir -p $kubDir
+      curl -sSL https://github.com/kubernetes/kubernetes/archive/master.tar.gz | tar xvz --strip-components 1 -C $kubDir >/dev/null 2>&1
     fi
-    mkdir -p $kubDir
-    curl -sSL https://github.com/kubernetes/kubernetes/archive/master.tar.gz | tar xvz --strip-components 1 -C $kubDir >/dev/null 2>&1
   fi
 
-  if [ "$SETUP_TYPE" == "origin" ]
+  if [ "$APP_TYPE" == "origin" ] || [ "$SETUP_TYPE" == "origin" ]
   then
     if [ "$FAST_CLONE" == "N" ]
     then

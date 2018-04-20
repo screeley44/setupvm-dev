@@ -29,7 +29,7 @@
     echo "$AWSSECRET" >> myconf.txt
     echo "$ZONE" >> myconf.txt
     echo "json" >> myconf.txt
-    /usr/local/bin/aws configure < myconf.txt
+    /usr/local/bin/aws configure < myconf.txt >/dev/null 2>&1
 
     echo " ... ... Creating aws.conf file"  
     cd /etc

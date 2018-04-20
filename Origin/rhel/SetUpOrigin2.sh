@@ -45,14 +45,25 @@ DoBlock()
 }
 
 #Perform Basic Host Configuration
+echo "................................."
+echo "     Configuring Host Env"
+echo "................................."
 source $CONFIG_HOME/../../lib/host-config.sh
+echo ""
 
 #RHSM
+echo "................................."
+echo "      Setting up RHSM"
+echo "................................."
 source $CONFIG_HOME/../../lib/rhsm.sh
-
+echo ""
 
 # Install RHEL base software
+echo "................................."
+echo "... Installing RHEL Base Software"
+echo "................................."
 source $CONFIG_HOME/../../lib/yum-rhel-install.sh
+echo ""
 
 # Install core software (go, etcd, docker, etc...)
 source $CONFIG_HOME/../../lib/install-go.sh
