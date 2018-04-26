@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+ name: pv-ebs-cdi
+spec:
+ capacity:
+   storage: 20Gi
+ accessModes:
+   - ReadWriteOnce
+ awsElasticBlockStore:
+   volumeID: vol-02b4ef011143e63b9
+   fsType: ext4

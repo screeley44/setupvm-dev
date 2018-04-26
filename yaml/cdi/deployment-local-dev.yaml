@@ -19,5 +19,13 @@ spec:
         env:
         - name: IMPORTER_IMAGE
           value: cdi-importer:screeley-latest
+        volumeMounts:
+        - mountPath: /usr/share/cdi/images
+          name: image-vol
+      volumes:
+      - name: image-vol
+        hostPath:
+          path: /etc/kubernetes-dev/dev-configs/cdi
+
 
 
