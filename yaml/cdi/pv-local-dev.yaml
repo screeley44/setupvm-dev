@@ -1,0 +1,22 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-cdi-pv
+spec:
+  volumeMode: Filesystem
+  capacity:
+    storage: 10Gi
+  local:
+    path: /usr/share/cdi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - ip-172-18-4-143.ec2.internal
+

@@ -5,6 +5,7 @@ metadata:
   annotations:
     kubevirt.io/storage.import.endpoint: "file:///usr/share/cdi/images/tinyCore.iso"   # Required.  Format: (http||s3)://www.myUrl.com/path/of/data
 spec:
+  volumeMode: Filesystem
   accessModes:
   - ReadWriteOnce
   resources:
