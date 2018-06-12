@@ -50,8 +50,9 @@
     echo "export CLOUD_CONFIG=/etc/gce/gce.conf" >> newbashrc
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> newbashrc
     echo "export NUM_NODES=$KUBEUP_NUM_NODES" >> newbashrc
-    echo "export KUBE_GCE_INSTANCE_PREFIX=$INTERNALHOST" >> newbashrc
+    echo "export KUBE_GCE_INSTANCE_PREFIX=$KUBEUP_NODES_PREFIX" >> newbashrc
     echo "export KUBE_GCE_ZONE=$ZONE" >> newbashrc
+    echo "export NODE_INSTANCE_PREFIX=$KUBEUP_NODES_PREFIX" >> newbashrc
   fi
   echo "export HOSTNAME_OVERRIDE=$HOSTNAME" >> newbashrc
   echo "export ALLOW_SECURITY_CONTEXT=true" >> newbashrc
@@ -82,8 +83,9 @@
     echo "export CLOUD_CONFIG=/etc/gce/gce.conf" >> .bash_profile
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> .bash_profile
     echo "export NUM_NODES=$KUBEUP_NUM_NODES" >> .bash_profile
-    echo "export KUBE_GCE_INSTANCE_PREFIX=$INTERNALHOST" >> .bash_profile
+    echo "export KUBE_GCE_INSTANCE_PREFIX=$KUBEUP_NODES_PREFIX" >> .bash_profile
     echo "export KUBE_GCE_ZONE=$ZONE" >> .bash_profile
+    echo "export NODE_INSTANCE_PREFIX=$KUBEUP_NODES_PREFIX" >> .bash_profile
   fi
 
   echo "export HOSTNAME_OVERRIDE=$HOSTNAME" >> .bash_profile
