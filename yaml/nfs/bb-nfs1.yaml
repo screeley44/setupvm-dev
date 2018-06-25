@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nfs-bb-pod1
+spec:
+  securityContext:
+    runAsUser: 2323
+    supplementalGroups: [2323]
+  containers:
+  - name: nfs-bb-pod1
+    image: busybox
+    command: ["sleep", "600000"]
+    volumeMounts:
+    - mountPath: /usr/share/busybox/nfsshare
+      name: nfsvol
+  volumes:
+  - name: nfsvol
+    nfs:
+      path: /nfsshare/folder1
+      server: ip-172-18-9-105.ec2.internal
+
+

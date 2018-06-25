@@ -1,0 +1,30 @@
+---
+apiVersion: gluster.org/v1alpha1
+kind: GlusterCluster
+metadata:
+  name: demo
+  namespace: anthill
+spec:
+  wipe: true
+  nodes:
+  - devices:
+    - GCEPersistentDisk:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: gluster-gce
+      volumeMode: Block
+      capacity:
+        storage: 20Gi
+  - devices:
+    - GCEPersistentDisk:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: gluster-gce
+      volumeMode: Block
+      capacity:
+        storage: 20Gi
+  - devices:
+    - GCEPersistentDisk:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: gluster-gce
+      volumeMode: Block
+      capacity:
+        storage: 20Gi

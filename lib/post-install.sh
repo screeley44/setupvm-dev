@@ -9,6 +9,7 @@
   $SUDO cp /root/setupvm-dev/yaml/aws/* $KUBEPATH/dev-configs/aws
   $SUDO cp /root/setupvm-dev/yaml/gce/* $KUBEPATH/dev-configs/gce
   $SUDO cp /root/setupvm-dev/yaml/hostpath/* $KUBEPATH/dev-configs/hostpath
+  $SUDO cp /root/setupvm-dev/yaml/nfs/* $KUBEPATH/dev-configs/nfs
   $SUDO cp -R /root/setupvm-dev/CNV/AWS/yaml/* $KUBEPATH/dev-configs/cnv/aws
   $SUDO cp -R /root/setupvm-dev/CNV/LocalVM/yaml/* $KUBEPATH/dev-configs/cnv/local
   $SUDO cp /root/containerized-data-importer/manifests/importer/* $KUBEPATH/dev-configs/data-importer
@@ -24,6 +25,7 @@
   $SUDO cp /root/setupvm-dev/yaml/aws/* $OSEPATH/dev-configs/aws
   $SUDO cp /root/setupvm-dev/yaml/gce/* $OSEPATH/dev-configs/gce
   $SUDO cp /root/setupvm-dev/yaml/hostpath/* $OSEPATH/dev-configs/hostpath
+  $SUDO cp /root/setupvm-dev/yaml/nfs/* $OSEPATH/dev-configs/nfs
   $SUDO cp -R /root/setupvm-dev/CNV/AWS/yaml/* $OSEPATH/dev-configs/cnv/aws
   $SUDO cp -R /root/setupvm-dev/CNV/LocalVM/yaml/* $OSEPATH/dev-configs/cnv/local
   $SUDO cp /root/containerized-data-importer/manifests/importer/* $OSEPATH/dev-configs/data-importer

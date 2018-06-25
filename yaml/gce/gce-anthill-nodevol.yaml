@@ -1,0 +1,24 @@
+---
+apiVersion: gluster.org/v1alpha1
+kind: GlusterCluster
+metadata:
+  name: demo
+  namespace: anthill
+spec:
+  wipe: true
+  nodes:
+  - devices:
+    - GCEPersistentDisk:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: gluster-gce
+      volumeMode: Block
+      capacity:
+        storage: 20Gi
+      nodeAffinity:
+        required:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+              - node0
