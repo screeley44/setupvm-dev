@@ -3,7 +3,7 @@
 
 if [ "$SKIPSOURCECLONE" == "N" ]
 then
-  if [ "$APP_TYPE" == "origin" ] || [ "$SETUP_TYPE" == "origin" ]
+  if [ "$APP_TYPE" == "origin" ] || [ "$SETUP_TYPE" == "origin" ] || [ "$CLONEK8S" == "N" ]
   then
     echo " ... ... Skipping Kubernetes Clone"
   else
@@ -28,21 +28,26 @@ then
 
   if [ "$APP_TYPE" == "origin" ] || [ "$SETUP_TYPE" == "origin" ]
   then
-    if [ "$FAST_CLONE" == "N" ]
+    if [ "$CLONEOCP" == "N" ]
     then
-      echo " ... ... Cloning OpenShift in $GOLANGPATH"
-      cd $GOLANGPATH/go/src/github.com/openshift
-      rm -rf origin
-      git clone https://github.com/openshift/origin.git >/dev/null 2>&1
+      echo " ... ... Skipping OpenShift-Origin Clone"
     else
-      oseDir="$GOLANGPATH/go/src/github.com/openshift"
-      if [ -d $oseDir ]
+      if [ "$FAST_CLONE" == "N" ]
       then
+        echo " ... ... Cloning OpenShift in $GOLANGPATH"
         cd $GOLANGPATH/go/src/github.com/openshift
         rm -rf origin
+        git clone https://github.com/openshift/origin.git >/dev/null 2>&1
+      else
+        oseDir="$GOLANGPATH/go/src/github.com/openshift"
+        if [ -d $oseDir ]
+        then
+          cd $GOLANGPATH/go/src/github.com/openshift
+          rm -rf origin
+        fi
+        mkdir -p $oseDir
+        curl -sSL https://github.com/openshift/origin/archive/master.tar.gz | tar xvz --strip-components 1 -C $oseDir >/dev/null 2>&1
       fi
-      mkdir -p $oseDir
-      curl -sSL https://github.com/openshift/origin/archive/master.tar.gz | tar xvz --strip-components 1 -C $oseDir >/dev/null 2>&1
     fi
   fi
 
