@@ -143,11 +143,11 @@ GOLANGPATH=""
   if [ "$GODEFAULT" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$GOLANGPATH" == "/home/centos" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
   then
     mkdir -p $GOLANGPATH/go/src/k8s.io
-    mkdir -p $GOLANGPATH/go/src/github.com/kubevirt
+    mkdir -p $GOLANGPATH/go/src/kubevirt.io
     mkdir -p $GOLANGPATH/go/src/github.com/openshift
   else
     $SUDO mkdir -p $GOLANGPATH/go/src/k8s.io
-    $SUDO mkdir -p $GOLANGPATH/go/src/github.com/kubevirt
+    $SUDO mkdir -p $GOLANGPATH/go/src/kubevirt.io
     $SUDO mkdir -p $GOLANGPATH/go/src/github.com/openshift
     $SUDO chmod -R 777 $GOLANGPATH
   fi

@@ -62,7 +62,7 @@ then
   fi
 
   echo " ... ... Cloning CDI repo in $GOLANGPATH/go/src/github.com/kubevirt"
-  cd $GOLANGPATH/go/src/github.com/kubevirt
+  cd $GOLANGPATH/go/src/kubevirt.io
   git clone https://github.com/kubevirt/containerized-data-importer.git >/dev/null 2>&1
   cd /root
 
