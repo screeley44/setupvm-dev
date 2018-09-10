@@ -14,9 +14,8 @@
   $SUDO cp -R /root/setupvm-dev/CNV/LocalVM/yaml/* $KUBEPATH/dev-configs/cnv/local
   # $SUDO cp /root/containerized-data-importer/manifests/importer/* $KUBEPATH/dev-configs/data-importer
   # $SUDO cp /root/containerized-data-importer/manifests/importer/* $KUBEPATH/dev-configs/cdi
-  $SUDO cp /root/containerized-data-importer/manifests/controller/* $KUBEPATH/dev-configs/cdi
+  $SUDO cp /root/containerized-data-importer/manifests/generated/* $KUBEPATH/dev-configs/cdi
   $SUDO cp /root/containerized-data-importer/manifests/example/* $KUBEPATH/dev-configs/cdi
-  $SUDO cp /root/containerized-data-importer/test/images/* $KUBEPATH/dev-configs/cdi
   $SUDO cp /root/setupvm-dev/yaml/cdi/* $KUBEPATH/dev-configs/cdi
   
   $SUDO cp /root/setupvm-dev/CNV/Origin/config-ocp.sh $OSEPATH
@@ -30,9 +29,8 @@
   $SUDO cp -R /root/setupvm-dev/CNV/LocalVM/yaml/* $OSEPATH/dev-configs/cnv/local
   # $SUDO cp /root/containerized-data-importer/manifests/importer/* $OSEPATH/dev-configs/data-importer
   # $SUDO cp /root/containerized-data-importer/manifests/importer/* $OSEPATH/dev-configs/cdi
-  $SUDO cp /root/containerized-data-importer/manifests/controller/* $OSEPATH/dev-configs/cdi
+  $SUDO cp /root/containerized-data-importer/manifests/generated/* $OSEPATH/dev-configs/cdi
   $SUDO cp /root/containerized-data-importer/manifests/example/* $OSEPATH/dev-configs/cdi
-  $SUDO cp /root/containerized-data-importer/test/images/* $OSEPATH/dev-configs/cdi
   $SUDO cp /root/setupvm-dev/yaml/cdi/* $OSEPATH/dev-configs/cdi
 
   $SUDO cp /root/setupvm-dev/host-files/* /root
