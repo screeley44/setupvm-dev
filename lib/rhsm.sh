@@ -21,6 +21,7 @@ then
       echo ""
     else
       echo "!!!! System Not Registered with RHSM - maybe invalid username or password OR RHSM could be down?  !!!!!"
+      echo "!!!! Run Again or Wait until RHSM is Back Up  !!!!!"
       exit 1
     fi
 
