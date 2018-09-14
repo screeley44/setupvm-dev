@@ -3,7 +3,7 @@
 
 if [ "$HOSTENV" == "rhel" ]
 then  
-  echo "...Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet unzip kexec-tools sos psacct ... this will take several minutes"
+  echo " ... ... Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet unzip kexec-tools sos psacct ... this will take several minutes"
   until $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct -y> /dev/null; do echo "Failure installing utils Repos, retrying..."; sleep 8; done
 
   # krb5-devel - been reported that this is needed for OCP
@@ -19,12 +19,12 @@ then
     fi
   fi
 
-  echo "...performing yum update"
+  echo " ... ... performing yum update"
   $SUDO yum update -y> /dev/null
 
   if [ "$HOSTENV" == "rhel" ] && [ "$APP_TYPE" == "origin" ]
   then
-      echo "...Installing openshift utils for DEV setup type..."
+      echo " ... ... Installing openshift utils for DEV setup type..."
       $SUDO yum install atomic-openshift-utils -y> /dev/null
   fi
   echo ""

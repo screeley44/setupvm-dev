@@ -3,7 +3,7 @@
 
 
 # Docker Registry Stuff
-echo "...Updating the docker config file with insecure-registry"
+echo " ... ... Updating the docker config file with insecure-registry"
 $SUDO sed -i '/OPTIONS=.*/c\OPTIONS="--selinux-enabled --insecure-registry 172.30.0.0/16"' /etc/sysconfig/docker
 echo ""
 
@@ -11,7 +11,7 @@ echo ""
 DoBlock
 echo ""
 
-echo "...Running docker-storage-setup"
+echo " ... ... Running docker-storage-setup"
 $SUDO docker-storage-setup
 $SUDO lvs
 echo ""
@@ -33,9 +33,9 @@ DoBlock()
     then
       $SUDO sh -c "echo 'DEVS=/dev/$block_device' >> /etc/sysconfig/docker-storage-setup"
       $SUDO sh -c "echo 'VG=$VG' >> /etc/sysconfig/docker-storage-setup"
-      echo "docker-storage-setup file updated"
+      echo " ... ... docker-storage-setup file updated"
     else
-      echo "Let's try again..."
+      echo " !!! Let's try again..."
       echo ""
       DoBlock
     fi
