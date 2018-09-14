@@ -1,0 +1,48 @@
+# UAT CNS 3.10 Example 1
+# Section 4.2 - Applications
+# Create an OSEv3 group that contains the masters, nodes, and etcd groups
+[OSEv3:children]
+masters
+nodes
+etcd
+glusterfs
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+ansible_ssh_user=root
+openshift_deployment_type=openshift-enterprise
+oreg_url=example.com/openshift3/ose-${component}:${version}
+openshift_examples_modify_imagestreams=true
+openshift_disable_check=disk_availability,memory_availability,package_availability,package_version
+openshift_storage_glusterfs_namespace=app-storage
+openshift_storage_glusterfs_storageclass=true
+openshift_storage_glusterfs_storageclass_default=false
+openshift_storage_glusterfs_block_deploy=true
+openshift_storage_glusterfs_block_host_vol_create=true
+openshift_storage_glusterfs_block_host_vol_size=20
+openshift_storage_glusterfs_block_storageclass=true
+openshift_storage_glusterfs_block_storageclass_default=false
+
+# uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
+#openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+
+[masters]
+ip-172-18-9-22.ec2.internal node=True storage=True master=True openshift_schedulable=False
+
+[etcd]
+ip-172-18-9-22.ec2.internal
+
+[nodes]
+ip-172-18-9-22.ec2.internal node=True storage=True master=True openshift_schedulable=False openshift_node_group_name='node-config-master-infra'
+ip-172-18-15-49.ec2.internal node=True storage=True openshift_node_labels="{'region': 'infra'}" openshift_schedulable=True openshift_node_group_name='node-config-compute'
+ip-172-18-11-91.ec2.internal node=True storage=True openshift_node_labels="{'region': 'infra'}" openshift_schedulable=True openshift_node_group_name='node-config-compute'
+ip-172-18-14-183.ec2.internal node=True storage=True openshift_node_labels="{'region': 'infra'}" openshift_schedulable=True openshift_node_group_name='node-config-compute'
+
+[glusterfs]
+ip-172-18-15-49.ec2.internal glusterfs_devices='[ "/dev/xvdc", "/dev/xvdd" ]'
+ip-172-18-11-91.ec2.internal glusterfs_devices='[ "/dev/xvdc", "/dev/xvdd" ]'
+ip-172-18-14-183.ec2.internal glusterfs_devices='[ "/dev/xvdc", "/dev/xvdd" ]'
+
+
+
+
