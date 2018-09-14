@@ -2,7 +2,10 @@
 # Some automation to setting up OSE/K8 VM's
 
   # source testfiles.sh
+  BASESRC=$BASH_SOURCE
+  BASEDIR=`dirname $BASH_SOURCE`
   echo " ... ... Copying Dev Configs to Working Dir"
+  echo " ... ... ... Base Dir is $BASEDIR"
   $SUDO cp ../CNV/Origin/config-ocp.sh $KUBEPATH
   $SUDO cp ../CNV/Origin/aws-hosts /root
   $SUDO cp ../CNV/yaml/* $KUBEPATH/dev-configs/cinder
