@@ -48,17 +48,31 @@ DoBlock()
 source $CONFIG_HOME/../../lib/host-config.sh
 
 #RHSM
+echo ""
+echo "................................."
+echo "  Registering System with RHSM"
+echo "................................."
 source $CONFIG_HOME/../../lib/rhsm.sh
 
 
-# Install RHEL base software
-source $CONFIG_HOME/../../lib/yum-rhel-install.sh
-
 # Install core software (go, etcd, docker, etc...)
+echo ""
+echo "................................."
+echo "  Installing Host PreReqs"
+echo "................................."
+echo " ... ... Installing Base Software"
+source $CONFIG_HOME/../../lib/yum-rhel-install.sh
+echo " ... ... Installing Go-$GOVERSION"
 source $CONFIG_HOME/../../lib/install-go.sh
+echo " ... ... Installing etcd-$ETCD_VER"
 source $CONFIG_HOME/../../lib/install-etcd.sh
+echo " ... ... Installing Docker-$DOCKERVER"
 source $CONFIG_HOME/../../lib/docker-base.sh
 
+
+echo "................................."
+echo "  Configuring Docker"
+echo "................................."
 if [ "$APP_TYPE" == "origin" ] && [ "$HOSTENV" == "rhel" ]
 then
   source $CONFIG_HOME/../../lib/docker-registry.sh

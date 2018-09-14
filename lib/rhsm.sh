@@ -14,7 +14,7 @@ then
   if [ "$HOSTENV" == "rhel" ]
   then
     # Subscription Manager Stuffs - for RHEL 7.X devices
-    echo "Setting up subscription services from RHEL..."
+    echo " ... Setting up subscription services from RHEL..."
     #subscription-manager register --username=$RHNUSER --password=$RHNPASS
     if ($SUDO subscription-manager register --username=$RHNUSER --password=$RHNPASS | grep -q "system has been registered")
     then
@@ -103,5 +103,7 @@ then
       echo ""
     fi
   fi
+else
+  echo "...Not Attaching Repos..."
 fi
 
