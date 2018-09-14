@@ -45,6 +45,9 @@ DoBlock()
 }
 
 #Perform Basic Host Configuration
+echo "................................."
+echo "     Configuring Host Env"
+echo "................................."
 source $CONFIG_HOME/../../lib/host-config.sh
 
 #RHSM
@@ -69,7 +72,7 @@ source $CONFIG_HOME/../../lib/install-etcd.sh
 echo " ... ... Installing Docker-$DOCKERVER"
 source $CONFIG_HOME/../../lib/docker-base.sh
 
-
+echo ""
 echo "................................."
 echo "  Configuring Docker"
 echo "................................."
@@ -81,15 +84,27 @@ source $CONFIG_HOME/../../lib/docker-restart.sh
 
 
 # Clone Repos
+echo "................................."
+echo "      Cloning Repos"
+echo "................................."
 source $CONFIG_HOME/../../lib/clone-repos.sh
+echo ""
 
 # Create Profiles
+echo "................................."
+echo "   Setting Bash Environment"
+echo "................................."
 source $CONFIG_HOME/../../lib/bash-profile.sh
+echo ""
 
 # Cloud Config
 if [  "$ISCLOUD" == "aws" ] || [ "$ISCLOUD" == "gce" ]
 then
+  echo "................................."
+  echo " Performing Cloud Configurations"
+  echo "................................."
   source $CONFIG_HOME/../../lib/cloud-config.sh
+  echo ""
 fi
 
 # Enable CNS and Heketi
@@ -99,8 +114,11 @@ then
 fi
 
 # Post Install
+echo "................................."
+echo " Performing Post Configurations"
+echo "................................."
 source $CONFIG_HOME/../../lib/post-install.sh
-
+echo ""
 
   # This is a common issue I've run into 
   # export PATH=$PATH:$GOPATH/bin; go get -u github.com/cloudflare/cfssl/cmd/...
