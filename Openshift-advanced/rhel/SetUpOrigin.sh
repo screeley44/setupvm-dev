@@ -78,6 +78,12 @@ then
   source $CONFIG_HOME/../../lib/cloud-config.sh
 fi
 
+# Enable CNS and Heketi
+if [  "$ENABLE_CNS" == "Y" ] && [ "$HOSTENV" == "rhel" ]
+then
+  source $CONFIG_HOME/../../lib/cns-config.sh
+fi
+
 # Post Install
 source $CONFIG_HOME/../../lib/post-install.sh
 
