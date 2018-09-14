@@ -3,37 +3,37 @@
 
   # source testfiles.sh
   echo " ... ... Copying Dev Configs to Working Dir"
-  $SUDO cp /root/setupvm-dev/CNV/Origin/config-ocp.sh $KUBEPATH
-  $SUDO cp /root/setupvm-dev/CNV/Origin/aws-hosts /root
-  $SUDO cp /root/setupvm-dev/CNV/yaml/* $KUBEPATH/dev-configs/cinder
-  $SUDO cp /root/setupvm-dev/yaml/aws/* $KUBEPATH/dev-configs/aws
-  $SUDO cp /root/setupvm-dev/yaml/gce/* $KUBEPATH/dev-configs/gce
-  $SUDO cp /root/setupvm-dev/yaml/hostpath/* $KUBEPATH/dev-configs/hostpath
-  $SUDO cp /root/setupvm-dev/yaml/nfs/* $KUBEPATH/dev-configs/nfs
-  $SUDO cp -R /root/setupvm-dev/CNV/AWS/yaml/* $KUBEPATH/dev-configs/cnv/aws
-  $SUDO cp -R /root/setupvm-dev/CNV/LocalVM/yaml/* $KUBEPATH/dev-configs/cnv/local
+  $SUDO cp ../CNV/Origin/config-ocp.sh $KUBEPATH
+  $SUDO cp ../CNV/Origin/aws-hosts /root
+  $SUDO cp ../CNV/yaml/* $KUBEPATH/dev-configs/cinder
+  $SUDO cp ../yaml/aws/* $KUBEPATH/dev-configs/aws
+  $SUDO cp ../yaml/gce/* $KUBEPATH/dev-configs/gce
+  $SUDO cp ../yaml/hostpath/* $KUBEPATH/dev-configs/hostpath
+  $SUDO cp ../yaml/nfs/* $KUBEPATH/dev-configs/nfs
+  $SUDO cp -R ../CNV/AWS/yaml/* $KUBEPATH/dev-configs/cnv/aws
+  $SUDO cp -R ../CNV/LocalVM/yaml/* $KUBEPATH/dev-configs/cnv/local
   # $SUDO cp /root/containerized-data-importer/manifests/importer/* $KUBEPATH/dev-configs/data-importer
   # $SUDO cp /root/containerized-data-importer/manifests/importer/* $KUBEPATH/dev-configs/cdi
   $SUDO cp /root/containerized-data-importer/manifests/generated/* $KUBEPATH/dev-configs/cdi
   $SUDO cp /root/containerized-data-importer/manifests/example/* $KUBEPATH/dev-configs/cdi
-  $SUDO cp /root/setupvm-dev/yaml/cdi/* $KUBEPATH/dev-configs/cdi
+  $SUDO cp ../yaml/cdi/* $KUBEPATH/dev-configs/cdi
   
-  $SUDO cp /root/setupvm-dev/CNV/Origin/config-ocp.sh $OSEPATH
-  $SUDO cp /root/setupvm-dev/CNV/Origin/aws-hosts /root
-  $SUDO cp /root/setupvm-dev/CNV/yaml/* $OSEPATH/dev-configs/cinder
-  $SUDO cp /root/setupvm-dev/yaml/aws/* $OSEPATH/dev-configs/aws
-  $SUDO cp /root/setupvm-dev/yaml/gce/* $OSEPATH/dev-configs/gce
-  $SUDO cp /root/setupvm-dev/yaml/hostpath/* $OSEPATH/dev-configs/hostpath
-  $SUDO cp /root/setupvm-dev/yaml/nfs/* $OSEPATH/dev-configs/nfs
-  $SUDO cp -R /root/setupvm-dev/CNV/AWS/yaml/* $OSEPATH/dev-configs/cnv/aws
-  $SUDO cp -R /root/setupvm-dev/CNV/LocalVM/yaml/* $OSEPATH/dev-configs/cnv/local
+  $SUDO cp ../CNV/Origin/config-ocp.sh $OSEPATH
+  $SUDO cp ../CNV/Origin/aws-hosts /root
+  $SUDO cp ../yaml/* $OSEPATH/dev-configs/cinder
+  $SUDO cp ../yaml/aws/* $OSEPATH/dev-configs/aws
+  $SUDO cp ../yaml/gce/* $OSEPATH/dev-configs/gce
+  $SUDO cp ../yaml/hostpath/* $OSEPATH/dev-configs/hostpath
+  $SUDO cp ../yaml/nfs/* $OSEPATH/dev-configs/nfs
+  $SUDO cp -R ../CNV/AWS/yaml/* $OSEPATH/dev-configs/cnv/aws
+  $SUDO cp -R ../CNV/LocalVM/yaml/* $OSEPATH/dev-configs/cnv/local
   # $SUDO cp /root/containerized-data-importer/manifests/importer/* $OSEPATH/dev-configs/data-importer
   # $SUDO cp /root/containerized-data-importer/manifests/importer/* $OSEPATH/dev-configs/cdi
   $SUDO cp /root/containerized-data-importer/manifests/generated/* $OSEPATH/dev-configs/cdi
   $SUDO cp /root/containerized-data-importer/manifests/example/* $OSEPATH/dev-configs/cdi
-  $SUDO cp /root/setupvm-dev/yaml/cdi/* $OSEPATH/dev-configs/cdi
+  $SUDO cp ../yaml/cdi/* $OSEPATH/dev-configs/cdi
 
-  $SUDO cp /root/setupvm-dev/host-files/* /root
+  $SUDO cp ../host-files/* /root
 
   # security stuff
   if [ "$HOSTENV" == "centos" ]
