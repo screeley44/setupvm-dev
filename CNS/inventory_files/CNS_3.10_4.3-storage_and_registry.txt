@@ -1,0 +1,67 @@
+# UAT CNS 3.10 Example 1
+# Section 4.2 - Applications
+# Create an OSEv3 group that contains the masters, nodes, and etcd groups
+[OSEv3:children]
+masters
+nodes
+etcd
+glusterfs
+glusterfs_registry
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+ansible_ssh_user=root
+openshift_deployment_type=openshift-enterprise
+openshift_disable_check=disk_availability,memory_availability,package_availability,package_version,docker_image_availability
+
+#App storage Vars
+openshift_storage_glusterfs_namespace=app-storage
+openshift_storage_glusterfs_storageclass=true
+openshift_storage_glusterfs_storageclass_default=false
+openshift_storage_glusterfs_block_deploy=true
+openshift_storage_glusterfs_block_host_vol_create=true
+openshift_storage_glusterfs_block_host_vol_size=20
+openshift_storage_glusterfs_block_storageclass=true
+openshift_storage_glusterfs_block_storageclass_default=false
+
+# Registry Vars
+openshift_hosted_registry_storage_kind=glusterfs
+openshift_hosted_registry_storage_volume_size=5Gi
+openshift_hosted_registry_selector='node-role.kubernetes.io/infra=true'
+openshift_storage_glusterfs_registry_namespace=infra-storage
+openshift_storage_glusterfs_registry_storageclass=true
+openshift_storage_glusterfs_registry_storageclass_default=false
+openshift_storage_glusterfs_registry_block_deploy=true
+openshift_storage_glusterfs_registry_block_host_vol_create=true
+openshift_storage_glusterfs_registry_block_host_vol_size=20
+openshift_storage_glusterfs_registry_block_storageclass=true
+openshift_storage_glusterfs_registry_block_storageclass_default=false
+
+# uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
+openshift_master_identity_providers=[{'name': 'allow_all_auth', 'login': 'true', 'challenge': 'true', 'kind': 'AllowAllPasswordIdentityProvider'}]
+
+[masters]
+ip-172-18-11-92.ec2.internal node=True storage=True master=True openshift_schedulable=True
+
+[etcd]
+ip-172-18-11-92.ec2.internal
+
+[nodes]
+ip-172-18-11-92.ec2.internal node=True storage=True master=True openshift_schedulable=True openshift_node_group_name='node-config-master-infra'
+ip-172-18-6-124.ec2.internal node=True storage=True openshift_schedulable=True openshift_node_group_name='node-config-compute'
+ip-172-18-10-210.ec2.internal node=True storage=True openshift_schedulable=True openshift_node_group_name='node-config-compute'
+ip-172-18-3-136.ec2.internal node=True storage=True openshift_schedulable=True openshift_node_group_name='node-config-compute'
+ip-172-18-10-91.ec2.internal node=True storage=True openshift_schedulable=True openshift_node_group_name='node-config-compute'
+ip-172-18-11-130.ec2.internal node=True storage=True openshift_schedulable=True openshift_node_group_name='node-config-compute'
+ip-172-18-14-145.ec2.internal node=True storage=True openshift_schedulable=True openshift_node_group_name='node-config-compute'
+
+[glusterfs]
+ip-172-18-6-124.ec2.internal glusterfs_devices='[ "/dev/xvdc", "/dev/xvdd" ]'
+ip-172-18-10-210.ec2.internal glusterfs_devices='[ "/dev/xvdc", "/dev/xvdd" ]'
+ip-172-18-3-136.ec2.internal glusterfs_devices='[ "/dev/xvdc", "/dev/xvdd" ]'
+
+[glusterfs_registry]
+ip-172-18-10-91.ec2.internal glusterfs_devices='[ "/dev/xvdc" ]'
+ip-172-18-11-130.ec2.internal glusterfs_devices='[ "/dev/xvdc" ]'
+ip-172-18-14-145.ec2.internal glusterfs_devices='[ "/dev/xvdc" ]'
+

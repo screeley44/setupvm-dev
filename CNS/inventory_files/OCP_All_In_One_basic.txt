@@ -1,0 +1,30 @@
+# All in one single node cluster
+# Create an OSEv3 group that contains the masters, nodes, and etcd groups
+# Execute:
+#  ansible-playbook -i /root/aws-hosts /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
+#  then
+#  ansible-playbook -i /root/aws-hosts /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
+#
+[OSEv3:children]
+masters
+nodes
+etcd
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+ansible_ssh_user=root
+openshift_deployment_type=openshift-enterprise
+openshift_disable_check=disk_availability,memory_availability,package_availability,package_version,docker_image_availability
+
+# uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
+openshift_master_identity_providers=[{'name': 'allow_all_auth', 'login': 'true', 'challenge': 'true', 'kind': 'AllowAllPasswordIdentityProvider'}]
+
+[masters]
+ip-172-18-7-250.ec2.internal node=True storage=True master=True openshift_schedulable=True
+
+[etcd]
+ip-172-18-7-250.ec2.internal
+
+[nodes]
+ip-172-18-7-250.ec2.internal node=True storage=True master=True openshift_schedulable=True openshift_node_group_name='node-config-all-in-one'
+
