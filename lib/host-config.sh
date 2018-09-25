@@ -108,7 +108,7 @@ GOLANGPATH=""
   then
     mkdir -p $GOLANGPATH
   else
-    $SUDO mkdir -p $GOLANGPATH
+    $SUDO mkdir -p $GOLANGPATH/bin
     $SUDO chmod -R 777 $GOLANGPATH
   fi
 
