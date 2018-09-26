@@ -3,8 +3,8 @@
 
 if [ "$HOSTENV" == "rhel" ]
 then  
-  echo " ... ... Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet unzip kexec-tools sos psacct krb5-devel ... this will take several minutes"
-  until $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct krb5-devel -y> /dev/null; do echo "Failure installing utils Repos, retrying..."; sleep 8; done
+  echo " ... ... Installing wget, git, net-tools, bind-utils, iptables-services, rpcbind, nfs-utils, glusterfs-client bridge-utils, gcc, python-virtualenv, bash-completion telnet unzip kexec-tools sos psacct krb5-devel rpm-build createrepo bc rsync file jq tito gpgme gpgme-devel libassuan libassuan-devel ... this will take several minutes"
+  until $SUDO yum install wget git net-tools bind-utils iptables-services rpcbind nfs-utils glusterfs-client bridge-utils gcc python-virtualenv bash-completion telnet unzip kexec-tools sos psacct krb5-devel rpm-build createrepo bc rsync file jq tito gpgme gpgme-devel libassuan libassuan-devel -y> /dev/null; do echo "Failure installing utils Repos, retrying..."; sleep 8; done
 
   # krb5-devel - been reported that this is needed for OCP
   if [ "$APP_TYPE" == "origin" ]
