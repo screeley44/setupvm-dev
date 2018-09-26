@@ -14,7 +14,7 @@ etcd
 [OSEv3:vars]
 ansible_ssh_user=root
 openshift_deployment_type=openshift-enterprise
-#openshift_additional_repos=[{'id': 'origin-local-release', 'name': 'local-release', 'baseurl': 'file:///go/src/github.com/openshift/origin/_output/local/releases/rpms/', 'enabled': 1, 'gpgcheck': 0}]
+#openshift_additional_repos=[{'id': 'origin-local-release', 'name': 'origin-local-release', 'baseurl': 'file:///go/src/github.com/openshift/origin/_output/local/releases/rpms/', 'enabled': 1, 'gpgcheck': 0}]
 openshift_disable_check=disk_availability,memory_availability,package_availability,package_version,docker_image_availability
 
 # uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
