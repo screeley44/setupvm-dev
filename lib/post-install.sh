@@ -7,7 +7,7 @@
   echo " ... ... Copying Dev Configs to Working Dir"
   echo " ... ... ... Base Dir is $BASEDIR"
   $SUDO cp $BASEDIR/../CNV/Origin/config-ocp.sh $KUBEPATH
-  $SUDO cp $BASEDIR/../CNV/Origin/aws-hosts /root
+  #$SUDO cp $BASEDIR/../CNV/Origin/aws-hosts /root
   $SUDO cp $BASEDIR/../CNV/yaml/* $KUBEPATH/dev-configs/cinder
   $SUDO cp $BASEDIR/../yaml/aws/* $KUBEPATH/dev-configs/aws
   $SUDO cp $BASEDIR/../yaml/gce/* $KUBEPATH/dev-configs/gce
@@ -22,7 +22,7 @@
   $SUDO cp $BASEDIR/../yaml/cdi/* $KUBEPATH/dev-configs/cdi
   
   $SUDO cp $BASEDIR/../CNV/Origin/config-ocp.sh $OSEPATH
-  $SUDO cp $BASEDIR/../CNV/Origin/aws-hosts /root
+  #$SUDO cp $BASEDIR/../CNV/Origin/aws-hosts /root
   $SUDO cp $BASEDIR/../CNV/yaml/* $OSEPATH/dev-configs/cinder
   $SUDO cp $BASEDIR/../yaml/aws/* $OSEPATH/dev-configs/aws
   $SUDO cp $BASEDIR/../yaml/gce/* $OSEPATH/dev-configs/gce
