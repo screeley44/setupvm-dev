@@ -15,8 +15,8 @@ etcd
 ansible_ssh_user=root
 openshift_enable_excluders=false
 openshift_deployment_type=openshift-enterprise
-#openshift_additional_repos=[{'id': 'origin-local-release', 'name': 'origin-local-release', 'baseurl': 'file:///go/src/github.com/openshift/origin/_output/local/releases/rpms/', 'enabled': 1, 'gpgcheck': 0}]
-openshift_disable_check=disk_availability,memory_availability,package_availability,package_version,docker_image_availability
+#openshift_additional_repos=[{'id': 'origin-local-release', 'name': 'origin-local-release', 'baseurl': 'file:///opt/go/src/github.com/openshift/origin/_output/local/releases/rpms/', 'enabled': 1, 'gpgcheck': 0}]
+openshift_disable_check=disk_availability,memory_availability,package_availability,package_version,docker_image_availability,docker_storage
 
 # uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
 openshift_master_identity_providers=[{'name': 'allow_all_auth', 'login': 'true', 'challenge': 'true', 'kind': 'AllowAllPasswordIdentityProvider'}]
