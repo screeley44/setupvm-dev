@@ -14,12 +14,12 @@ etcd
 [OSEv3:vars]
 ansible_ssh_user=root
 openshift_enable_excluders=false
-# comment enterprise and uncomment follow 3 lines if using custom repo
-openshift_deployment_type=openshift-enterprise
-#openshift_deployment_type=origin
-#openshift_release=3.11
-#openshift_image_tag=3.11
-#openshift_additional_repos=[{'id': 'origin-local-release', 'name': 'origin-local-release', 'baseurl': 'file:///opt/go/src/github.com/openshift/origin/_output/local/releases/rpms/', 'enabled': 1, 'gpgcheck': 0}]
+openshift_deployment_type=origin
+openshift_release=v3.11
+openshift_docker_additional_registries=registry.reg-aws.openshift.com:443
+oreg_url=registry.reg-aws.openshift.com:443/openshift3/ose-${component}:${version}
+oreg_auth_user=screeley@redhat.com
+oreg_auth_password=<your token>
 openshift_disable_check=disk_availability,memory_availability,package_availability,package_version,docker_image_availability,docker_storage
 
 # uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
@@ -33,4 +33,3 @@ ip-172-18-7-250.ec2.internal
 
 [nodes]
 ip-172-18-7-250.ec2.internal node=True storage=True master=True openshift_schedulable=True openshift_node_group_name='node-config-all-in-one'
-
