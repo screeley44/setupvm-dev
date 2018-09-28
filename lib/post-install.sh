@@ -55,8 +55,8 @@
   echo " ... ... Restarting Docker"
   systemctl restart docker >/dev/null 2>&1
 
-  if [ "$CUSTOM_OCP_REPO" == "Y" ] && [ "$HOSTENV" == "rhel" ]
-  then
-    echo " ... ... Using custom OCP repo, disabling ose-$OCPVERSION-rpms repo"
-    $SUDO subscription-manager repos --disable="rhel-7-server-ose-$OCPVERSION-rpms"
-  fi
+  #if [ "$CUSTOM_OCP_REPO" == "Y" ] && [ "$HOSTENV" == "rhel" ]
+  #then
+  #  echo " ... ... Using custom OCP repo, disabling ose-$OCPVERSION-rpms repo"
+  #  $SUDO subscription-manager repos --disable="rhel-7-server-ose-$OCPVERSION-rpms"
+  #fi

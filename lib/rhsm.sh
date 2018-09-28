@@ -100,8 +100,14 @@ then
       else
         until $SUDO yum-config-manager --disable \*> /dev/null; do echo "Failure disabling yum-config-manager, retrying..."; sleep 8; done
       fi
-      until $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-$OCPVERSION-rpms" --enable="rhel-7-server-ansible-2.4-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-client-for-rhel-7-server-rpms" --enable="rhel-7-server-optional-rpms"; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
-      echo ""
+      if [ "$CUSTOM_OCP_REPO" == "Y" ]
+      then
+        until $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ansible-2.4-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-client-for-rhel-7-server-rpms" --enable="rhel-7-server-optional-rpms"; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
+        echo ""
+      else
+        until $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-$OCPVERSION-rpms" --enable="rhel-7-server-ansible-2.4-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-client-for-rhel-7-server-rpms" --enable="rhel-7-server-optional-rpms"; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
+        echo ""
+      fi
     fi
   fi
 else
