@@ -24,9 +24,15 @@ then
 
   if [ "$HOSTENV" == "rhel" ] && [ "$APP_TYPE" == "origin" ]
   then
-      echo " ... ... Installing openshift utils for DEV setup type..."
-      #$SUDO yum install atomic-openshift-utils -y> /dev/null
-      $SUDO yum install openshift-ansible -y> /dev/null
+      if [ "$CUSTOM_OCP_REPO" == "Y" ]
+      then
+        echo " ... ... Installing ansible..."
+        $SUDO yum install ansible -y> /dev/null
+      else
+        echo " ... ... Installing openshift utils for DEV setup type..."
+        #$SUDO yum install atomic-openshift-utils -y> /dev/null
+        $SUDO yum install openshift-ansible -y> /dev/null
+      fi
   fi
   echo ""
   echo "  ************************************"
