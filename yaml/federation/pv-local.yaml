@@ -1,0 +1,23 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-pv-cluster1
+spec:
+  volumeMode: Filesystem
+  capacity:
+    storage: 10Gi
+  local:
+    path: /usr/share/mongo
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - ip-172-18-6-77.ec2.internal
+
+

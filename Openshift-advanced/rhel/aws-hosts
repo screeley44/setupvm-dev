@@ -1,104 +1,40 @@
+# All in one single node cluster with custom build repo
 [OSEv3:children]
 masters
 nodes
+etcd
 
+# Set variables common for all OSEv3 hosts
 [OSEv3:vars]
-openshift_deployment_type=origin
-containerized=true
-openshift_image_tag=v3.9.0-alpha.4
-openshift_clock_enabled=true
 ansible_ssh_user=root
-openshift_master_identity_providers=[{'name': 'allow_all_auth', 'login': 'true', 'challenge': 'true', 'kind': 'AllowAllPasswordIdentityProvider'}]
-openshift_disable_check=memory_availability,disk_availability,docker_storage,package_availability,docker_image_availability
 openshift_enable_excluders=false
-template_service_broker_install=false
-openshift_use_manageiq=false
-openshift_install_examples=false
+openshift_deployment_type=origin
+openshift_additional_repos=[{'id': 'origin-local-release', 'name': 'origin-local-release', 'baseurl': 'file:///opt/go/src/github.com/openshift/origin/_output/local/releases/rpms/', 'enabled': 1, 'gpgcheck': 0}]
+openshift_disable_check=disk_availability,memory_availability,package_availability,package_version,docker_image_availability,docker_storage
 
-# BEGIN ANSIBLE BROKER CONFIG
-openshift_hosted_etcd_storage_kind=nfs
-openshift_hosted_etcd_storage_nfs_options="*(rw,root_squash,sync,no_wdelay)"
-openshift_hosted_etcd_storage_nfs_directory=/opt/osev3-etcd
-openshift_hosted_etcd_storage_volume_name=etcd-vol2
-openshift_hosted_etcd_storage_access_modes=["ReadWriteOnce"]
-openshift_hosted_etcd_storage_volume_size=1100M
-openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
-ansible_service_broker_refresh_interval=20s
-ansible_service_broker_registry_whitelist=[".*-apb$"]
-ansible_service_broker_local_registry_whitelist=[".*-apb$"]
-ansible_service_broker_image_prefix=ansibleplaybookbundle/origin-
-ansible_service_broker_image_tag=latest
-ansible_service_broker_etcd_image_prefix=quay.io/coreos/
-ansible_service_broker_etcd_image_tag=latest
-# END ANSIBLE BROKER CONFIG
+# uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
+openshift_master_identity_providers=[{'name': 'allow_all_auth', 'login': 'true', 'challenge': 'true', 'kind': 'AllowAllPasswordIdentityProvider'}]
 
-## metrics
-# Will be uncommented for Metrics deployment
-#openshift_metrics_storage_kind=dynamic
+# Set Up AWS Configuration
+# Cloud Provider Configuration
+#
+# Note: You may make use of environment variables rather than store
+# sensitive configuration within the ansible inventory.
+# For example:
+#openshift_cloudprovider_aws_access_key="{{ lookup('env','AWS_ACCESS_KEY_ID') }}"
+#openshift_cloudprovider_aws_secret_key="{{ lookup('env','AWS_SECRET_ACCESS_KEY') }}"
+#
+openshift_clusterid=screeley
+openshift_cloudprovider_kind=aws
+openshift_cloudprovider_aws_access_key=aws_access_key_id
+openshift_cloudprovider_aws_secret_key=aws_secret_access_key
 
-## logging
-# the size of each PersistentVolume of the ElasticSearch pods (modify as desired)
-# Logging requires a PVC size for installation
-openshift_logging_es_pvc_size=10Gi
-# Will be uncommented for Logging deployment
-#openshift_logging_storage_kind=dynamic
-
-## this is required otherwise it will fail openshift_sanitize_inventory
-## cloud provider is not configured but dynamic is set
-dynamic_volumes_check=False
-
-## First CNS storage cluster for applications
-# Namespace for CNS pods (will be created)
-openshift_storage_glusterfs_namespace=app-storage
-# Automatically create a StorageClass referencing this CNS cluster
-openshift_storage_glusterfs_storageclass=true
-# glusterblock functionality is not supported outside of Logging/Metrics
-openshift_storage_glusterfs_block_deploy=false
-
-## Second CNS storage cluster for OpenShift infrastructure
-# Namespace for CNS pods (will be created)
-openshift_storage_glusterfs_registry_namespace=infra-storage
-# No StorageClass; this cluster should not need to provide dynamic provisioning
-openshift_storage_glusterfs_registry_storageclass=false
-openshift_storage_glusterfs_registry_block_deploy=true
-# Size of automatically created block-hosting volumes,
-# must be at least the size of your largest desired block volume
-openshift_storage_glusterfs_registry_block_host_vol_size=50
-# Create StorageClass, used by Logging and Metrics
-
-openshift_storage_glusterfs_registry_block_storageclass=true
-# StorageClass needs to be cluster default for Logging/Metrics provisioning
-openshift_storage_glusterfs_registry_block_storageclass_default=true
-
-# Disable any other default StorageClass
-openshift_storageclass_default=false
-
-
-
-# BEGIN CUSTOM SETTINGS
 [masters]
-ip-172-18-15-58.ec2.internal
+ip-172-18-5-30.ec2.internal node=True storage=True master=True openshift_schedulable=True
 
 [etcd]
-ip-172-18-15-58.ec2.internal
+ip-172-18-5-30.ec2.internal
 
 [nodes]
-ip-172-18-15-58.ec2.internal openshift_schedulable=true openshift_node_labels="{'region': 'infra','zone': 'default'}"
-ip-172-18-5-161.ec2.internal openshift_node_labels="{'region': 'infra','zone': 'default'}"
-
-# Specify the storage nodes along with the devices attached to them.
-# The [glusterfs] group represents the CNS nodes for application storage.
-# The [glusterfs_registry] group represents the CNS nodes for infra storage.
-[glusterfs]
-ip-172-18-5-161.ec2.internal glusterfs_devices='[ "/dev/xvde", "/dev/xvdf" ]'
-ip-172-18-5-161.ec2.internal glusterfs_devices='[ "/dev/xvde", "/dev/xvdf" ]'
-ip-172-18-5-161.ec2.internal glusterfs_devices='[ "/dev/xvde", "/dev/xvdf" ]'
-
-[glusterfs_registry]
-ose-infra-node01.ocpgluster.com glusterfs_devices='[ "/dev/xvdf" ]'
-ose-infra-node02.ocpgluster.com glusterfs_devices='[ "/dev/xvdf" ]'
-ose-infra-node03.ocpgluster.com glusterfs_devices='[ "/dev/xvdf" ]'
-
-
-# END CUSTOM SETTINGS
+ip-172-18-5-30.ec2.internal node=True storage=True master=True openshift_schedulable=True openshift_node_group_name='node-config-all-in-one'
 
