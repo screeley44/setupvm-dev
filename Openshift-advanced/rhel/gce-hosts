@@ -1,0 +1,40 @@
+# All in one single node cluster
+# Create an OSEv3 group that contains the masters, nodes, and etcd groups
+# Execute:
+#  ansible-playbook -i /root/aws-hosts /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
+#  then
+#  ansible-playbook -i /root/aws-hosts /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
+#
+[OSEv3:children]
+masters
+nodes
+etcd
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+ansible_ssh_user=root
+openshift_enable_excluders=false
+openshift_deployment_type=origin
+openshift_additional_repos=[{'id': 'origin-local-release', 'name': 'origin-local-release', 'baseurl': 'file:///opt/go/src/github.com/openshift/origin/_output/local/releases/rpms/', 'enabled': 1, 'gpgcheck': 0}]
+openshift_disable_check=disk_availability,memory_availability,package_availability,package_version,docker_image_availability,docker_storage
+
+# uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
+openshift_master_identity_providers=[{'name': 'allow_all_auth', 'login': 'true', 'challenge': 'true', 'kind': 'AllowAllPasswordIdentityProvider'}]
+
+# Set Up AWS Configuration
+# Cloud Provider Configuration
+#
+openshift_cloudprovider_kind=gce
+openshift_gcp_project=openshift-gce-devel 
+openshift_gcp_prefix=screeley
+openshift_gcp_multizone=False 
+
+[masters]
+screeley-fed1-cluster1 node=True storage=True master=True openshift_schedulable=True
+
+[etcd]
+screeley-fed1-cluster1
+
+[nodes]
+screeley-fed1-cluster1 node=True storage=True master=True openshift_schedulable=True openshift_node_group_name='node-config-all-in-one'
+
