@@ -30,11 +30,13 @@ openshift_cloudprovider_aws_access_key=aws_access_key_id
 openshift_cloudprovider_aws_secret_key=aws_secret_access_key
 
 [masters]
-ip-172-18-5-30.ec2.internal node=True storage=True master=True openshift_schedulable=True
+ip-172-31-5-30.ec2.internal node=True storage=True master=True openshift_schedulable=True
 
 [etcd]
-ip-172-18-5-30.ec2.internal
+ip-172-31-5-30.ec2.internal
 
 [nodes]
-ip-172-18-5-30.ec2.internal node=True storage=True master=True openshift_schedulable=True openshift_node_group_name='node-config-all-in-one'
+ip-172-31-1-185.ec2.internal node=True storage=True master=True openshift_schedulable=True openshift_node_group_name='node-config-master'
+ip-172-31-15-203.ec2.internal node=True storage=True master=True openshift_schedulable=True openshift_node_group_name='node-config-infra'
+ip-172-31-14-86.ec2.internal node=True storage=True master=True openshift_schedulable=True openshift_node_group_name='node-config-compute'
 

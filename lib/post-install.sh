@@ -13,6 +13,7 @@
   $SUDO cp $BASEDIR/../yaml/gce/* $KUBEPATH/dev-configs/gce
   $SUDO cp $BASEDIR/../yaml/hostpath/* $KUBEPATH/dev-configs/hostpath
   $SUDO cp $BASEDIR/../yaml/nfs/* $KUBEPATH/dev-configs/nfs
+  $SUDO cp $BASEDIR/../yaml/federation/* $KUBEPATH/dev-configs/federation
   $SUDO cp -R $BASEDIR/../CNV/* $KUBEPATH/dev-configs/cnv/aws
   $SUDO cp -R $BASEDIR/../CNV/LocalVM/yaml/* $KUBEPATH/dev-configs/cnv/local
   # $SUDO cp /root/containerized-data-importer/manifests/importer/* $KUBEPATH/dev-configs/data-importer
@@ -28,6 +29,7 @@
   $SUDO cp $BASEDIR/../yaml/gce/* $OSEPATH/dev-configs/gce
   $SUDO cp $BASEDIR/../yaml/hostpath/* $OSEPATH/dev-configs/hostpath
   $SUDO cp $BASEDIR/../yaml/nfs/* $OSEPATH/dev-configs/nfs
+  $SUDO cp $BASEDIR/../yaml/federation/* $OSEPATH/dev-configs/federation
   $SUDO cp -R $BASEDIR/../CNV/* $OSEPATH/dev-configs/cnv/aws
   $SUDO cp -R $BASEDIR/../CNV/LocalVM/yaml/* $OSEPATH/dev-configs/cnv/local
   # $SUDO cp /root/containerized-data-importer/manifests/importer/* $OSEPATH/dev-configs/data-importer

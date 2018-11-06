@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: List
+items:
+- apiVersion: core.federation.k8s.io/v1alpha1
+  kind: FederatedDeployment
+  metadata:
+    labels:
+      name: glusterfs
+    name: glusterfs
+  spec:
+    template:
+      metadata:
+        labels:
+          name: glusterfs
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            name: glusterfs
+        template:
+          metadata:
+            name: glusterfs
+            labels:
+              name: glusterfs
+          spec:
+            hostNetwork: false
+            containers:
+            - image: gluster/gluster-centos:latest
+              imagePullPolicy: IfNotPresent
+              name: glusterfs
+              ports:
+              - containerPort: 24007
+              - containerPort: 24008
+              volumeMounts:
+              - name: glusterfs-state
+                mountPath: "/glusterfs"
+              - name: glusterd-state
+                mountPath: "/var/lib/glusterd"
+              - name: glusterfs-cgroup
+                mountPath: "/sys/fs/cgroup"
+                readOnly: true
+              - name: glusterfs-ssl
+                mountPath: "/etc/ssl"
+                readOnly: true
+              - name: glusterfs-data0
+                mountPath: "/data/glusterfs-container"
+              - name: glusterfs-data-mongo
+                mountPath: "/data/gluster-brick1"
+              securityContext:
+                capabilities: {}
+                privileged: true
+              readinessProbe:
+                timeoutSeconds: 3
+                initialDelaySeconds: 10
+                tcpSocket:
+                  port: 24007
+                periodSeconds: 15
+                successThreshold: 1
+                failureThreshold: 12
+            volumes:
+            - name: glusterfs-cgroup
+              hostPath:
+                path: "/sys/fs/cgroup"
+            - name: glusterfs-ssl
+              hostPath:
+                path: "/etc/ssl"
+            - name: glusterfs-state
+              persistentVolumeClaim:
+                claimName: glusterfs-state
+            - name: glusterd-state
+              persistentVolumeClaim:
+                claimName: glusterd-state
+            - name: glusterfs-data0
+              persistentVolumeClaim:
+                claimName: glusterfs-data0
+            - name: glusterfs-data-mongo
+              persistentVolumeClaim:
+                claimName: glusterfs-data-mongo
+- apiVersion: core.federation.k8s.io/v1alpha1
+  kind: FederatedDeploymentPlacement
+  metadata:
+    name: glusterfs
+    namespace: gfs
+  spec:
+    clusterNames:
+    - cluster1
+    - cluster2
+    - cluster3
+
