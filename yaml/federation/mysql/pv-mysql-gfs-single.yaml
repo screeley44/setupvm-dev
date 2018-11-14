@@ -1,0 +1,101 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-data-mysql1
+spec:
+  volumeMode: Filesystem
+  capacity:
+    storage: 25Gi
+  local:
+    path: /data/mysql-gluster-brick1
+  accessModes:
+    - ReadWriteMany
+  claimRef:
+    namespace: gfs
+    name: glusterfs-data-mysql1
+  persistentVolumeReclaimPolicy: Retain
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - ip-172-31-57-7.ec2.internal
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-data-mysql2
+spec:
+  volumeMode: Filesystem
+  capacity:
+    storage: 25Gi
+  local:
+    path: /data/mysql-gluster-brick2
+  accessModes:
+    - ReadWriteMany
+  claimRef:
+    namespace: gfs
+    name: glusterfs-data-mysql2
+  persistentVolumeReclaimPolicy: Retain
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - ip-172-31-57-7.ec2.internal
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-data-mysql3
+spec:
+  volumeMode: Filesystem
+  capacity:
+    storage: 25Gi
+  local:
+    path: /data/mysql-gluster-brick3
+  accessModes:
+    - ReadWriteMany
+  claimRef:
+    namespace: gfs
+    name: glusterfs-data-mysql3
+  persistentVolumeReclaimPolicy: Retain
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - ip-172-31-57-7.ec2.internal
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-data-mysql0
+spec:
+  volumeMode: Filesystem
+  capacity:
+    storage: 20Gi
+  local:
+    path: /data/mysql-gluster-brick0
+  accessModes:
+    - ReadWriteMany
+  claimRef:
+    namespace: gfs
+    name: glusterfs-data-mysql0
+  persistentVolumeReclaimPolicy: Retain
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - ip-172-31-57-7.ec2.internal
+
+

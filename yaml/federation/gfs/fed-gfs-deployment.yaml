@@ -50,6 +50,14 @@ items:
                 mountPath: "/data/mongo-gluster-brick2"
               - name: glusterfs-data-mongo3
                 mountPath: "/data/mongo-gluster-brick3"
+              - name: glusterfs-data-mysql1
+                mountPath: "/data/mysql-gluster-brick1"
+              - name: glusterfs-data-mysql2
+                mountPath: "/data/mysql-gluster-brick2"
+              - name: glusterfs-data-mysql3
+                mountPath: "/data/mysql-gluster-brick3"
+              - name: glusterfs-data-mysql0
+                mountPath: "/data/mysql-gluster-brick0"
               securityContext:
                 capabilities: {}
                 privileged: true
@@ -77,15 +85,27 @@ items:
             - name: glusterfs-data0
               persistentVolumeClaim:
                 claimName: glusterfs-data0
-            - name: glusterfs-data-mongo
+            - name: glusterfs-data-mongo1
               persistentVolumeClaim:
                 claimName: glusterfs-data-mongo1
-            - name: glusterfs-data-mongo
+            - name: glusterfs-data-mongo2
               persistentVolumeClaim:
                 claimName: glusterfs-data-mongo2
-            - name: glusterfs-data-mongo
+            - name: glusterfs-data-mongo3
               persistentVolumeClaim:
                 claimName: glusterfs-data-mongo3
+            - name: glusterfs-data-mysql1
+              persistentVolumeClaim:
+                claimName: glusterfs-data-mysql1
+            - name: glusterfs-data-mysql2
+              persistentVolumeClaim:
+                claimName: glusterfs-data-mysql2
+            - name: glusterfs-data-mysql3
+              persistentVolumeClaim:
+                claimName: glusterfs-data-mysql3
+            - name: glusterfs-data-mysql0
+              persistentVolumeClaim:
+                claimName: glusterfs-data-mysql0
 - apiVersion: core.federation.k8s.io/v1alpha1
   kind: FederatedDeploymentPlacement
   metadata:

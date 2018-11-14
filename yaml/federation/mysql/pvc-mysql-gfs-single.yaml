@@ -1,0 +1,47 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: glusterfs-data-mysql1
+spec:
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 25Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: glusterfs-data-mysql2
+spec:
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 25Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: glusterfs-data-mysql3
+spec:
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 25Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: glusterfs-data-mysql0
+spec:
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
