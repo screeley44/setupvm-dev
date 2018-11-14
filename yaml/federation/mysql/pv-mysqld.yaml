@@ -1,0 +1,22 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-pv-mysqld
+spec:
+  volumeMode: Filesystem
+  capacity:
+    storage: 5Gi
+  local:
+    path: /usr/share/gfs/mysqld
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - ip-172-31-57-7.ec2.internal
+

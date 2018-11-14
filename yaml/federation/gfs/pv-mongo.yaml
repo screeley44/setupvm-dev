@@ -1,13 +1,66 @@
 kind: PersistentVolume
 apiVersion: v1
 metadata:
-  name: local-data-mongo
+  name: local-data-mongo1
 spec:
+  claimRef:
+    namespace: gfs
+    name: glusterfs-data-mongo1
   volumeMode: Filesystem
   capacity:
     storage: 30Gi
   local:
-    path: /data/gluster-brick1
+    path: /data/mongo-gluster-brick1
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - ip-172-31-63-33.ec2.internal
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-data-mongo2
+spec:
+  claimRef:
+    namespace: gfs
+    name: glusterfs-data-mongo2
+  volumeMode: Filesystem
+  capacity:
+    storage: 30Gi
+  local:
+    path: /data/mongo-gluster-brick2
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - ip-172-31-63-33.ec2.internal
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-data-mongo3
+spec:
+  claimRef:
+    namespace: gfs
+    name: glusterfs-data-mongo3
+  volumeMode: Filesystem
+  capacity:
+    storage: 30Gi
+  local:
+    path: /data/mongo-gluster-brick3
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain

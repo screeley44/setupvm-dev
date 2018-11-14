@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-mongo-data
+spec:
+  capacity:
+    storage: 30Gi
+  accessModes:
+    - ReadWriteMany
+  glusterfs:
+    endpoints: glusterfs-cluster
+    path: mongo0
+    readOnly: false
+  persistentVolumeReclaimPolicy: Retain

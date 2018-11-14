@@ -4,26 +4,26 @@ items:
 - apiVersion: core.federation.k8s.io/v1alpha1
   kind: FederatedService
   metadata:
-    name: mongo
+    name: mysql
   spec:
     template:
       metadata:
         labels:
-          name: mongo
+          name: mysql
       spec:
         type: LoadBalancer
         ports:
-          - port: 27017
-            targetPort: 27017
+          - port: 3306
+            targetPort: 3306
         selector:
-          name: mongo
+          name: mysql
 - apiVersion: core.federation.k8s.io/v1alpha1
   kind: FederatedServicePlacement
   metadata:
-    name: mongo
+    name: mysql
+    namespace: gfs
   spec:
     clusterNames:
     - cluster1
     - cluster2
     - cluster3
-

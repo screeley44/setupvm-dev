@@ -22,6 +22,12 @@ items:
           - port: 49152
             name: brick1
             targetPort: 49152
+          - port: 49153
+            name: brick2
+            targetPort: 49153
+          - port: 49154
+            name: brick3
+            targetPort: 49154
         selector:
           name: glusterfs
 - apiVersion: core.federation.k8s.io/v1alpha1

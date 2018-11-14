@@ -44,8 +44,12 @@ items:
                 readOnly: true
               - name: glusterfs-data0
                 mountPath: "/data/glusterfs-container"
-              - name: glusterfs-data-mongo
-                mountPath: "/data/gluster-brick1"
+              - name: glusterfs-data-mongo1
+                mountPath: "/data/mongo-gluster-brick1"
+              - name: glusterfs-data-mongo2
+                mountPath: "/data/mongo-gluster-brick2"
+              - name: glusterfs-data-mongo3
+                mountPath: "/data/mongo-gluster-brick3"
               securityContext:
                 capabilities: {}
                 privileged: true
@@ -75,7 +79,13 @@ items:
                 claimName: glusterfs-data0
             - name: glusterfs-data-mongo
               persistentVolumeClaim:
-                claimName: glusterfs-data-mongo
+                claimName: glusterfs-data-mongo1
+            - name: glusterfs-data-mongo
+              persistentVolumeClaim:
+                claimName: glusterfs-data-mongo2
+            - name: glusterfs-data-mongo
+              persistentVolumeClaim:
+                claimName: glusterfs-data-mongo3
 - apiVersion: core.federation.k8s.io/v1alpha1
   kind: FederatedDeploymentPlacement
   metadata:

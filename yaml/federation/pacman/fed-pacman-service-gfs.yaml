@@ -4,26 +4,30 @@ items:
 - apiVersion: core.federation.k8s.io/v1alpha1
   kind: FederatedService
   metadata:
-    name: mongo
+    name: pacman
+    namespace: gfs
+    labels:
+      name: pacman
   spec:
     template:
       metadata:
         labels:
-          name: mongo
+          name: pacman
       spec:
         type: LoadBalancer
         ports:
-          - port: 27017
-            targetPort: 27017
+          - port: 80
+            targetPort: 8080
+            protocol: TCP
         selector:
-          name: mongo
+          name: pacman
 - apiVersion: core.federation.k8s.io/v1alpha1
   kind: FederatedServicePlacement
   metadata:
-    name: mongo
+    name: pacman
+    namespace: gfs
   spec:
     clusterNames:
     - cluster1
     - cluster2
     - cluster3
-
