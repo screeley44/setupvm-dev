@@ -1,0 +1,20 @@
+[mysqld]
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+old_passwords=1
+
+server-id=2
+
+master-host = a70d0dfc5e83b11e886140aca2081f5e-824391640.us-east-1.elb.amazonaws.com
+master-user = replication
+master-password = slave
+master-port = 3306
+
+[mysql.server]
+user=mysql
+basedir=/var/lib
+
+[mysqld_safe]
+err-log=/var/log/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+

@@ -1,0 +1,23 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-pv-gfsmgmt
+spec:
+  volumeMode: Filesystem
+  capacity:
+    storage: 10Gi
+  local:
+    path: /usr/share/gfs/gfsmgmt
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - app-node-0.ait-fed.e2e.bos.redhat.com
+

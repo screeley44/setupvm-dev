@@ -1,0 +1,23 @@
+[mysqld]
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+old_passwords=1
+
+log-bin
+binlog-do-db=test  # input the database which should be replicated
+binlog-ignore-db=mysql            # input the database that should be ignored for replication
+
+server-id=1
+
+[mysql.server]
+user=mysql
+basedir=/var/lib
+
+[client]
+user=root
+password=password
+
+[mysqld_safe]
+err-log=/var/log/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+

@@ -1,0 +1,63 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: glusterfs
+  labels:
+    name: glusterfs
+spec:
+  hostNetwork: false
+  containers:
+  - image: gluster/gluster-centos:latest
+    imagePullPolicy: IfNotPresent
+    name: glusterfs
+    ports:
+    - containerPort: 24007
+    - containerPort: 24008
+    volumeMounts:
+    - name: glusterfs-state
+      mountPath: "/glusterfs"
+    - name: glusterd-state
+      mountPath: "/var/lib/glusterd"
+    - name: glusterfs-cgroup
+      mountPath: "/sys/fs/cgroup"
+      readOnly: true
+    - name: glusterfs-ssl
+      mountPath: "/etc/ssl"
+      readOnly: true
+    - name: photogallery
+      mountPath: "/data/photo-gluster-brick1"
+    securityContext:
+      capabilities: {}
+      privileged: true
+    readinessProbe:
+      timeoutSeconds: 3
+      initialDelaySeconds: 10
+      tcpSocket:
+        port: 24007
+      periodSeconds: 15
+      successThreshold: 1
+      failureThreshold: 12
+  nodeSelector:
+    fed-app1: photogallery1
+  volumes:
+  - name: glusterfs-cgroup
+    hostPath:
+      path: "/sys/fs/cgroup"
+  - name: glusterfs-ssl
+    hostPath:
+      path: "/etc/ssl"
+  - name: glusterfs-state
+    persistentVolumeClaim:
+      claimName: glusterfs-state
+  - name: glusterd-state
+    persistentVolumeClaim:
+      claimName: glusterd-state
+  - name: photogallery
+    persistentVolumeClaim:
+      claimName: photogallery1
+
+
+
+
+
+

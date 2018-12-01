@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: List
+items:
+- apiVersion: core.federation.k8s.io/v1alpha1
+  kind: FederatedDeployment
+  metadata:
+    labels:
+      name: photo1
+    name: photo1
+  spec:
+    template:
+      metadata:
+        labels:
+          name: photo1
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            name: photo1
+        template:
+          metadata:
+            labels:
+              name: photo1
+          spec:
+            containers:
+            - image: docker.io/zherman/demo:latest
+              name: photo1
+              env:
+              - name: BUCKET_NAME
+                value: /data/photogallery1/
+              - name: OBJECT_STORAGE_S3_TYPE
+                value: local
+              ports:
+              - name: photo1
+                containerPort: 3000
+                protocol: TCP
+              volumeMounts:
+                - name: bucket
+                  mountPath: /data/photogallery1
+            volumes:
+              - name: bucket
+                persistentVolumeClaim:
+                  claimName: photogallery1-gfs
+- apiVersion: core.federation.k8s.io/v1alpha1
+  kind: FederatedDeploymentPlacement
+  metadata:
+    name: photo1
+    namespace: pgallery1
+  spec:
+    clusterNames:
+    - cluster1
+    - cluster2
+    - cluster3

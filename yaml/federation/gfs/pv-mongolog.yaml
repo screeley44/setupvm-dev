@@ -1,0 +1,22 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: mongolog
+spec:
+  volumeMode: Filesystem
+  capacity:
+    storage: 25Gi
+  local:
+    path: /data/mongolog-gluster-brick1/volume
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - ip-172-31-57-7.ec2.internal
+

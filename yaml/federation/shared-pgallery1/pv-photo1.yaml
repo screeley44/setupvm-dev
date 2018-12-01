@@ -1,0 +1,23 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: photogallery1
+spec:
+  volumeMode: Filesystem
+  capacity:
+    storage: 14Gi
+  local:
+    path: /data/photo-gluster-brick1
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - app-node-0.ait-fed.e2e.bos.redhat.com
+
