@@ -22,19 +22,42 @@ items:
             labels:
               name: mongo
           spec:
+#            initContainers:
+#            - name: make-dir
+#              image: busybox
+#              command: ["/bin/sh","-c","mkdir -p /var/log/mongodb"]
+#            - name: chown-log
+#              image: busybox
+#              command: ["/bin/sh","-c","chmod -R 777 /var/log/mongodb"]
             containers:
             - image: mongo
               name: mongo
+#              command: ["/bin/bash","-c","mkdir -p /var/log/mongodb && chmod -R 777 /var/log/mongodb"]
               ports:
               - name: mongo
                 containerPort: 27017
+              env:
+              - name: MY_NODE
+                valueFrom:
+                  fieldRef: 
+                    fieldPath: spec.nodeName
+              args:
+              - --replSet
+              - rs0
+              - --logpath
+              - /var/log/mongodb/mongo-$(MY_NODE).log
               volumeMounts:
-                - name: mongo-db
+                - name: mongodata
                   mountPath: /data/db
+                - name: mongolog
+                  mountPath: /var/log/mongodb
             volumes:
-              - name: mongo-db
+              - name: mongodata
                 persistentVolumeClaim:
-                  claimName: glusterfs-pacman
+                  claimName: mongodata
+              - name: mongolog
+                persistentVolumeClaim:
+                  claimName: mongolog-gfs
 - apiVersion: core.federation.k8s.io/v1alpha1
   kind: FederatedDeploymentPlacement
   metadata:

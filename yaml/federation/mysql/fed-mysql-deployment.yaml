@@ -28,9 +28,14 @@ items:
               env:
               - name: MYSQL_ALLOW_EMPTY_PASSWORD
                 value: "1"
+              - name: MYSQL_DATABASE
+                value: "pacman"
               ports:
               - name: mysql
                 containerPort: 3306
+              args:
+              - --external-locking
+              - --delay-key-write=OFF
               volumeMounts:
                 - name: mysql-db
                   mountPath: /var/lib/mysql
@@ -39,7 +44,7 @@ items:
             volumes:
               - name: mysql-db
                 persistentVolumeClaim:
-                  claimName: mysql-storage
+                  claimName: glusterfs-mysql-pacman
               - name: mysqld
                 persistentVolumeClaim:
                   claimName: mysqld

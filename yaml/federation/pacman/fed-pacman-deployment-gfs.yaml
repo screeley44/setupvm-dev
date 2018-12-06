@@ -28,6 +28,17 @@ items:
               ports:
               - containerPort: 8080
                 name: http-server
+              env:
+              - name: MONGO_DATABASE
+                value: pacman
+              - name: MONGO_REPLICA_SET
+                value: rs0
+              - name: MONGO_NAMESPACE_SERVICE_HOST
+                value: mongo.gfs.svc.cluster.local
+#              - name: MONGO_NAMESPACE_SERVICE_HOST
+#                value: a306d30cbe3a011e886140aca2081f5e-2095109445.us-east-1.elb.amazonaws.com:27017,a306e6cb8e3a011e8a1990a8ddc6ecc3-902634034.us-east-1.elb.amazonaws.com:27017,a306c8910e3a011e882710aaf763165e-209740617.us-east-1.elb.amazonaws.com:27017
+#              - name: MONGO_SERVICE_HOST
+#                value: a306d30cbe3a011e886140aca2081f5e-2095109445.us-east-1.elb.amazonaws.com:27017,a306e6cb8e3a011e8a1990a8ddc6ecc3-902634034.us-east-1.elb.amazonaws.com:27017,a306c8910e3a011e882710aaf763165e-209740617.us-east-1.elb.amazonaws.com:27017
 - apiVersion: core.federation.k8s.io/v1alpha1
   kind: FederatedDeploymentPlacement
   metadata:
