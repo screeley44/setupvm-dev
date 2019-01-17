@@ -145,12 +145,15 @@ GOLANGPATH=""
     mkdir -p $GOLANGPATH/go/src/k8s.io
     mkdir -p $GOLANGPATH/go/src/kubevirt.io
     mkdir -p $GOLANGPATH/go/src/github.com/openshift
+    mkdir -p $GOLANGPATH/go/src/github.com/openshift/installer
   else
     $SUDO mkdir -p $GOLANGPATH/go/src/k8s.io
     $SUDO mkdir -p $GOLANGPATH/go/src/kubevirt.io
     $SUDO mkdir -p $GOLANGPATH/go/src/github.com/openshift
+    $SUDO mkdir -p $GOLANGPATH/go/src/github.com/openshift/installer
     $SUDO chmod -R 777 $GOLANGPATH
   fi
+
 
   if [ "$GODEFAULt" == "yes" ] || [ "$GOLANGPATH" == "/home/ec2-user" ] || [ "$KUBEPATH" == "/home/centos" ] || [ "$GOLANGPATH" == "/root" ] || [[ "$GOLANGPATH" =~ /home ]] 
   then

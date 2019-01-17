@@ -1,6 +1,14 @@
 #! /bin/bash
 # Some automation to setting up OSE/K8 VM's
 
+if [ "$APP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
+then
+  echo " ... ... Cloning openshift/installer in $GOLANGPATH/go/src/github.com/openshift"
+  cd $GOLANGPATH/go/src/github.com/openshift
+  rm -rf installer
+  git clone https://github.com/openshift/installer.git >/dev/null 2>&1
+fi
+
 if [ "$SKIPSOURCECLONE" == "N" ]
 then
   if [ "$APP_TYPE" == "origin" ] || [ "$SETUP_TYPE" == "origin" ] || [ "$CLONEK8S" == "N" ]

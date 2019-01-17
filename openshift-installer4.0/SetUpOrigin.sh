@@ -64,23 +64,23 @@ echo "................................."
 echo "  Installing Host PreReqs"
 echo "................................."
 echo " ... ... Installing Base Software"
-source $CONFIG_HOME/../../lib/yum-rhel-install.sh
+source $CONFIG_HOME/../../lib/yum-rhel-4.sh
 echo " ... ... Installing Go-$GOVERSION"
 source $CONFIG_HOME/../../lib/install-go.sh
-echo " ... ... Installing etcd-$ETCD_VER"
-source $CONFIG_HOME/../../lib/install-etcd.sh
-echo " ... ... Installing Docker-$DOCKERVER"
-source $CONFIG_HOME/../../lib/docker-base.sh
+#echo " ... ... Installing etcd-$ETCD_VER"
+#source $CONFIG_HOME/../../lib/install-etcd.sh
+#echo " ... ... Installing Docker-$DOCKERVER"
+#source $CONFIG_HOME/../../lib/docker-base.sh
 
-echo ""
-echo "................................."
-echo "  Configuring Docker"
-echo "................................."
-if [ "$APP_TYPE" == "origin" ] && [ "$HOSTENV" == "rhel" ]
-then
-  source $CONFIG_HOME/../../lib/docker-registry.sh
-fi
-source $CONFIG_HOME/../../lib/docker-restart.sh
+#echo ""
+#echo "................................."
+#echo "  Configuring Docker"
+#echo "................................."
+#if [ "$APP_TYPE" == "origin" ] && [ "$HOSTENV" == "rhel" ]
+#then
+#  source $CONFIG_HOME/../../lib/docker-registry.sh
+#fi
+#source $CONFIG_HOME/../../lib/docker-restart.sh
 
 
 # Clone Repos
@@ -94,7 +94,7 @@ echo ""
 echo "................................."
 echo "   Setting Bash Environment"
 echo "................................."
-source $CONFIG_HOME/../../lib/bash-profile.sh
+source $CONFIG_HOME/../../lib/bash-profile-4.sh
 echo ""
 
 # Cloud Config
@@ -107,11 +107,6 @@ then
   echo ""
 fi
 
-# Enable CNS and Heketi
-if [  "$ENABLE_CNS" == "Y" ] && [ "$HOSTENV" == "rhel" ]
-then
-  source $CONFIG_HOME/../../lib/cns-config.sh
-fi
 
 # Post Install
 echo "................................."

@@ -40,6 +40,13 @@
     echo "Zone = $ZONE" >> aws.conf
     $SUDO mkdir -p /etc/kubernetes/cloud-config
     cp aws.conf /etc/kubernetes/cloud-config
+
+    echo " ... ... Creating aws.credentials file"   
+    cd /etc/aws
+    echo "[sysdeseng]" > aws.credentials
+    echo "aws_access_key_id = $AWSKEY" >> aws.credentials
+    echo "aws_secret_access_key = $AWSSECRET" >> aws.credentials
+    cp aws.credentials /etc/kubernetes/cloud-config
   fi
 
   if [ "$ISCLOUD" == "gce" ]

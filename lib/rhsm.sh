@@ -91,6 +91,18 @@ then
       fi
       $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.7-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rh-gluster-3-for-rhel-7-server-rpms"
       echo ""
+    elif [ "$OCPVERSION" == "4.0" ]
+    then
+      echo " ... ... ... Enabling rhel 7 rpms for OCP 4.0..."
+      $SUDO subscription-manager repos --disable="*"> /dev/null
+      if [ "$ISCLOUD" == "gce" ]
+      then
+        echo " ... ... skipping disable of yum-config-manager"
+      else
+        $SUDO yum-config-manager --disable \*> /dev/null
+      fi
+      $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rhel-server-rhscl-7-rpms"
+      echo ""
     else
       echo " ... ... ... Enabling rhel 7 rpms defaulting to OCP  $OCPVERSION as latest..."
       until $SUDO subscription-manager repos --disable="*"> /dev/null; do echo "Failure Enabling Repos, retrying..."; sleep 8; done
