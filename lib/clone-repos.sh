@@ -1,12 +1,19 @@
 #! /bin/bash
 # Some automation to setting up OSE/K8 VM's
 
-if [ "$APP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
+if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
 then
   echo " ... ... Cloning openshift/installer in $GOLANGPATH/go/src/github.com/openshift"
   cd $GOLANGPATH/go/src/github.com/openshift
   rm -rf installer
   git clone https://github.com/openshift/installer.git >/dev/null 2>&1
+  echo ""
+  echo " ... ... Downloading latest openshift installer"
+  cd ~
+  wget https://github.com/openshift/installer/releases/download/$INSTALLER_VERSION/openshift-install-linux-amd64
+  mv openshift-install-linux-amd64 openshift-install
+  chmod +x openshift-install
+  mkdir -p ~/$CLUSTER_NAME
 fi
 
 if [ "$SKIPSOURCECLONE" == "N" ]

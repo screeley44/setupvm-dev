@@ -16,11 +16,19 @@
 
   if [ "$ISCLOUD" == "aws" ]
   then
-    echo " ... ... Installing awscli bundle"
-    cd $GOLANGPATH
-    curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" >/dev/null 2>&1
-    unzip awscli-bundle.zip >/dev/null 2>&1
-    $SUDO ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws >/dev/null 2>&1
+    if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
+    then
+      echo " ... ... Installing and configuring pip and awscli"
+      scl enable python27 bash
+      pip install --upgrade pip
+      pip install awscli --upgrade
+    fi
+
+    #echo " ... ... Installing awscli bundle"
+    #cd $GOLANGPATH
+    #curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" >/dev/null 2>&1
+    #unzip awscli-bundle.zip >/dev/null 2>&1
+    #$SUDO ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws >/dev/null 2>&1
 
     echo " ... ... Configuring aws cli"
     cd $GOLANGPATH
@@ -29,7 +37,7 @@
     echo "$AWSSECRET" >> myconf.txt
     echo "$ZONE" >> myconf.txt
     echo "json" >> myconf.txt
-    /usr/local/bin/aws configure < myconf.txt >/dev/null 2>&1
+    aws configure < $GOLANGPATH/myconf.txt >/dev/null 2>&1
 
     echo " ... ... Creating aws.conf file"  
     cd /etc
