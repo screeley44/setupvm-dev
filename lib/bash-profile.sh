@@ -117,7 +117,14 @@
     echo "export KUBE_FEATURE_GATES=$FEATURE_GATES" >> .bash_profile
   fi
 
+#  if [ "$SETUP_TYPE" == "installer" ]
+#  then
+#    echo "export OPENSHIFT_INSTALL_BASE_DOMAIN=$DOMAIN" >> newbashrc
+#    echo "export OPENSHIFT_INSTALL_BASE_DOMAIN=$DOMAIN" >> bash_profile
 
+
+#OPENSHIFT_INSTALL_CLUSTER_NAME=screeley-test
+#OPENSHIFT_INSTALL_PLATFORM=aws
 
   echo "" >> newbashrc
   echo "#go environment" >> newbashrc
