@@ -19,14 +19,11 @@
     if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
     then
       echo " ... ... Installing and configuring pip and awscli"
-      scl enable python27 bash
-      echo " ... ... ... python27 bash enabled"
-      pip install --upgrade pip
-      pip --version
-      pip install --upgrade pip
-      pip --version
+      #scl enable python27 bash
+      #scl enable python27
+      pip install --upgrade pip > /dev/null
       echo " ... ... ... pip installed"
-      pip install awscli --upgrade
+      pip install awscli --upgrade > /dev/null
       echo " ... ... ... awscli installed"
     fi
 
