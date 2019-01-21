@@ -20,7 +20,8 @@
     then
       echo " ... ... Installing and configuring pip and awscli"
       #scl enable python27 bash
-      #scl enable python27
+      source /opt/rh/python27/enable
+      echo " ... ... ... python27 enabled"
       pip install --upgrade pip > /dev/null
       echo " ... ... ... pip installed"
       pip install awscli --upgrade > /dev/null
