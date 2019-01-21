@@ -49,6 +49,8 @@
   echo "export OPENSHIFT_INSTALL_PASSWORD=$INSTALL_PASSWORD" >> .bash_profile
   echo "export OPENSHIFT_INSTALL_AWS_REGION=$ZONE" >> newbashrc
   echo "export OPENSHIFT_INSTALL_AWS_REGION=$ZONE" >> .bash_profile
+  echo "export OPENSHIFT_INSTALL_SSH_PUB_KEY_PATH=$SSHPATH" >> newbashrc
+  echo "export OPENSHIFT_INSTALL_SSH_PUB_KEY_PATH=$SSHPATH" >> .bash_profile
   #echo "export AWS_PROFILE=$INSTALL_PASSWORD" >> newbashrc
   #echo "export AWS_PROFILE=$INSTALL_PASSWORD" >> .bash_profile
 
@@ -81,3 +83,13 @@
   echo "export PATH" >> .bash_profile
 
   $SUDO cp newbashrc /root/.bashrc
+
+  # Create 4.0 config
+  cd ~
+  echo "export OPENSHIFT_INSTALL_BASE_DOMAIN=$HOSTED_ZONE" > mycluster.cfg
+  echo "export OPENSHIFT_INSTALL_CLUSTER_NAME=$CLUSTER_NAME" >> mycluster.cfg
+  echo "export OPENSHIFT_INSTALL_PLATFORM=$ISCLOUD" >> mycluster.cfg
+  echo "export OPENSHIFT_INSTALL_EMAIL_ADDRESS=$EMAIL" >> mycluster.cfg
+  echo "export OPENSHIFT_INSTALL_PASSWORD=$INSTALL_PASSWORD" >> mycluster.cfg
+  echo "export OPENSHIFT_INSTALL_AWS_REGION=$ZONE" >> mycluster.cfg
+  echo "export OPENSHIFT_INSTALL_SSH_PUB_KEY_PATH=$SSHPATH" >> mycluster.cfg
