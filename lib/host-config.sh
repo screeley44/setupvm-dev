@@ -169,6 +169,7 @@ GOLANGPATH=""
     mkdir -p $GOLANGPATH/dev-configs/cnv/local
     mkdir -p $GOLANGPATH/dev-configs/cnv/data-importer
     mkdir -p $GOLANGPATH/dev-configs/cdi
+    mkdir -p $GOLANGPATH/dev-configs/federation
   else
     $SUDO mkdir -p $GOLANGPATH/dev-configs
     $SUDO mkdir -p $GOLANGPATH/dev-configs/aws
@@ -182,6 +183,7 @@ GOLANGPATH=""
     $SUDO mkdir -p $GOLANGPATH/dev-configs/cnv/local
     $SUDO mkdir -p $GOLANGPATH/dev-configs/cnv/data-importer
     $SUDO mkdir -p $GOLANGPATH/dev-configs/cdi
+    $SUDO mkdir -p $GOLANGPATH/dev-configs/federation
     $SUDO chmod -R 777 $GOLANGPATH
   fi
 
@@ -200,6 +202,7 @@ GOLANGPATH=""
     mkdir -p $KUBEPATH/dev-configs/cnv/local
     mkdir -p $KUBEPATH/dev-configs/cnv/data-importer
     mkdir -p $KUBEPATH/dev-configs/cdi
+    mkdir -p $KUBEPATH/dev-configs/federation
   else
     $SUDO mkdir -p $KUBEPATH/dev-configs
     $SUDO mkdir -p $KUBEPATH/dev-configs/aws
@@ -213,6 +216,7 @@ GOLANGPATH=""
     $SUDO mkdir -p $KUBEPATH/dev-configs/cnv/local
     $SUDO mkdir -p $KUBEPATH/dev-configs/cnv/data-importer
     $SUDO mkdir -p $KUBEPATH/dev-configs/cdi
+    $SUDO mkdir -p $KUBEPATH/dev-configs/federation
     $SUDO chmod -R 777 $KUBEPATH
   fi
 
@@ -230,6 +234,7 @@ GOLANGPATH=""
     mkdir -p $OSEPATH/dev-configs/cnv/local
     mkdir -p $OSEPATH/dev-configs/cnv/data-importer
     mkdir -p $OSEPATH/dev-configs/cdi
+    mkdir -p $OSEPATH/dev-configs/federation
   else
     if [ "$OSEPATH" == "" ]
     then
@@ -247,6 +252,7 @@ GOLANGPATH=""
     $SUDO mkdir -p $OSEPATH/dev-configs/cnv/local
     $SUDO mkdir -p $OSEPATH/dev-configs/cnv/data-importer
     $SUDO mkdir -p $OSEPATH/dev-configs/cdi
+    $SUDO mkdir -p $OSEPATH/dev-configs/federation
     $SUDO chmod -R 777 $OSEPATH
     fi
   fi

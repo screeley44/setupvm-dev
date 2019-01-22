@@ -18,8 +18,13 @@
   $SUDO cp -R $BASEDIR/../CNV/LocalVM/yaml/* $KUBEPATH/dev-configs/cnv/local
   # $SUDO cp /root/containerized-data-importer/manifests/importer/* $KUBEPATH/dev-configs/data-importer
   # $SUDO cp /root/containerized-data-importer/manifests/importer/* $KUBEPATH/dev-configs/cdi
-  $SUDO cp /root/containerized-data-importer/manifests/generated/* $KUBEPATH/dev-configs/cdi
-  $SUDO cp /root/containerized-data-importer/manifests/example/* $KUBEPATH/dev-configs/cdi
+  if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
+  then
+    echo " ... ... ... not copying CDI manifests"
+  else
+    $SUDO cp /root/containerized-data-importer/manifests/generated/* $KUBEPATH/dev-configs/cdi
+    $SUDO cp /root/containerized-data-importer/manifests/example/* $KUBEPATH/dev-configs/cdi
+  fi
   $SUDO cp $BASEDIR/../yaml/cdi/* $KUBEPATH/dev-configs/cdi
   
   $SUDO cp $BASEDIR/../CNV/Origin/config-ocp.sh $OSEPATH
@@ -32,10 +37,13 @@
   $SUDO cp $BASEDIR/../yaml/federation/* $OSEPATH/dev-configs/federation
   $SUDO cp -R $BASEDIR/../CNV/* $OSEPATH/dev-configs/cnv/aws
   $SUDO cp -R $BASEDIR/../CNV/LocalVM/yaml/* $OSEPATH/dev-configs/cnv/local
-  # $SUDO cp /root/containerized-data-importer/manifests/importer/* $OSEPATH/dev-configs/data-importer
-  # $SUDO cp /root/containerized-data-importer/manifests/importer/* $OSEPATH/dev-configs/cdi
-  $SUDO cp /root/containerized-data-importer/manifests/generated/* $OSEPATH/dev-configs/cdi
-  $SUDO cp /root/containerized-data-importer/manifests/example/* $OSEPATH/dev-configs/cdi
+  if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
+  then
+    echo " ... ... ... not copying CDI manifests"
+  else
+    $SUDO cp /root/containerized-data-importer/manifests/generated/* $OSEPATH/dev-configs/cdi
+    $SUDO cp /root/containerized-data-importer/manifests/example/* $OSEPATH/dev-configs/cdi
+  fi
   $SUDO cp $BASEDIR/../yaml/cdi/* $OSEPATH/dev-configs/cdi
 
   $SUDO cp host-files/* /root
@@ -53,14 +61,19 @@
     $SUDO iptables -F
   fi
 
+
   # 4.0 create install-config.yaml
   if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
   then
     if [ "$IS_FOR_AMI" == "N" ]
     then
+      echo " ... ... Creating install-config.yaml"
+      cID=$( uuidgen )
+      sshK=$( cat $SSHPATH )
+      echo " ... ... ... uuid = $cID"
       cd ~/$CLUSTER_NAME
       echo "baseDomain: $HOSTED_ZONE" > install-config.yaml
-      echo "clusterID: $( uuidgen )" >> install-config.yaml
+      echo "clusterID: $cID" >> install-config.yaml
       echo "machines:" >> install-config.yaml
       echo "- name: master" >> install-config.yaml
       echo "  platform: {}" >> install-config.yaml
@@ -82,7 +95,9 @@
       echo "    region: us-east-1" >> install-config.yaml
       echo "    vpcCIDRBlock: 10.0.0.0/16" >> install-config.yaml
       echo "pullSecret: '$PULLSECRET'" >> install-config.yaml
-      echo "sshKey: \"$( cat $SSHKEY )\"" >> install-config.yaml
+      echo "sshKey: \"$sshK\"" >> install-config.yaml
+      echo " ... ... ... install-config.yaml created!"
+      echo ""
     fi
   fi
 
