@@ -70,6 +70,7 @@
       echo " ... ... Creating install-config.yaml"
       cID=$( uuidgen )
       sshK=$( cat $SSHPATH )
+      pS=$( cat $PULLSECRETPATH )
       echo " ... ... ... uuid = $cID"
       cd ~/$CLUSTER_NAME
       echo "baseDomain: $HOSTED_ZONE" > install-config.yaml
@@ -94,10 +95,11 @@
       echo "  $ISCLOUD:" >> install-config.yaml
       echo "    region: us-east-1" >> install-config.yaml
       echo "    vpcCIDRBlock: 10.0.0.0/16" >> install-config.yaml
-      echo "pullSecret: '$PULLSECRET'" >> install-config.yaml
+      echo "pullSecret: '$pS'" >> install-config.yaml
       echo "sshKey: \"$sshK\"" >> install-config.yaml
       echo " ... ... ... install-config.yaml created!"
       echo ""
+      cp install-config.yaml ../install-config-$CLUSTER_NAME.yaml
     fi
   fi
 
