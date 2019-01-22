@@ -22,9 +22,9 @@
       #scl enable python27 bash
       source /opt/rh/python27/enable
       echo " ... ... ... python27 enabled"
-      pip install --upgrade pip > /dev/null
+      pip install --upgrade pip
       echo " ... ... ... pip installed"
-      pip install awscli --upgrade > /dev/null
+      pip install awscli --upgrade
       echo " ... ... ... awscli installed"
     fi
 
