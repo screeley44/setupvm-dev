@@ -53,9 +53,47 @@
     $SUDO iptables -F
   fi
 
+  # 4.0 create install-config.yaml
+  if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
+  then
+    if [ "$IS_FOR_AMI" == "N" ]
+    then
+      cd ~/$CLUSTER_NAME
+      echo "baseDomain: $HOSTED_ZONE" > install-config.yaml
+      echo "clusterID: $( uuidgen )" >> install-config.yaml
+      echo "machines:" >> install-config.yaml
+      echo "- name: master" >> install-config.yaml
+      echo "  platform: {}" >> install-config.yaml
+      echo "  replicas: $MASTER_COUNT" >> install-config.yaml
+      echo "- name: worker" >> install-config.yaml
+      echo "  platform: {}" >> install-config.yaml
+      echo "  replicas: $WORKER_COUNT" >> install-config.yaml
+      echo "metadata:" >> install-config.yaml
+      echo "  creationTimestamp: null" >> install-config.yaml
+      echo "  name: $CLUSTER_NAME" >> install-config.yaml
+      echo "networking:" >> install-config.yaml
+      echo "  clusterNetworks:" >> install-config.yaml
+      echo "  - cidr: 10.128.0.0/14" >> install-config.yaml
+      echo "    hostSubnetLength: 9" >> install-config.yaml
+      echo "  serviceCIDR: 172.30.0.0/16" >> install-config.yaml
+      echo "  type: OpenshiftSDN" >> install-config.yaml
+      echo "platform:" >> install-config.yaml
+      echo "  $ISCLOUD:" >> install-config.yaml
+      echo "    region: us-east-1" >> install-config.yaml
+      echo "    vpcCIDRBlock: 10.0.0.0/16" >> install-config.yaml
+      echo "pullSecret: '$PULLSECRET'" >> install-config.yaml
+      echo "sshKey: \"$( cat $SSHKEY )\"" >> install-config.yaml
+    fi
+  fi
+
   # restart docker
-  echo " ... ... Restarting Docker"
-  systemctl restart docker >/dev/null 2>&1
+  if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
+  then
+    echo ""
+  else
+    echo " ... ... Restarting Docker"
+    systemctl restart docker >/dev/null 2>&1
+  fi
 
   #if [ "$CUSTOM_OCP_REPO" == "Y" ] && [ "$HOSTENV" == "rhel" ]
   #then

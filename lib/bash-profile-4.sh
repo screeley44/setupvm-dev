@@ -51,6 +51,8 @@
   echo "export OPENSHIFT_INSTALL_AWS_REGION=$ZONE" >> .bash_profile
   echo "export OPENSHIFT_INSTALL_SSH_PUB_KEY_PATH=$SSHPATH" >> newbashrc
   echo "export OPENSHIFT_INSTALL_SSH_PUB_KEY_PATH=$SSHPATH" >> .bash_profile
+  echo "export OPENSHIFT_INSTALL_PULL_SECRET=$SSHPATH" >> newbashrc
+  echo "export OPENSHIFT_INSTALL_PULL_SECRET=$SSHPATH" >> .bash_profile
   #echo "export AWS_PROFILE=$INSTALL_PASSWORD" >> newbashrc
   #echo "export AWS_PROFILE=$INSTALL_PASSWORD" >> .bash_profile
 
@@ -93,3 +95,4 @@
   echo "export OPENSHIFT_INSTALL_PASSWORD=$INSTALL_PASSWORD" >> mycluster.cfg
   echo "export OPENSHIFT_INSTALL_AWS_REGION=$ZONE" >> mycluster.cfg
   echo "export OPENSHIFT_INSTALL_SSH_PUB_KEY_PATH=$SSHPATH" >> mycluster.cfg
+  echo "export OPENSHIFT_INSTALL_PULL_SECRET=$PULLSECRET" >> mycluster.cfg
