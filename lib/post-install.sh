@@ -73,14 +73,21 @@
       pS=$( cat $PULLSECRETPATH )
       echo " ... ... ... uuid = $cID"
       cd ~/$CLUSTER_NAME
-      echo "baseDomain: $HOSTED_ZONE" > install-config.yaml
+      echo "apiVersion: v1beta1" > install-config.yaml
+      echo "baseDomain: $HOSTED_ZONE" >> install-config.yaml
       echo "clusterID: $cID" >> install-config.yaml
       echo "machines:" >> install-config.yaml
       echo "- name: master" >> install-config.yaml
       echo "  platform: {}" >> install-config.yaml
       echo "  replicas: $MASTER_COUNT" >> install-config.yaml
       echo "- name: worker" >> install-config.yaml
-      echo "  platform: {}" >> install-config.yaml
+      echo "  platform:" >> install-config.yaml
+      echo "    $ISCLOUD:" >> install-config.yaml
+      echo "      rootVolume:" >> install-config.yaml
+      # echo "        iops: 4000" >> install-config.yaml
+      echo "        size: $ROOTSIZE" >> install-config.yaml
+      # echo "        type: io1" >> install-config.yaml
+      # echo "      type: c5.9xlarge" >> install-config.yaml
       echo "  replicas: $WORKER_COUNT" >> install-config.yaml
       echo "metadata:" >> install-config.yaml
       echo "  creationTimestamp: null" >> install-config.yaml
