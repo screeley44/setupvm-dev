@@ -88,4 +88,10 @@ then
   echo " ... ... Cloning openshift-ansible in $GOLANGPATH"
   cd $GOLANGPATH
   git clone https://github.com/openshift/openshift-ansible.git >/dev/null 2>&1 
+
+  echo " ... ... Cloing AWS Service Operator in $GOLANGPATH/go/src/github.com/awslabs"
+  cd $GOLANGPATH/go/src/github.com/
+  mkdir -p awslabs
+  git clone https://github.com/awslabs/aws-service-operator.git
+
 fi
