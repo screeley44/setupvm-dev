@@ -34,9 +34,9 @@
       #scl enable python27 bash
       #source /opt/rh/python27/enable
       echo " ... ... ... upgrading pip"
-      pip install --upgrade pip
+      pip install --upgrade pip >/dev/null 2>&1
       echo " ... ... ... pip installed"
-      pip install awscli --upgrade
+      pip install awscli --upgrade >/dev/null 2>&1
       echo " ... ... ... awscli installed"
     fi
 
@@ -81,9 +81,24 @@
       else
         echo " ... ... Creating Kops S3 bucket"
         aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION
-        aws s3api put-bucket-versioning --bucket $BUCKET_NAME --versioning-configuration Status=Enabled
+        #aws s3api put-bucket-versioning --bucket $BUCKET_NAME --versioning-configuration Status=Enabled
       fi
     fi
+
+    if [ "$SETUP_TYPE" == "k8-dev" ]
+    then
+      if [ "$BUCKET_NAME" == "" ]
+      then
+        echo " ... ... No Kops Config...skipping kops install"
+      else
+        echo " ... ... Creating Kops install"
+        cd ~
+        wget https://github.com/kubernetes/kops/releases/download/1.10.0/kops-linux-amd64 >/dev/null 2>&1
+        chmod +x kops-linux-amd64
+        mv kops-linux-amd64 /usr/local/bin/kops
+      fi
+    fi
+
 
   fi
 

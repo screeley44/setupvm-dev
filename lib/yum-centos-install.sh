@@ -11,8 +11,26 @@ then
   systemctl restart NetworkManager >/dev/null 2>&1
 
   # install pip
-  yum install epel-release -y
-  yum install python-pip -y
+  yum install epel-release -y >/dev/null 2>&1
+  yum install python-pip -y >/dev/null 2>&1
+
+  if [ "$SETUP_TYPE" == "k8-dev" ]
+  then
+    if [ "$BUCKET_NAME" == "" ]
+    then
+      echo " ... ... ... not installing kubectl"
+    else
+      echo " ... ... ... installing kubectl"
+      echo "[kubernetes]" > /etc/yum.repos.d/kubernetes.repo
+      echo "name=Kubernetes" >> /etc/yum.repos.d/kubernetes.repo
+      echo "baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64" >> /etc/yum.repos.d/kubernetes.repo
+      echo "enabled=1" >> /etc/yum.repos.d/kubernetes.repo
+      echo "gpgcheck=1" >> /etc/yum.repos.d/kubernetes.repo
+      echo "repo_gpgcheck=1" >> /etc/yum.repos.d/kubernetes.repo
+      echo "gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg" >> /etc/yum.repos.d/kubernetes.repo
+      yum install -y kubectl >/dev/null 2>&1
+    fi
+  fi
 
 
   # krb5-devel - been reported that this is needed for OCP
