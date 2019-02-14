@@ -15,3 +15,6 @@
     $SUDO tar -C /usr/local -xzf go$GOVERSION.linux-amd64.tar.gz >/dev/null 2>&1
   fi
 
+  # Install HELM from latest script
+  curl https://raw.githubusercontent.com/helm/helm/master/scripts/get | bash >/dev/null 2>&1
+
