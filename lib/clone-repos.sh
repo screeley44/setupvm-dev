@@ -92,6 +92,7 @@ then
   echo " ... ... Cloing AWS Service Operator in $GOLANGPATH/go/src/github.com/awslabs"
   cd $GOLANGPATH/go/src/github.com/
   mkdir -p awslabs
+  cd awslabs
   git clone https://github.com/awslabs/aws-service-operator.git
 
 fi
