@@ -10,6 +10,11 @@ then
   systemctl enable NetworkManager >/dev/null 2>&1
   systemctl restart NetworkManager >/dev/null 2>&1
 
+  # install pip
+  yum install epel-release -y
+  yum install python-pip -y
+
+
   # krb5-devel - been reported that this is needed for OCP
   if [ "$APP_TYPE" == "origin" ]
   then

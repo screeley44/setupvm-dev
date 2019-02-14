@@ -71,6 +71,8 @@
   echo "export CINDERCLIENT_BYPASS_URL=$CCINDERCLIENT_BYPASS_URL" >> newbashrc
   echo "export OS_PROJECT_ID=$COS_PROJECT_ID" >> newbashrc
   echo "export OS_VOLUME_API_VERSION=$COS_VOLUME_API_VERSION" >> newbashrc
+  echo "export KOPS_CLUSTER_NAME=$KOPS_CLUSTERNAME" >> newbashrc
+  echo "export KOPS_STATE_STORE=$S3_KOPS$BUCKET_NAME" >> newbashrc
 
   echo "# Some K8 exports" >> .bash_profile 
   if [ "$ISCLOUD" == "aws" ]
@@ -105,6 +107,8 @@
   echo "export CINDERCLIENT_BYPASS_URL=$CCINDERCLIENT_BYPASS_URL" >> .bash_profile
   echo "export OS_PROJECT_ID=$COS_PROJECT_ID" >> .bash_profile
   echo "export OS_VOLUME_API_VERSION=$COS_VOLUME_API_VERSION" >> .bash_profile
+  echo "export KOPS_CLUSTER_NAME=$KOPS_CLUSTERNAME" >> .bash_profile
+  echo "export KOPS_STATE_STORE=$S3_KOPS$BUCKET_NAME" >> .bash_profile
 
   if [ "$FEATURE_GATES" == "" ]
   then

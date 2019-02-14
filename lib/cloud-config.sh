@@ -28,6 +28,18 @@
       echo " ... ... ... awscli installed"
     fi
 
+    if [ "$SETUP_TYPE" == "k8-dev" ] && [ "$HOSTENV" == "centos" ]
+    then
+      echo " ... ... Installing and configuring pip and awscli"
+      #scl enable python27 bash
+      #source /opt/rh/python27/enable
+      echo " ... ... ... upgrading pip"
+      pip install --upgrade pip
+      echo " ... ... ... pip installed"
+      pip install awscli --upgrade
+      echo " ... ... ... awscli installed"
+    fi
+
     #echo " ... ... Installing awscli bundle"
     #cd $GOLANGPATH
     #curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" >/dev/null 2>&1
@@ -48,8 +60,9 @@
     $SUDO mkdir aws
     $SUDO chmod -R 777 /etc/aws  
     cd /etc/aws
-    echo "[Global]" > aws.conf
+    echo "[default]" > aws.conf
     echo "Zone = $ZONE" >> aws.conf
+    echo "region=$REGION" >> aws.conf
     $SUDO mkdir -p /etc/kubernetes/cloud-config
     cp aws.conf /etc/kubernetes/cloud-config
 
@@ -59,6 +72,19 @@
     echo "aws_access_key_id = $AWSKEY" >> aws.credentials
     echo "aws_secret_access_key = $AWSSECRET" >> aws.credentials
     cp aws.credentials /etc/kubernetes/cloud-config
+
+    if [ "$SETUP_TYPE" == "k8-dev" ]
+    then
+      if [ "$BUCKET_NAME" == "" ]
+      then
+        echo " ... ... No Kops Config...skipping bucket creation"
+      else
+        echo " ... ... Creating Kops S3 bucket"
+        aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION
+        aws s3api put-bucket-versioning --bucket $BUCKET_NAME --versioning-configuration Status=Enabled
+      fi
+    fi
+
   fi
 
   if [ "$ISCLOUD" == "gce" ]
