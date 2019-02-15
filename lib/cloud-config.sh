@@ -99,7 +99,6 @@
       fi
     fi
 
-
   fi
 
   if [ "$ISCLOUD" == "gce" ]

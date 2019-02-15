@@ -32,7 +32,6 @@ then
     fi
   fi
 
-
   # krb5-devel - been reported that this is needed for OCP
   if [ "$APP_TYPE" == "origin" ]
   then
