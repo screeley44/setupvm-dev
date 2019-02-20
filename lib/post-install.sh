@@ -6,18 +6,10 @@
   BASEDIR=`dirname $BASH_SOURCE`
   echo " ... ... Copying Dev Configs to Working Dir"
   echo " ... ... ... Base Dir is $BASEDIR"
-  $SUDO cp $BASEDIR/../CNV/Origin/config-ocp.sh $KUBEPATH
-  #$SUDO cp $BASEDIR/../CNV/Origin/aws-hosts /root
-  $SUDO cp $BASEDIR/../CNV/yaml/* $KUBEPATH/dev-configs/cinder
-  $SUDO cp $BASEDIR/../yaml/aws/* $KUBEPATH/dev-configs/aws
-  $SUDO cp $BASEDIR/../yaml/gce/* $KUBEPATH/dev-configs/gce
-  $SUDO cp $BASEDIR/../yaml/hostpath/* $KUBEPATH/dev-configs/hostpath
-  $SUDO cp $BASEDIR/../yaml/nfs/* $KUBEPATH/dev-configs/nfs
-  $SUDO cp $BASEDIR/../yaml/federation/* $KUBEPATH/dev-configs/federation
-  $SUDO cp -R $BASEDIR/../CNV/* $KUBEPATH/dev-configs/cnv/aws
-  $SUDO cp -R $BASEDIR/../CNV/LocalVM/yaml/* $KUBEPATH/dev-configs/cnv/local
-  # $SUDO cp /root/containerized-data-importer/manifests/importer/* $KUBEPATH/dev-configs/data-importer
-  # $SUDO cp /root/containerized-data-importer/manifests/importer/* $KUBEPATH/dev-configs/cdi
+
+  # Kubernetes Dev Path
+  $SUDO cp -R $BASEDIR/yaml/ $KUBEPATH/dev-configs/
+
   if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
   then
     echo " ... ... ... not copying CDI manifests"
@@ -25,18 +17,10 @@
     $SUDO cp /root/containerized-data-importer/manifests/generated/* $KUBEPATH/dev-configs/cdi
     $SUDO cp /root/containerized-data-importer/manifests/example/* $KUBEPATH/dev-configs/cdi
   fi
-  $SUDO cp $BASEDIR/../yaml/cdi/* $KUBEPATH/dev-configs/cdi
   
-  $SUDO cp $BASEDIR/../CNV/Origin/config-ocp.sh $OSEPATH
-  #$SUDO cp $BASEDIR/../CNV/Origin/aws-hosts /root
-  $SUDO cp $BASEDIR/../CNV/yaml/* $OSEPATH/dev-configs/cinder
-  $SUDO cp $BASEDIR/../yaml/aws/* $OSEPATH/dev-configs/aws
-  $SUDO cp $BASEDIR/../yaml/gce/* $OSEPATH/dev-configs/gce
-  $SUDO cp $BASEDIR/../yaml/hostpath/* $OSEPATH/dev-configs/hostpath
-  $SUDO cp $BASEDIR/../yaml/nfs/* $OSEPATH/dev-configs/nfs
-  $SUDO cp $BASEDIR/../yaml/federation/* $OSEPATH/dev-configs/federation
-  $SUDO cp -R $BASEDIR/../CNV/* $OSEPATH/dev-configs/cnv/aws
-  $SUDO cp -R $BASEDIR/../CNV/LocalVM/yaml/* $OSEPATH/dev-configs/cnv/local
+  # OpenShift Dev Path
+  $SUDO cp -R $BASEDIR/yaml/ $OSEPATH/dev-configs/
+
   if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
   then
     echo " ... ... ... not copying CDI manifests"
