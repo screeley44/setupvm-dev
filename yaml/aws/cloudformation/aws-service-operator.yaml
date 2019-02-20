@@ -1,0 +1,234 @@
+apiVersion: v1
+kind: List
+items:
+- kind: Namespace
+  apiVersion: v1
+  metadata:
+    name: aws-service-operator
+
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: cloudformationtemplates.service-operator.aws
+  spec:
+    group: service-operator.aws
+    names:
+      kind: CloudFormationTemplate
+      listKind: CloudFormationTemplateList
+      plural: cloudformationtemplates
+      shortNames:
+      - cft
+      - cfts
+      - cfn
+      - cfns
+      - cloudformation
+      singular: cloudformationtemplates
+    scope: Namespaced
+    version: v1alpha1
+
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: dynamodbs.service-operator.aws
+  spec:
+    group: service-operator.aws
+    names:
+      kind: DynamoDB
+      listKind: DynamoDBList
+      plural: dynamodbs
+      shortNames:
+      - ddb
+      - ddbs
+      - dynamo
+      - dynamotable
+      - dynamotables
+      singular: dynamodbs
+    scope: Namespaced
+    version: v1alpha1
+
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: ecrrepositories.service-operator.aws
+  spec:
+    group: service-operator.aws
+    names:
+      kind: ECRRepository
+      listKind: ECRRepositoryList
+      plural: ecrrepositories
+      shortNames:
+      - ecr
+      - repository
+      singular: ecrrepositories
+    scope: Namespaced
+    version: v1alpha1
+
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: elasticaches.service-operator.aws
+  spec:
+    group: service-operator.aws
+    names:
+      kind: ElastiCache
+      listKind: ElastiCacheList
+      plural: elasticaches
+      shortNames:
+      - ec
+      singular: elasticaches
+    scope: Namespaced
+    version: v1alpha1
+
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: s3buckets.service-operator.aws
+  spec:
+    group: service-operator.aws
+    names:
+      kind: S3Bucket
+      listKind: S3BucketList
+      plural: s3buckets
+      shortNames:
+      - s3
+      - bucket
+      - buckets
+      singular: s3buckets
+    scope: Namespaced
+    version: v1alpha1
+
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: snssubscriptions.service-operator.aws
+  spec:
+    group: service-operator.aws
+    names:
+      kind: SNSSubscription
+      listKind: SNSSubscriptionList
+      plural: snssubscriptions
+      shortNames:
+      - subscription
+      singular: snssubscriptions
+    scope: Namespaced
+    version: v1alpha1
+
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: snstopics.service-operator.aws
+  spec:
+    group: service-operator.aws
+    names:
+      kind: SNSTopic
+      listKind: SNSTopicList
+      plural: snstopics
+      shortNames:
+      - sns
+      - topic
+      - topics
+      singular: snstopics
+    scope: Namespaced
+    version: v1alpha1
+
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: sqsqueues.service-operator.aws
+  spec:
+    group: service-operator.aws
+    names:
+      kind: SQSQueue
+      listKind: SQSQueueList
+      plural: sqsqueues
+      shortNames:
+      - sqs
+      - queue
+      - queues
+      singular: sqsqueues
+    scope: Namespaced
+    version: v1alpha1
+
+- kind: ClusterRole
+  apiVersion: rbac.authorization.k8s.io/v1beta1
+  metadata:
+    name: aws-service-operator
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - secrets
+    - pods
+    - configmaps
+    - services
+    - events
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - delete
+    - update
+    - patch
+  - apiGroups:
+    - apiextensions.k8s.io
+    resources:
+    - customresourcedefinitions
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - delete
+  - apiGroups:
+    - service-operator.aws
+    resources:
+    - "*"
+    verbs:
+    - "*"
+
+- kind: ServiceAccount
+  apiVersion: v1
+  metadata:
+    name: aws-service-operator
+    namespace: aws-service-operator
+
+- kind: ClusterRoleBinding
+  apiVersion: rbac.authorization.k8s.io/v1beta1
+  metadata:
+    name: aws-service-operator
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: aws-service-operator
+  subjects:
+  - kind: ServiceAccount
+    name: aws-service-operator
+    namespace: aws-service-operator
+
+- kind: Deployment
+  apiVersion: apps/v1beta1
+  metadata:
+    name: aws-service-operator
+    namespace: aws-service-operator
+  spec:
+    replicas: 1
+    template:
+      metadata:
+        annotations:
+          iam.amazonaws.com/role: aws-service-operator
+        labels:
+          app: aws-service-operator
+      spec:
+        serviceAccountName: aws-service-operator
+        containers:
+        - name: aws-service-operator
+          image: awsserviceoperator/aws-service-operator:v0.0.1-alpha3
+          imagePullPolicy: Always
+          args:
+            - server
+            - --cluster-name=screeley-aws4.screeley.sysdeseng.com
+            - --region=us-east-1
+            - --account-id=939345161466
+            - --bucket-name=screeley-state-store
+
