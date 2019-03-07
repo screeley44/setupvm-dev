@@ -8,7 +8,7 @@
   echo " ... ... ... Base Dir is $BASEDIR"
 
   # Kubernetes Dev Path
-  $SUDO cp -R $BASEDIR/yaml/ $KUBEPATH/dev-configs/
+  $SUDO cp -R $BASEDIR/../yaml/ $KUBEPATH/dev-configs/
 
   if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
   then
@@ -19,7 +19,7 @@
   fi
   
   # OpenShift Dev Path
-  $SUDO cp -R $BASEDIR/yaml/ $OSEPATH/dev-configs/
+  $SUDO cp -R $BASEDIR/../yaml/ $OSEPATH/dev-configs/
 
   if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
   then
