@@ -44,6 +44,8 @@
   then
     echo "export CLOUD_CONFIG=/etc/aws/aws.conf" >> newbashrc
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> newbashrc
+    echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> newbashrc
+    echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> newbashrc
   fi
   if [ "$ISCLOUD" == "gce" ]
   then
@@ -62,8 +64,6 @@
   echo "export KUBE_DEFAULT_STORAGE_CLASS=$DEFAULT_STORAGECLASS" >> newbashrc
   echo "export ENABLE_DEFAULT_STORAGE_CLASS=$DEFAULT_STORAGECLASS" >> newbashrc
   echo "export ENABLE_HOSTPATH_PROVISIONER=$ENABLE_HOSTPATH" >> newbashrc
-  echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> newbashrc
-  echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> newbashrc
   echo "export ZONE=$ZONE" >> newbashrc
   echo "" >> newbashrc
   echo "# Cinder Env Vars" >> newbashrc
@@ -79,6 +79,8 @@
   then
     echo "export CLOUD_CONFIG=/etc/aws/aws.conf" >> .bash_profile
     echo "export CLOUD_PROVIDER=$ISCLOUD" >> .bash_profile
+    echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> .bash_profile
+    echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> .bash_profile
   fi
   if [ "$ISCLOUD" == "gce" ]
   then
@@ -98,8 +100,6 @@
   echo "export KUBE_DEFAULT_STORAGE_CLASS=$DEFAULT_STORAGECLASS" >> .bash_profile
   echo "export ENABLE_DEFAULT_STORAGE_CLASS=$DEFAULT_STORAGECLASS" >> .bash_profile
   echo "export ENABLE_HOSTPATH_PROVISIONER=$ENABLE_HOSTPATH" >> .bash_profile
-  echo "export AWS_ACCESS_KEY_ID=$AWSKEY" >> .bash_profile
-  echo "export AWS_SECRET_ACCESS_KEY=$AWSSECRET" >> .bash_profile
   echo "export ZONE=$ZONE" >> .bash_profile
   echo "" >> .bash_profile
   echo "# Cinder Env Vars" >> .bash_profile
