@@ -4,7 +4,7 @@ metadata:
   name: screeley-prov4
   namespace: s3-provisioner
 spec:
-  bucketName: screeley-prov4
+  bucketName: screeley-provb-1
   storageClassName: s3-buckets
   SSL: true
   versioned: true
