@@ -1,0 +1,11 @@
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: screeley-provb-3
+  namespace: s3-provisioner
+spec:
+  bucketName: screeley-provb-3
+  storageClassName: s3-buckets
+  SSL: true
+  versioned: true
+

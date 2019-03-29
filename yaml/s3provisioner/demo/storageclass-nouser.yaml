@@ -1,0 +1,13 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: s3-buckets-nouser
+provisioner: aws-s3.io/bucket
+parameters:
+  region: us-west-1
+  secretName: s3-bucket-owner
+  secretNamespace: s3-provisioner
+  createBucketUser: "no"
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+
