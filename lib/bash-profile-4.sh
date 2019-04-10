@@ -62,6 +62,7 @@
   echo "export GOPATH=$GOLANGPATH/go" >> newbashrc
   echo "GOPATH1=/usr/local/go" >> newbashrc
   echo "GO_BIN_PATH=/usr/local/go/bin" >> newbashrc
+  #echo "export KUBECONFIG=/root/$CLUSTER_NAME/auth/kubeconfig" >> newbashrc
   echo "" >> newbashrc
   #TODO: set up KPATH as well
   # export KPATH=$GOPATH/src/k8s.io/kubernetes

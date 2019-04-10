@@ -106,6 +106,16 @@
     fi
   fi
 
+  # 4.0 install OC CLI
+  if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
+  then
+    $SUDO wget https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz >/dev/null 2>&1
+    $SUDO rm -rf /usr/local/bin/oc		
+    $SUDO tar -C /usr/local/bin -xzf oc.tar.gz >/dev/null 2>&1
+    $SUDO cp oc /usr/local/bin/.
+  fi
+  
+
   # restart docker
   if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
   then
