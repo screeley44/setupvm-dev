@@ -115,6 +115,18 @@
     $SUDO tar -C /usr/local/bin -xzf oc.tar.gz >/dev/null 2>&1
   fi
   
+  #4.0 install KUBECTL CLI
+  if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
+  then
+    cd ~
+    $SUDO curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl >/dev/null 2>&1
+    #$SUDO curl -LO https://storage.googleapis.com/kubernetes-release/release/$KUBE_VERSION/bin/linux/amd64/kubectl >/dev/null 2>&1
+    $SUDO chmod +x ./kubectl
+    $SUDO rm -rf /usr/local/bin/kubectl		
+    $SUDO mv ./kubectl /usr/local/bin/kubectl >/dev/null 2>&1
+  fi
+
+
 
   # restart docker
   if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
