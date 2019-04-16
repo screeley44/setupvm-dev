@@ -119,13 +119,28 @@
   if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
   then
     cd ~
-    $SUDO curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl >/dev/null 2>&1
-    #$SUDO curl -LO https://storage.googleapis.com/kubernetes-release/release/$KUBE_VERSION/bin/linux/amd64/kubectl >/dev/null 2>&1
-    $SUDO chmod +x ./kubectl
-    $SUDO rm -rf /usr/local/bin/kubectl		
-    $SUDO mv ./kubectl /usr/local/bin/kubectl >/dev/null 2>&1
+    if [ "$KUBECTL_VERSION" == "latest" ]
+    then
+      $SUDO curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl >/dev/null 2>&1
+      $SUDO chmod +x ./kubectl
+      $SUDO rm -rf /usr/local/bin/kubectl		
+      $SUDO mv ./kubectl /usr/local/bin/kubectl >/dev/null 2>&1
+    else
+      $SUDO curl -LO https://storage.googleapis.com/kubernetes-release/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl >/dev/null 2>&1
+      $SUDO chmod +x ./kubectl
+      $SUDO rm -rf /usr/local/bin/kubectl		
+      $SUDO mv ./kubectl /usr/local/bin/kubectl >/dev/null 2>&1
+    fi
   fi
 
+  #4.0 install KUBEFEDV2 CLI
+  if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ] || [ "$SETUP_TYPE" == "k8-dev" ]
+  then
+    cd ~
+    $SUDO curl -Ls https://github.com/kubernetes-sigs/federation-v2/releases/download/$KUBEFEDV2_VERSION/kubefed2.tgz | tar xz >/dev/null 2>&1
+    $SUDO rm -rf /usr/local/bin/kubefed2		
+    $SUDO mv kubefed2 /usr/local/bin/kubefed2 >/dev/null 2>&1
+  fi
 
 
   # restart docker
