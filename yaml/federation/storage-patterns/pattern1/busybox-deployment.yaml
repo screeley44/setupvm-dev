@@ -1,0 +1,37 @@
+apiVersion: types.federation.k8s.io/v1alpha1
+kind: FederatedDeployment
+metadata:
+  name: busybox
+  namespace: federation-test
+spec:
+  template:
+    metadata:
+      labels:
+        app: bbtest
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: bb-fed-test
+      template:
+        metadata:
+          labels:
+            app: bb-fed-test
+        spec:
+          containers:
+          - name: bb-fed-test
+            image: busybox
+            command: ["sleep", "600000"]
+            volumeMounts:
+            - mountPath: /usr/share/busybox/test
+              name: ebsvol
+          volumes:
+          - name: ebsvol
+            persistentVolumeClaim:
+              claimName: ebs-default
+  placement:
+    clusterNames:
+    - cluster1
+    - cluster2
+
+

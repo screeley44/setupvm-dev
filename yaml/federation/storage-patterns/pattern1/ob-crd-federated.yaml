@@ -1,0 +1,56 @@
+apiVersion: types.federation.k8s.io/v1alpha1
+kind: FederatedCustomResourceDefinition
+metadata:
+  name: objectbuckets.objectbucket.io
+  namespace: federation-test
+spec:
+  template:
+    group: objectbucket.io
+    versions:
+      - name: v1alpha1
+        served: true
+        storage: true
+    names:
+      kind: ObjectBucket
+      listKind: ObjectBucketList
+      plural: objectbuckets
+      singular: objectbucket
+      shortNames:
+        - ob
+        - obs
+    scope: Cluster
+    subresources:
+      status: {}
+  placement:
+    clusterNames:
+    - cluster2
+    - cluster1
+---
+apiVersion: types.federation.k8s.io/v1alpha1
+kind: FederatedCustomResourceDefinition
+metadata:
+  name: objectbucketclaims.objectbucket.io
+  namespace: federation-test
+spec:
+  template:
+    group: objectbucket.io
+    versions:
+      - name: v1alpha1
+        served: true
+        storage: true
+    names:
+      kind: ObjectBucketClaim
+      listKind: ObjectBucketClaimList
+      plural: objectbucketclaims
+      singular: objectbucketclaim
+      shortNames:
+        - obc
+        - obcs
+    scope: Namespaced
+    subresources:
+      status: {}
+  placement:
+    clusterNames:
+    - cluster2
+    - cluster1
+
