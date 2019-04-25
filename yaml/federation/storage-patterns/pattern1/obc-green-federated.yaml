@@ -1,0 +1,12 @@
+apiVersion: types.federation.k8s.io/v1alpha1
+kind: FederatedObjectBucketClaim
+metadata:
+  name: green-obc
+  namespace: federation-test
+spec:
+  template:
+    bucketName: screeley-fed-bucket
+    storageClassName: s3-buckets
+  placement:
+    clusterNames:
+    - cluster1
