@@ -1,0 +1,91 @@
+apiVersion: v1
+items:
+- apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+    annotations:
+    generation: 2
+    labels:
+      olm.owner: cluster-federation.v0.0.8
+      olm.owner.kind: ClusterServiceVersion
+      olm.owner.namespace: federation-test
+    name: federation-controller-manager
+    namespace: federation-test
+    ownerReferences:
+    - apiVersion: operators.coreos.com/v1alpha1
+      blockOwnerDeletion: false
+      controller: false
+      kind: ClusterServiceVersion
+      name: cluster-federation.v0.0.8
+      uuid: f9a12295-2252-4b30-a7cc-269bc956616f
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: federation-controller-manager
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          capabilities: Basic Install
+          categories: OpenShift Optional, Integration & Delivery
+          certified: "false"
+          containerImage: quay.io/openshift/origin-federation-controller:latest
+          createdAt: "2019-01-01T00:00:00Z"
+          description: Cluster-scoped Federation
+          olm.operatorGroup: cluster-scoped-federation
+          olm.operatorNamespace: federation-test
+          olm.targetNamespaces: ""
+        creationTimestamp: null
+        labels:
+          app: federation-controller-manager
+      spec:
+        containers:
+        - args:
+          - --federation-namespace=federation-test
+          - --registry-namespace=federation-test
+          - -v=5
+          - --logtostderr
+          command:
+          - /root/controller-manager
+          env:
+          - name: FEDERATION_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: CLUSTER_REGISTRY_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: quay.io/openshift/origin-federation-controller:latest
+          imagePullPolicy: Always
+          name: controller-manager
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: federation-controller-manager
+        serviceAccountName: federation-controller-manager
+        terminationGracePeriodSeconds: 5
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""
+
