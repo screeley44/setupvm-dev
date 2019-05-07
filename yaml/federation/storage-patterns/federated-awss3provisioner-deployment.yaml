@@ -1,0 +1,32 @@
+apiVersion: types.federation.k8s.io/v1alpha1
+kind: FederatedDeployment
+metadata:
+  labels:
+    name: aws-s3-provisioner
+  name: federated-aws-s3-provisioner-deployment
+  namespace: s3-provisioner
+spec:
+  template:
+    metadata:
+      labels:
+        name: aws-s3-provisioner
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: aws-s3-provisioner
+    template:
+      metadata:
+        labels:
+          app: aws-s3-provisioner
+      spec:
+        containers:
+        - name: aws-s3-provisioner
+          image: quay.io/screeley44/aws-s3-provsioner:v1.0.0
+          imagePullPolicy: Always
+        restartPolicy: Always
+  placement:
+    clusterNames:
+    - cluster1
+    - cluster2
+

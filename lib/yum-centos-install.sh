@@ -12,7 +12,7 @@ then
 
   # install pip
   yum install epel-release -y >/dev/null 2>&1
-  yum install python-pip -y >/dev/null 2>&1
+  yum install python36u python36u-pip python36u-devel -y >/dev/null 2>&1
 
   if [ "$SETUP_TYPE" == "k8-dev" ]
   then
