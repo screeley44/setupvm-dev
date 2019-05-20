@@ -101,7 +101,7 @@ then
       else
         $SUDO yum-config-manager --disable \*> /dev/null
       fi
-      $SUDO subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-fast-datapath-rpms" --enable="rhel-server-rhscl-7-rpms"
+      $SUDO subscription-manager repos --enable="rhel-8-for-x86_64-appstream-rpms" --enable="rhel-8-for-x86_64-supplementary-source-rpms" --enable="fast-datapath-beta-for-rhel-8-x86_64-rpms" --enable="rhel-8-for-x86_64-baseos-rpms"
       echo ""
     else
       echo " ... ... ... Enabling rhel 7 rpms defaulting to OCP  $OCPVERSION as latest..."
