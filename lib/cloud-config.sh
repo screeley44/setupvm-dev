@@ -19,7 +19,7 @@
     if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
     then
       echo " ... ... Installing and configuring pip and awscli"
-      pip install awscli --upgrade
+      pip3 install awscli --upgrade
       echo " ... ... ... awscli installed"
     fi
 
@@ -38,7 +38,7 @@
     if [ "$SETUP_TYPE" == "k8-dev" ] && [ "$HOSTENV" == "rhel" ]
     then
       echo " ... ... Installing and configuring pip and awscli"
-      pip install awscli --upgrade
+      pip3 install awscli --upgrade
       echo " ... ... ... awscli installed"
     fi
 

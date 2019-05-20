@@ -93,7 +93,7 @@ then
       echo ""
     elif [ "$OCPVERSION" == "4.0" ]
     then
-      echo " ... ... ... Enabling rhel 7 rpms for OCP 4.0..."
+      echo " ... ... ... Enabling rhel 8 rpms for OCP 4.1..."
       $SUDO subscription-manager repos --disable="*"> /dev/null
       if [ "$ISCLOUD" == "gce" ]
       then
