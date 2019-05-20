@@ -137,9 +137,10 @@
   if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ] || [ "$SETUP_TYPE" == "k8-dev" ]
   then
     cd ~
-    $SUDO curl -Ls https://github.com/kubernetes-sigs/federation-v2/releases/download/$KUBEFEDV2_VERSION/kubefed2.tgz | tar xz >/dev/null 2>&1
-    $SUDO rm -rf /usr/local/bin/kubefed2		
-    $SUDO mv kubefed2 /usr/local/bin/kubefed2 >/dev/null 2>&1
+    $SUDO curl -Ls https://github.com/kubernetes-sigs/federation-v2/releases/download/$KUBEFEDV2_VERSION/kubefedctl.tgz | tar xz >/dev/null 2>&1
+    # $SUDO curl -Ls https://github.com/kubernetes-sigs/federation-v2/releases/download/$KUBEFEDV2_VERSION/kubefed2.tgz | tar xz >/dev/null 2>&1
+    $SUDO rm -rf /usr/local/bin/kubefedctl		
+    $SUDO mv kubefedctl /usr/local/bin/kubefedctl >/dev/null 2>&1
   fi
 
 
