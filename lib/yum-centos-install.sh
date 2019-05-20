@@ -13,6 +13,7 @@ then
   # install pip
   yum install epel-release -y >/dev/null 2>&1
   yum install python36 python36-pip python36-devel -y >/dev/null 2>&1
+  yum install jq -y >/dev/null 2>&1
 
   if [ "$SETUP_TYPE" == "k8-dev" ]
   then

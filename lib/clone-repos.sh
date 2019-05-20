@@ -14,8 +14,8 @@ then
   then
     echo " ... ... Downloading latest openshift installer"
     cd ~
-    wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux-4.1.0-rc.0.tar.gz
-    tar -xzf openshift-install-linux-4.1.0-rc.0.tar.gz >/dev/null 2>&1
+    wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/$INSTALLER_TAR
+    tar -xzf $INSTALLER_TAR >/dev/null 2>&1
     chmod +x openshift-install
     mkdir -p ~/$CLUSTER_NAME
   else
