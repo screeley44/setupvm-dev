@@ -19,11 +19,6 @@
     if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
     then
       echo " ... ... Installing and configuring pip and awscli"
-      #scl enable python27 bash
-      source /opt/rh/python27/enable
-      echo " ... ... ... python27 enabled"
-      pip install --upgrade pip
-      echo " ... ... ... pip installed"
       pip install awscli --upgrade
       echo " ... ... ... awscli installed"
     fi
@@ -37,6 +32,13 @@
       pip install --upgrade pip >/dev/null 2>&1
       echo " ... ... ... pip installed"
       pip install awscli --upgrade >/dev/null 2>&1
+      echo " ... ... ... awscli installed"
+    fi
+
+    if [ "$SETUP_TYPE" == "k8-dev" ] && [ "$HOSTENV" == "rhel" ]
+    then
+      echo " ... ... Installing and configuring pip and awscli"
+      pip install awscli --upgrade
       echo " ... ... ... awscli installed"
     fi
 
