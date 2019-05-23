@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gcs-bucket-provisioner-deployment
+  namespace: gcs-prov
+  labels:
+    app: gcs-bucket-provisioner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gcs-bucket-provisioner
+  template:
+    metadata:
+      labels:
+        app: gcs-bucket-provisioner
+    spec:
+      containers:
+      - name: gcs-bucket-provisioner
+        image: quay.io/screeley44/gcs-bucket-provisioner:v1.0.0
+        imagePullPolicy: Always
+      restartPolicy: Always
+

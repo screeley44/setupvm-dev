@@ -1,0 +1,10 @@
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: screeley-gcs-bucket1
+  namespace: gcs-prov
+spec:
+  bucketName: screeley-gcs-bucket1
+  storageClassName: gcs-buckets
+  SSL: true
+  versioned: true

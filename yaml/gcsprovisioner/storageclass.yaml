@@ -1,0 +1,9 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: gcs-buckets
+provisioner: gcs.io/bucket
+parameters:
+  region: us-east1-d
+  project: openshift-gce-devel
+reclaimPolicy: Delete
