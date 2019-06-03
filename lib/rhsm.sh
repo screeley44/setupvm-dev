@@ -25,6 +25,14 @@ then
       exit 1
     fi
 
+  fi
+fi
+
+
+if [ "$SKIPREPOS" == "N" ]
+then
+  if [ "$HOSTENV" == "rhel" ]
+  then
 
     if [ "$POOLID" == "" ]
     then
@@ -41,14 +49,7 @@ then
         exit 1
       fi
     fi
-  fi
-fi
 
-
-if [ "$SKIPREPOS" == "N" ]
-then
-  if [ "$HOSTENV" == "rhel" ]
-  then
     echo ""
     echo " ... ... Attaching Repo Information, this could take several minutes..."    
 
