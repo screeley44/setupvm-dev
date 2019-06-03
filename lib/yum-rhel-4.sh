@@ -3,7 +3,7 @@
 
 if [ "$HOSTENV" == "rhel" ]
 then  
-  echo " ... ... Installing wget, git, gcc-c++ bind-utils python27-python-pip ... this will take several minutes"
+  echo " ... ... Installing wget, git, gcc-c++ python3-pip ... this will take several minutes"
   until $SUDO yum install wget git gcc-c++ python3-pip -y> /dev/null; do echo "Failure installing utils Repos, retrying..."; sleep 8; done
 
 
