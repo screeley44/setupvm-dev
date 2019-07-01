@@ -31,7 +31,7 @@
       echo " ... ... ... upgrading pip"
       pip install --upgrade pip >/dev/null 2>&1
       echo " ... ... ... pip installed"
-      pip install awscli --upgrade >/dev/null 2>&1
+      pip3 install awscli --upgrade >/dev/null 2>&1
       echo " ... ... ... awscli installed"
     fi
 

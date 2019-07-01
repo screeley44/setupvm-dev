@@ -4,7 +4,7 @@
 if [ "$HOSTENV" == "centos" ]
 then  
   echo " ... ... Installing base software for CentOS ... this will take several minutes"
-  yum install -y wget gcc python-virtualenv git net-tools unzip bash-completion telnet kexec-tools sos psacct NetworkManager >/dev/null 2>&1
+  yum install -y wget gcc python-virtualenv git net-tools unzip bash-completion telnet kexec-tools sos psacct NetworkManager jq >/dev/null 2>&1
 
   # enable NetworkManager
   systemctl enable NetworkManager >/dev/null 2>&1
