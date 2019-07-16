@@ -138,14 +138,22 @@
     fi
   fi
 
-  #4.0 install KUBEFEDV2 CLI
+  #4.0 install KUBEFED CLI
   if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ] || [ "$SETUP_TYPE" == "k8-dev" ]
   then
-    cd ~
-    $SUDO curl -Ls https://github.com/kubernetes-sigs/federation-v2/releases/download/$KUBEFEDV2_VERSION/kubefedctl.tgz | tar xz >/dev/null 2>&1
-    # $SUDO curl -Ls https://github.com/kubernetes-sigs/federation-v2/releases/download/$KUBEFEDV2_VERSION/kubefed2.tgz | tar xz >/dev/null 2>&1
-    $SUDO rm -rf /usr/local/bin/kubefedctl		
-    $SUDO mv kubefedctl /usr/local/bin/kubefedctl >/dev/null 2>&1
+    if [ "$KUBEFEDCTL_VERSION" == "" ]
+    then
+      echo " ... ... skipping kubefedctl install"
+    else
+      echo " ... ... installing kubefedctl $KUBEFEDCTL_NAME"
+      cd ~
+      https://github.com/kubernetes-sigs/kubefed/releases/tag/v0.1.0-rc3
+      $SUDO curl -Ls https://github.com/kubernetes-sigs/kubefed/releases/tag/$KUBEFEDCTL_VERSION/$KUBEFEDCTL_NAME | tar xz >/dev/null 2>&1
+      # $SUDO curl -Ls https://github.com/kubernetes-sigs/federation-v2/releases/download/$KUBEFEDV2_VERSION/kubefedctl.tgz | tar xz >/dev/null 2>&1
+      # $SUDO curl -Ls https://github.com/kubernetes-sigs/federation-v2/releases/download/$KUBEFEDV2_VERSION/kubefed2.tgz | tar xz >/dev/null 2>&1
+      $SUDO rm -rf /usr/local/bin/kubefedctl		
+      $SUDO mv kubefedctl /usr/local/bin/kubefedctl >/dev/null 2>&1
+    fi
   fi
 
 
