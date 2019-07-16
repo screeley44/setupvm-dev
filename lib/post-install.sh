@@ -8,7 +8,6 @@
   echo " ... ... ... Base Dir is $BASEDIR"
 
   # Kubernetes Dev Path
-  Base Dir is /root/setupvm-dev/K8/GCE/../../lib
   cd $BASEDIR
   cd ../yaml
   $SUDO cp -R * $KUBEPATH/dev-configs/
@@ -147,8 +146,7 @@
     else
       echo " ... ... installing kubefedctl $KUBEFEDCTL_NAME"
       cd ~
-      https://github.com/kubernetes-sigs/kubefed/releases/tag/v0.1.0-rc3
-      $SUDO curl -Ls https://github.com/kubernetes-sigs/kubefed/releases/tag/$KUBEFEDCTL_VERSION/$KUBEFEDCTL_NAME | tar xz >/dev/null 2>&1
+      $SUDO curl -Ls https://github.com/kubernetes-sigs/kubefed/releases/download/$KUBEFEDCTL_VERSION/$KUBEFEDCTL_NAME | tar xz >/dev/null 2>&1
       # $SUDO curl -Ls https://github.com/kubernetes-sigs/federation-v2/releases/download/$KUBEFEDV2_VERSION/kubefedctl.tgz | tar xz >/dev/null 2>&1
       # $SUDO curl -Ls https://github.com/kubernetes-sigs/federation-v2/releases/download/$KUBEFEDV2_VERSION/kubefed2.tgz | tar xz >/dev/null 2>&1
       $SUDO rm -rf /usr/local/bin/kubefedctl		
