@@ -1,8 +1,8 @@
-apiVersion: types.federation.k8s.io/v1alpha1
+apiVersion: types.kubefed.k8s.io/v1beta1
 kind: FederatedStorageClass
 metadata:
   name: s3-buckets
-  namespace: federation-test
+  namespace: fed-test
 spec:
   template:
     provisioner: aws-s3.io/bucket
