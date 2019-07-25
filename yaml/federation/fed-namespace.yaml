@@ -1,5 +1,10 @@
-apiVersion: v1
-kind: Namespace
+apiVersion: types.kubefed.k8s.io/v1beta1
+kind: FederatedNamespace
 metadata:
-  name: test-namespace
-
+  name: fedns
+  namespace: fedns
+spec:
+  placement:
+    clusters:
+    - name: cluster2
+    - name: cluster1

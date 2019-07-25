@@ -12,7 +12,8 @@ spec:
       secretNamespace: s3-provisioner
     reclaimPolicy: Delete
   placement:
-    clusterNames:
-    - cluster1
-    - cluster2
+    clusters:
+    - name: cluster2
+    - name: cluster1
+
 
