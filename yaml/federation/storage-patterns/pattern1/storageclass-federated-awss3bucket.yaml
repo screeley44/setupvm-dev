@@ -1,0 +1,19 @@
+apiVersion: types.kubefed.k8s.io/v1beta1
+kind: FederatedStorageClass
+metadata:
+  name: s3-buckets
+  namespace: fed-test
+spec:
+  template:
+    provisioner: aws-s3.io/bucket
+    parameters:
+      region: us-west-1
+      secretName: s3-bucket-owner
+      secretNamespace: s3-provisioner
+    reclaimPolicy: Delete
+  placement:
+    clusters:
+    - name: cluster2
+    - name: cluster1
+
+

@@ -1,0 +1,16 @@
+apiVersion: types.kubefed.k8s.io/v1beta1
+kind: FederatedStorageClass
+metadata:
+  name: aws-block
+  namespace: fedns
+spec:
+  template:
+    provisioner: kubernetes.io/aws-ebs
+    parameters:
+      type: gp2
+      zone: us-east-1d
+    reclaimPolicy: Delete
+  placement:
+    clusters:
+    - name: cluster2
+    - name: cluster1
