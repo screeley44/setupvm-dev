@@ -101,7 +101,7 @@
       echo "platform:" >> install-config.yaml
       echo "  $ISCLOUD:" >> install-config.yaml
       echo "    region: us-east-1" >> install-config.yaml
-      echo "    vpcCIDRBlock: 10.0.0.0/16" >> install-config.yaml
+      # echo "    vpcCIDRBlock: 10.0.0.0/16" >> install-config.yaml
       echo "pullSecret: '$pS'" >> install-config.yaml
       echo "sshKey: \"$sshK\"" >> install-config.yaml
       echo " ... ... ... install-config.yaml created!"
