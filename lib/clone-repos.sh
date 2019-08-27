@@ -19,6 +19,7 @@ then
     chmod +x openshift-install
     mkdir -p ~/$CLUSTER_NAME
   elif [ "$INSTALLER_VERSION" == "nightly" ]
+  then
     echo " ... ... Downloading latest openshift installer"
     cd ~
     wget https://openshift-release-artifacts.svc.ci.openshift.org/$INSTALLER_VERSION/$INSTALLER_TAR
