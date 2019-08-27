@@ -21,8 +21,8 @@ then
   else
     echo " ... ... Downloading version $INSTALLER_VERSION openshift installer"
     cd ~
-    wget https://github.com/openshift/installer/releases/download/$INSTALLER_VERSION/openshift-install-linux-amd64
-    mv openshift-install-linux-amd64 openshift-install
+    wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$INSTALLER_VERSION/$INSTALLER_TAR
+    tar -xzf $INSTALLER_TAR >/dev/null 2>&1
     chmod +x openshift-install
     mkdir -p ~/$CLUSTER_NAME
   fi
