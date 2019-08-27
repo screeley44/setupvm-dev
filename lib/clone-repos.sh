@@ -18,6 +18,13 @@ then
     tar -xzf $INSTALLER_TAR >/dev/null 2>&1
     chmod +x openshift-install
     mkdir -p ~/$CLUSTER_NAME
+  elif [ "$INSTALLER_VERSION" == "nightly" ]
+    echo " ... ... Downloading latest openshift installer"
+    cd ~
+    wget https://openshift-release-artifacts.svc.ci.openshift.org/$INSTALLER_VERSION/$INSTALLER_TAR
+    tar -xzf $INSTALLER_TAR >/dev/null 2>&1
+    chmod +x openshift-install
+    mkdir -p ~/$CLUSTER_NAME
   else
     echo " ... ... Downloading version $INSTALLER_VERSION openshift installer"
     cd ~
