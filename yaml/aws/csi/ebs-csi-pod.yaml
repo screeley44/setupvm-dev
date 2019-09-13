@@ -1,0 +1,20 @@
+# Run CSI Driver for EBS - use command below - then can run the pod
+# kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/alpha/?ref=master"
+apiVersion: v1
+kind: Pod
+metadata:
+  name: csi-app
+spec:
+  containers:
+  - name: app
+    image: centos
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do echo $(date -u) >> /data/out.txt; sleep 5; done"]
+    volumeMounts:
+    - name: persistent-storage
+      mountPath: /data
+  volumes:
+  - name: persistent-storage
+    persistentVolumeClaim:
+      claimName: ebs-csi-claim
+

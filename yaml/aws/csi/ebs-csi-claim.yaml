@@ -1,0 +1,13 @@
+# Run CSI Driver for EBS - use command below
+# kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/alpha/?ref=master"
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ebs-csi-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ebs-csi-sc
+  resources:
+    requests:
+      storage: 4Gi
