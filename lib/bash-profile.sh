@@ -73,6 +73,7 @@
   echo "export OS_VOLUME_API_VERSION=$COS_VOLUME_API_VERSION" >> newbashrc
   echo "export KOPS_CLUSTER_NAME=$KOPS_CLUSTERNAME.$HOSTED_ZONE" >> newbashrc
   echo "export KOPS_STATE_STORE=$S3_KOPS$BUCKET_NAME" >> newbashrc
+  echo "export KOPS_RELEASE=$KOPS_RELEASE" >> newbashrc
 
   echo "# Some K8 exports" >> .bash_profile 
   if [ "$ISCLOUD" == "aws" ]
@@ -109,6 +110,7 @@
   echo "export OS_VOLUME_API_VERSION=$COS_VOLUME_API_VERSION" >> .bash_profile
   echo "export KOPS_CLUSTER_NAME=$KOPS_CLUSTERNAME.$HOST_ZONE" >> .bash_profile
   echo "export KOPS_STATE_STORE=$S3_KOPS$BUCKET_NAME" >> .bash_profile
+  echo "export KOPS_RELEASE=$KOPS_RELEASE" >> .bash_profile
 
   if [ "$FEATURE_GATES" == "" ]
   then
