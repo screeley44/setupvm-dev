@@ -1,0 +1,134 @@
+kind: Shoot
+apiVersion: garden.sapcloud.io/v1beta1
+metadata:
+  name: shoot4
+  namespace: garden-core
+  selfLink: /apis/garden.sapcloud.io/v1beta1/namespaces/garden-core/shoots/shoot4
+  uid: 261bf7cb-f690-11e9-aee8-b24fadb0879f
+  resourceVersion: '338395'
+  generation: 2
+  creationTimestamp: '2019-10-24T18:57:38Z'
+  labels:
+    shoot.garden.sapcloud.io/status: healthy
+  annotations:
+    garden.sapcloud.io/createdBy: screeley@redhat.com
+    garden.sapcloud.io/purpose: evaluation
+    migration.shoot.gardener.cloud/globalMachineImage: '{"Name":"coreos","ProviderConfig":null,"Version":"2135.6.0"}'
+    migration.shoot.gardener.cloud/workers: >-
+      {"worker-bzfjo":{"ProviderConfig":null,"Volume":null,"Zones":["us-east-1d"]}}
+  finalizers:
+    - gardener
+spec:
+  addons:
+    kubernetes-dashboard:
+      enabled: true
+      authenticationMode: token
+    nginx-ingress:
+      enabled: true
+  cloud:
+    profile: my-seed
+    region: us-east-1
+    secretBindingRef:
+      name: core-aws-my-seed
+    seed: my-seed
+    aws:
+      machineImage:
+        name: coreos
+        version: 2135.6.0
+      networks:
+        nodes: 10.250.0.0/16
+        pods: 100.96.32.0/24
+        services: 100.68.0.0/14
+        vpc:
+          cidr: 10.250.0.0/16
+        internal:
+          - 10.250.112.0/22
+        public:
+          - 10.250.96.0/22
+        workers:
+          - 10.250.0.0/19
+      workers:
+        - name: worker-bzfjo
+          machineType: m5.large
+          machineImage:
+            name: coreos
+            version: 2135.6.0
+          autoScalerMin: 1
+          autoScalerMax: 2
+          maxSurge: 1
+          maxUnavailable: 0
+          volumeType: gp2
+          volumeSize: 50Gi
+      zones:
+        - us-east-1d
+  dns:
+    domain: shoot4.core.shoot.screeley-garden.screeley.sysdeseng.com
+  hibernation:
+    schedules:
+      - start: '00 17 * * 1,2,3,4,5'
+        location: America/New_York
+  kubernetes:
+    allowPrivilegedContainers: true
+    kubeAPIServer:
+      enableBasicAuthentication: false
+    kubeControllerManager:
+      nodeCIDRMaskSize: 24
+    kubeProxy:
+      mode: IPTables
+    version: 1.16.2
+  networking:
+    nodes: 10.250.0.0/16
+    pods: 100.96.32.0/24
+    services: 100.68.0.0/14
+    type: calico
+  maintenance:
+    autoUpdate:
+      kubernetesVersion: true
+      machineImageVersion: true
+    timeWindow:
+      begin: 020000+0000
+      end: 030000+0000
+status:
+  conditions:
+    - type: APIServerAvailable
+      status: 'True'
+      lastTransitionTime: '2019-10-24T19:04:11Z'
+      lastUpdateTime: '2019-10-24T19:07:18Z'
+      reason: HealthzRequestFailed
+      message: >-
+        API server /healthz endpoint responded with success status code.
+        [response_time:9ms]
+    - type: ControlPlaneHealthy
+      status: Progressing
+      lastTransitionTime: '2019-10-24T19:06:47Z'
+      lastUpdateTime: '2019-10-24T19:07:18Z'
+      reason: DeploymentMissing
+      message: 'Missing required deployments: [cluster-autoscaler]'
+    - type: EveryNodeReady
+      status: 'True'
+      lastTransitionTime: '2019-10-24T19:06:16Z'
+      lastUpdateTime: '2019-10-24T19:07:18Z'
+      reason: EveryNodeReady
+      message: Every node registered to the cluster is ready.
+    - type: SystemComponentsHealthy
+      status: 'True'
+      lastTransitionTime: '2019-10-24T19:06:47Z'
+      lastUpdateTime: '2019-10-24T19:07:18Z'
+      reason: SystemComponentsRunning
+      message: All system components are healthy.
+  gardener:
+    id: 7c21838ab04dfd16967255480f079c791e32cde7c9e8b83eabb9301c09d80226
+    name: gardener-controller-manager-694d6d7588-hhvjq
+    version: 0.30.5
+  lastOperation:
+    description: Waiting until the Kubernetes API server can connect to the Shoot workers
+    lastUpdateTime: '2019-10-24T19:05:49Z'
+    progress: 89
+    state: Processing
+    type: Create
+  observedGeneration: 2
+  retryCycleStartTime: '2019-10-24T18:57:39Z'
+  hibernated: false
+  technicalID: shoot--core--shoot4
+  uid: 261bf7cb-f690-11e9-aee8-b24fadb0879f
+

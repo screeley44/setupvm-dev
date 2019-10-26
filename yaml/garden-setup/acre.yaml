@@ -1,0 +1,44 @@
+landscape:
+  name: screeley-garden2
+  domain: screeley-garden2.screeley.sysdeseng.com
+
+  cluster:
+    kubeconfig: ./kubeconfig
+    networks:
+      nodes: 172.20.32.0/19
+      pods: 100.96.0.0/19
+      services: 100.64.0.0/14
+
+  iaas:
+    - name: my-seed
+      type: aws
+      region: us-east-1
+      zones:
+        - us-east-1d
+      credentials:
+        accessKeyID: <your key>
+        secretAccessKey: <your secret>
+
+  dns:
+    type: aws-route53
+    credentials:
+        accessKeyID: <your key>
+        secretAccessKey: <your secret>
+  identity:
+    users:
+      - email:  screeley@redhat.com
+        username: screeley
+        password: password
+
+
+
+
+kubectl --kubeconfig /root/landscape/export/kube-apiserver/kubeconfig get shoot -n <<project-namespace>> -o yaml
+
+
+yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine -y
+yum update
+yum install -y yum-utils device-mapper-persistent-data lvm2
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum install docker-ce docker-ce-cli containerd.io -y
+systemctl restart docker
