@@ -1,6 +1,6 @@
 landscape:
-  name: screeley-garden2
-  domain: screeley-garden2.screeley.sysdeseng.com
+  name: screeley-garden14
+  domain: screeley-garden14.screeley.sysdeseng.com
 
   cluster:
     kubeconfig: ./kubeconfig
@@ -10,7 +10,7 @@ landscape:
       services: 100.64.0.0/14
 
   iaas:
-    - name: my-seed
+    - name: seed-14
       type: aws
       region: us-east-1
       zones:
