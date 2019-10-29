@@ -95,32 +95,42 @@
     fi
   fi
 
-  # 4.0 install OC CLI
+  # 4.0 Install CLI Tools
   if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
   then
     cd ~
-    $SUDO wget https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz >/dev/null 2>&1
+    $SUDO wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/$CLIENT_TAR >/dev/null 2>&1
     $SUDO rm -rf /usr/local/bin/oc		
-    $SUDO tar -C /usr/local/bin -xzf oc.tar.gz >/dev/null 2>&1
+    $SUDO tar -C /usr/local/bin -xzf $CLIENT_TAR >/dev/null 2>&1
   fi
+
+
+  # 4.0 install OC CLI
+  #if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
+  #then
+  #  cd ~
+  #  $SUDO wget https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz >/dev/null 2>&1
+  #  $SUDO rm -rf /usr/local/bin/oc		
+  #  $SUDO tar -C /usr/local/bin -xzf oc.tar.gz >/dev/null 2>&1
+  #fi
   
   #4.0 install KUBECTL CLI
-  if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
-  then
-    cd ~
-    if [ "$KUBECTL_VERSION" == "latest" ]
-    then
-      $SUDO curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl >/dev/null 2>&1
-      $SUDO chmod +x ./kubectl
-      $SUDO rm -rf /usr/local/bin/kubectl		
-      $SUDO mv ./kubectl /usr/local/bin/kubectl >/dev/null 2>&1
-    else
-      $SUDO curl -LO https://storage.googleapis.com/kubernetes-release/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl >/dev/null 2>&1
-      $SUDO chmod +x ./kubectl
-      $SUDO rm -rf /usr/local/bin/kubectl		
-      $SUDO mv ./kubectl /usr/local/bin/kubectl >/dev/null 2>&1
-    fi
-  fi
+  #if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
+  #then
+  #  cd ~
+  #  if [ "$KUBECTL_VERSION" == "latest" ]
+  #  then
+  #    $SUDO curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl >/dev/null 2>&1
+  #    $SUDO chmod +x ./kubectl
+  #    $SUDO rm -rf /usr/local/bin/kubectl		
+  #    $SUDO mv ./kubectl /usr/local/bin/kubectl >/dev/null 2>&1
+  #  else
+  #    $SUDO curl -LO https://storage.googleapis.com/kubernetes-release/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl >/dev/null 2>&1
+  #    $SUDO chmod +x ./kubectl
+  #    $SUDO rm -rf /usr/local/bin/kubectl		
+  #    $SUDO mv ./kubectl /usr/local/bin/kubectl >/dev/null 2>&1
+  #  fi
+  #fi
 
   #4.0 install KUBEFED CLI
   if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ] || [ "$SETUP_TYPE" == "k8-dev" ]
@@ -143,7 +153,8 @@
   # restart docker
   if [ "$SETUP_TYPE" == "installer" ] || [ "$OCPVERSION" == "4.0" ]
   then
-    echo ""
+    echo " ... ... Restarting Docker"
+    systemctl restart docker >/dev/null 2>&1
   else
     echo " ... ... Restarting Docker"
     systemctl restart docker >/dev/null 2>&1

@@ -36,6 +36,21 @@ then
   fi
 fi
 
+if [ "$GARDENER" == "yes" ]
+then
+  echo " ... ... Cloning Gardener SAP SetUp"
+  cd ~
+  echo " ... ... ... cloning sow $PWD"
+  rm -rf sow
+  git clone https://github.com/gardener/sow >/dev/null 2>&1
+  echo ""
+  mkdir landscape
+  cd landscape
+  echo " ... ... ... cloning garden-setup in $PWD in directory crop"
+  git clone https://github.com/gardener/garden-setup crop
+fi
+
+
 if [ "$SKIPSOURCECLONE" == "N" ]
 then
   if [ "$APP_TYPE" == "origin" ] || [ "$SETUP_TYPE" == "origin" ] || [ "$CLONEK8S" == "N" ]

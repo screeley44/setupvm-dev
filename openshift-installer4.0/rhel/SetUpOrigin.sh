@@ -69,18 +69,18 @@ echo " ... ... Installing Go-$GOVERSION"
 source $CONFIG_HOME/../../lib/install-go.sh
 #echo " ... ... Installing etcd-$ETCD_VER"
 #source $CONFIG_HOME/../../lib/install-etcd.sh
-#echo " ... ... Installing Docker-$DOCKERVER"
-#source $CONFIG_HOME/../../lib/docker-base.sh
+echo " ... ... Installing Docker-$DOCKERVER"
+source $CONFIG_HOME/../../lib/docker-base.sh
 
-#echo ""
-#echo "................................."
-#echo "  Configuring Docker"
-#echo "................................."
+echo ""
+echo "................................."
+echo "  Configuring Docker"
+echo "................................."
 #if [ "$APP_TYPE" == "origin" ] && [ "$HOSTENV" == "rhel" ]
 #then
 #  source $CONFIG_HOME/../../lib/docker-registry.sh
 #fi
-#source $CONFIG_HOME/../../lib/docker-restart.sh
+source $CONFIG_HOME/../../lib/docker-restart.sh
 
 
 # Clone Repos

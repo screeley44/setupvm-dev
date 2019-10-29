@@ -14,9 +14,6 @@ then
     $SUDO yum install docker-ce docker-ce-cli containerd.io -y >/dev/null 2>&1
     # $SUDO yum check-update
     # $SUDO curl -fsSL https://get.docker.com/ | sh >/dev/null 2>&1 
-  elif [ "$DOCKERVER" == "ce" ] 
-  then
-    $SUDO yum install docker-1.13.1 -y >/dev/null 2>&1   
   else
     $SUDO yum install docker-$DOCKERVER -y >/dev/null 2>&1
   fi
