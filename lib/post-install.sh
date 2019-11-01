@@ -66,7 +66,11 @@
       echo "compute:" >> install-config.yaml
       echo "- hyperthreading: Enabled" >> install-config.yaml
       echo "  name: worker" >> install-config.yaml
-      echo "  platform: {}" >> install-config.yaml
+      echo "  platform:" >> install-config.yaml
+      echo "    aws:" >> install-config.yaml
+      echo "      type: c5.4xlarge" >> install-config.yaml
+      echo "      zones:" >> install-config.yaml
+      echo "      - us-east-1d" >> install-config.yaml
       echo "  replicas: $WORKER_COUNT" >> install-config.yaml
       echo "controlPlane:" >> install-config.yaml
       echo "  hyperthreading: Enabled" >> install-config.yaml

@@ -2,12 +2,29 @@ landscape:
   name: screeley-garden14
   domain: screeley-garden14.screeley.sysdeseng.com
 
+# K8s on AWS
   cluster:
     kubeconfig: ./kubeconfig
     networks:
       nodes: 172.20.32.0/19
       pods: 100.96.0.0/19
       services: 100.64.0.0/14
+
+# OCP on AWS (from Scott)
+#  cluster:
+#    kubeconfig: ./kubeconfig
+#    networks:
+#      nodes: 10.1.0.0/16
+#      pods: 10.131.0.0/16
+#      services: 172.31.0.0/16
+
+# OCP on AWS (from Huamin)
+#  cluster:
+#    kubeconfig: ./kubeconfig
+#    networks:
+#      nodes: 10.0.0.0/16
+#      pods: 10.128.0.0/14
+#      services: 172.30.0.0/16
 
   iaas:
     - name: seed-14
@@ -29,6 +46,11 @@ landscape:
       - email:  screeley@redhat.com
         username: screeley
         password: password
+# one-off fix
+#  versions:
+#    dns-controller:
+#       branch: finalizer
+#       repo: https://github.com/rootfs/external-dns-management.git
 
 
 
