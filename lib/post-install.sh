@@ -55,47 +55,103 @@
   then
     if [ "$IS_FOR_AMI" == "N" ]
     then
-      echo " ... ... Creating install-config.yaml"
-      cID=$( uuidgen )
-      sshK=$( cat $SSHPATH )
-      pS=$( cat $PULLSECRETPATH )
-      echo " ... ... ... uuid = $cID"
-      cd ~/$CLUSTER_NAME
-      echo "apiVersion: v1" > install-config.yaml
-      echo "baseDomain: $HOSTED_ZONE" >> install-config.yaml
-      echo "compute:" >> install-config.yaml
-      echo "- hyperthreading: Enabled" >> install-config.yaml
-      echo "  name: worker" >> install-config.yaml
-      echo "  platform:" >> install-config.yaml
-      echo "    aws:" >> install-config.yaml
-      echo "      type: c5.4xlarge" >> install-config.yaml
-      echo "      zones:" >> install-config.yaml
-      echo "      - us-east-1d" >> install-config.yaml
-      echo "  replicas: $WORKER_COUNT" >> install-config.yaml
-      echo "controlPlane:" >> install-config.yaml
-      echo "  hyperthreading: Enabled" >> install-config.yaml
-      echo "  name: master" >> install-config.yaml
-      echo "  platform: {}" >> install-config.yaml
-      echo "  replicas: $MASTER_COUNT" >> install-config.yaml
-      echo "metadata:" >> install-config.yaml
-      echo "  creationTimestamp: null" >> install-config.yaml
-      echo "  name: $CLUSTER_NAME" >> install-config.yaml
-      echo "networking:" >> install-config.yaml
-      echo "  clusterNetwork:" >> install-config.yaml
-      echo "  - cidr: 10.128.0.0/14" >> install-config.yaml
-      echo "    hostPrefix: 23" >> install-config.yaml
-      echo "  machineCIDR: 10.0.0.0/16" >> install-config.yaml
-      echo "  networkType: OpenshiftSDN" >> install-config.yaml
-      echo "  serviceNetwork:" >> install-config.yaml
-      echo "  - 172.30.0.0/16" >> install-config.yaml
-      echo "platform:" >> install-config.yaml
-      echo "  $ISCLOUD:" >> install-config.yaml
-      echo "    region: us-east-1" >> install-config.yaml
-      echo "pullSecret: '$pS'" >> install-config.yaml
-      echo "sshKey: \"$sshK\"" >> install-config.yaml
-      echo " ... ... ... install-config.yaml created!"
-      echo ""
+      if [ "$ISCLOUD" == "aws" ]
+      then
+        echo " ... ... Creating install-config.yaml"
+        cID=$( uuidgen )
+        sshK=$( cat $SSHPATH )
+        pS=$( cat $PULLSECRETPATH )
+        echo " ... ... ... uuid = $cID"
+        cd ~/$CLUSTER_NAME
+        echo "apiVersion: v1" > install-config.yaml
+        echo "baseDomain: $HOSTED_ZONE" >> install-config.yaml
+        echo "compute:" >> install-config.yaml
+        echo "- hyperthreading: Enabled" >> install-config.yaml
+        echo "  name: worker" >> install-config.yaml
+        echo "  platform:" >> install-config.yaml
+        echo "    aws:" >> install-config.yaml
+        echo "      type: c5.4xlarge" >> install-config.yaml
+        echo "      zones:" >> install-config.yaml
+        echo "      - us-east-1d" >> install-config.yaml
+        echo "  replicas: $WORKER_COUNT" >> install-config.yaml
+        echo "controlPlane:" >> install-config.yaml
+        echo "  hyperthreading: Enabled" >> install-config.yaml
+        echo "  name: master" >> install-config.yaml
+        echo "  platform:" >> install-config.yaml
+        echo "    aws:" >> install-config.yaml
+        echo "      zones:" >> install-config.yaml
+        echo "      - us-east-1d" >> install-config.yaml
+        echo "  replicas: $MASTER_COUNT" >> install-config.yaml
+        echo "metadata:" >> install-config.yaml
+        echo "  creationTimestamp: null" >> install-config.yaml
+        echo "  name: $CLUSTER_NAME" >> install-config.yaml
+        echo "networking:" >> install-config.yaml
+        echo "  clusterNetwork:" >> install-config.yaml
+        echo "  - cidr: 10.128.0.0/14" >> install-config.yaml
+        echo "    hostPrefix: 23" >> install-config.yaml
+        echo "  machineCIDR: 10.0.0.0/16" >> install-config.yaml
+        echo "  networkType: OpenshiftSDN" >> install-config.yaml
+        echo "  serviceNetwork:" >> install-config.yaml
+        echo "  - 172.30.0.0/16" >> install-config.yaml
+        echo "platform:" >> install-config.yaml
+        echo "  $ISCLOUD:" >> install-config.yaml
+        echo "    region: us-east-1" >> install-config.yaml
+        echo "pullSecret: '$pS'" >> install-config.yaml
+        echo "sshKey: \"$sshK\"" >> install-config.yaml
+        echo " ... ... ... install-config.yaml created!"
+        echo ""
+      fi
+      # gce
+      if [ "$ISCLOUD" == "gce" ] || [ "$ISCLOUD" == "gcp" ]
+      then
+        echo " ... ... Creating install-config.yaml"
+        cID=$( uuidgen )
+        sshK=$( cat $SSHPATH )
+        pS=$( cat $PULLSECRETPATH )
+        echo " ... ... ... uuid = $cID"
+        cd ~/$CLUSTER_NAME
+        echo "apiVersion: v1" > install-config.yaml
+        echo "baseDomain: $HOSTED_ZONE" >> install-config.yaml
+        echo "compute:" >> install-config.yaml
+        echo "- hyperthreading: Enabled" >> install-config.yaml
+        echo "  name: worker" >> install-config.yaml
+        echo "  platform:" >> install-config.yaml
+        echo "    gcp:" >> install-config.yaml
+        echo "      type: n1-standard-8" >> install-config.yaml
+        echo "      zones:" >> install-config.yaml
+        echo "      - us-east4-c" >> install-config.yaml
+        echo "  replicas: $WORKER_COUNT" >> install-config.yaml
+        echo "controlPlane:" >> install-config.yaml
+        echo "  hyperthreading: Enabled" >> install-config.yaml
+        echo "  name: master" >> install-config.yaml
+        echo "  platform:" >> install-config.yaml
+        echo "    gcp:" >> install-config.yaml
+        echo "      zones:" >> install-config.yaml
+        echo "      - us-east4-c" >> install-config.yaml
+        echo "      type: n1-standard-4" >> install-config.yaml
+        echo "  replicas: $MASTER_COUNT" >> install-config.yaml
+        echo "metadata:" >> install-config.yaml
+        echo "  creationTimestamp: null" >> install-config.yaml
+        echo "  name: $CLUSTER_NAME" >> install-config.yaml
+        echo "networking:" >> install-config.yaml
+        echo "  clusterNetwork:" >> install-config.yaml
+        echo "  - cidr: 10.128.0.0/14" >> install-config.yaml
+        echo "    hostPrefix: 23" >> install-config.yaml
+        echo "  machineCIDR: 10.0.0.0/16" >> install-config.yaml
+        echo "  networkType: OpenshiftSDN" >> install-config.yaml
+        echo "  serviceNetwork:" >> install-config.yaml
+        echo "  - 172.30.0.0/16" >> install-config.yaml
+        echo "platform:" >> install-config.yaml
+        echo "  gcp:" >> install-config.yaml
+        echo "    region: us-east4" >> install-config.yaml
+        echo "    ProjectID: garden-258716" >> install-config.yaml
+        echo "pullSecret: '$pS'" >> install-config.yaml
+        echo "sshKey: \"$sshK\"" >> install-config.yaml
+        echo " ... ... ... install-config.yaml created!"
+        echo ""
+      fi
       cp install-config.yaml ../install-config-$CLUSTER_NAME.yaml
+      cp install-config.yaml ../install-config.yaml
     fi
   fi
 
