@@ -1,14 +1,14 @@
 landscape:
-  name: screeley-garden14
-  domain: screeley-garden14.screeley.sysdeseng.com
+  name: screeley-garden
+  domain: screeley-garden.garden-proj.com
 
 # K8s on AWS
   cluster:
     kubeconfig: ./kubeconfig
     networks:
-      nodes: 172.20.32.0/19
-      pods: 100.96.0.0/19
-      services: 100.64.0.0/14
+      nodes: 10.0.0.0/16
+      pods: 10.128.0.0/14
+      services: 172.30.0.0/16
 
 # OCP on AWS (from Scott)
 #  cluster:
@@ -27,17 +27,22 @@ landscape:
 #      services: 172.30.0.0/16
 
   iaas:
-    - name: seed-14
-      type: aws
-      region: us-east-1
+    - name: seed1
+      type: gcp
+      region: us-central1
       zones:
-        - us-east-1d
+        - us-central1-a
+        - us-central1-b
+        - us-central1-c
+        - us-central1-d
+        - us-central1-e
+        - us-central1-f
       credentials:
         accessKeyID: <your key>
         secretAccessKey: <your secret>
 
   dns:
-    type: aws-route53
+    type: google-clouddns
     credentials:
         accessKeyID: <your key>
         secretAccessKey: <your secret>
@@ -46,11 +51,11 @@ landscape:
       - email:  screeley@redhat.com
         username: screeley
         password: password
-# one-off fix
-#  versions:
-#    dns-controller:
-#       branch: finalizer
-#       repo: https://github.com/rootfs/external-dns-management.git
+
+  versions:
+    dns-controller:
+       branch: finalizer
+       repo: https://github.com/rootfs/external-dns-management.git
 
 
 
