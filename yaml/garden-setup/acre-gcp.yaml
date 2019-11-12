@@ -1,17 +1,3 @@
-credentials: &ref_0
-  serviceaccount.json: | 
-    {
-      "type": "service_account",
-      "project_id": "garden-258716",
-      "private_key_id": "a6f0da478d8be4deaf1ea8b833a8460c56d2835e",
-      "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC7yc4yGkYMFvuq\nII0oazHGSUAEoehgH1kudgveKLkJduTZ2yWMVxEsZQ7b4B1x0+a//i0IfQDRKAMJ\nDRZduH5Hh9j00w8t9XlS/    UA7j9iliKwveGOmQCy0650Bg4ghRs63nukv2fh3PoID\n+H6MW39ocLCq/vrsD84awS67AWRrGUUIJOmX0FxKqPw32pZPyr8GkUUCiylT6boN\nBWRb0eL3K9FA7G2RnCdzI8BuPRIx0ZDWQFASUm9Nfe4MxnHO2JbCYF26y+eb8qmz\nmKIPaOztygG/VG3otJaa02bxV8fyDZt+eJHJgWkZ0TznUL8401hw0i8p+It6Zi3x\nhGDwv1OhAgMBAAECggEAEiWceJ4Dsou5XTA7w9ymrjffk7MGZDI9/tiR1Ab7vqI6\ngk0EUg1gj6Q3woq5UwnRrNsGBLcjuufoHISjFS0iKDfEq6qxDFVs7dai/D6DMUKb\nCmlSuTr5YbBlIe4mhmSzzu3F21sagNd4XqQxrSRIadIorcA/L6G6s+jYOGJtjvsd\n8iCG6uEZxSvm2Z0k17P2HYlIJo0I2HvQK5cBAw4on1jVihQ2bUqGsDOxVxhoC35y\nWi0aXkiHtifgClSZXpGeucYUQZsaY7fkkU6mFGki+P/S/hW3rY4MB/VDnaG+vK2B\nyxwsHkpZkGCt7ssVC+NQemeolVZQ3zgttn19Gjkv6wKBgQDfezFrfMj1+ym3E8Zc\nA0uFaZ/lyMrWr0s6BBHhp3AzwUugGjwyBsL+2ylq/WUdgdxz1RGtfR6VF17F0O05\nB6Ub+7fDLnd0JQEF69F0cSNH+sh5dF3/HXk33PCbiPkJfuO8fceGWfyhLz8ASIoQ\nzXhJl+a+iEboIDG1AaJVLCl3rwKBgQDXHQe3H/CAT6ibiSzK6/9Bh3Zw1hAWKgF1\n8mN9O1Sl2IQRXo/SD4rhyPzde7bBwLS/TtQACxkGmdHBHYouhjrN5tKBum4lbiJK\nKceKMir2tgD1x6EhqglImouIoLlh4uaQDbczJt/rINP9tEzeeA+DtJ8w2/I81yeI\niH0RWd9trwKBgD5/nVqKE0l3bDse9KJW6Y/t8iG4/cD8VPVsnfOVd/OBYzzrGVqE\nOZQ8hmC9bMHLx3M9aywxiZP4bTC1NSJ12N7yjnmvTQjWMGsPgAwod81xfQ86U+88\ntuHAkClvLPZS3i2gn2QbVmNdaykRIEuCqtkp+gXe5rWUC1KrmlJnf1FRAoGATM2R\nnqFptfY7BeVRN9ZQ2a2q7RiQv8kZomn7eZAAZgJLDQSNJvvjoz+mgNGV69GI9zEG\n4kkUE1ZCHMgWOQw13KQIDsdoYjbTSVVnaAEHc/SBnT88WY+jJuf+37Y62icwGMi8\n2yeLFSEwb0m7lEabi3OmzsQI1g4fkFDjDpne+wMCgYB16MXUIBdibBKr0d2J87Oz\nXFl/bET+Vgmv6UXSgVENpWbUpopuNV+3lfYtCpMP9/mifgqtzaKuxWgHBtRi8mnA\nuqGRu8szvJPP/VErkapySVlBKMPq6Xf78TobknsB1NJrg54DJ8yCW+KCdMlbhfQS\nG/IOsutEeFK//qwwAlnYLw==\n-----END PRIVATE KEY-----\n",
-      "client_email": "garden@garden-258716.iam.gserviceaccount.com",
-      "client_id": "101113015639670980344",
-      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-      "token_uri": "https://oauth2.googleapis.com/token",
-      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/garden%40garden-258716.iam.gserviceaccount.com"
-    }
 
 landscape:
   name: screeley-garden
