@@ -1,0 +1,41 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredLabels
+metadata:
+  name: pod-must-have-label-test
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - "gk-test" 
+  parameters:
+    label: ["test"]
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAllowedImages
+metadata:
+  name: ns-no-centos
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - "gk-test" 
+  parameters:
+    image: "centos"
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sCronFormats
+metadata:
+  name: proper-cron
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["CronTab"]
+    namespaces:
+      - "gk-test" 
+  parameters:
+    cron: "*"

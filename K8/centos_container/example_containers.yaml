@@ -1,0 +1,86 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ghost
+  labels:
+    role: blog
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        role: blog
+    spec:
+      containers:
+      - name: ghost
+        image: ghost:0.11-alpine
+        command: ["/scripts/wrapper.sh"]
+        ports:
+        - name: ghost
+          containerPort: 2368
+          protocol: TCP
+        volumeMounts:
+        - name: wrapper
+          mountPath: /scripts
+      volumes:
+      - name: wrapper
+        configMap:
+          name: wrapper
+          defaultMode: 0744
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: alpine
+  namespace: default
+spec:
+  containers:
+  - image: alpine:3.2
+    command:
+      - /bin/sh
+      - "-c"
+      - "sleep 60m"
+    imagePullPolicy: IfNotPresent
+    name: alpine
+  restartPolicy: Always
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: alpine1
+  namespace: default
+spec:
+  containers:
+  - image: alpine:latest
+    command: ["/bin/sh","-c"]
+    args: ["-ec", "while :; do echo '.'; sleep 5 ; done"]
+    imagePullPolicy: Always
+    name: alpine1
+  restartPolicy: Always
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: alpine2
+  namespace: default
+spec:
+  containers:
+  - image: alpine:latest
+    imagePullPolicy: Always
+    name: alpine2
+    command: ["/scripts/wrapper.sh"]
+    volumeMounts:
+    - name: wrapper
+      mountPath: /scripts
+  volumes:
+  - name: wrapper
+    configMap:
+      name: wrapper
+      defaultMode: 0744
+  restartPolicy: Always
+
+
+
+
+

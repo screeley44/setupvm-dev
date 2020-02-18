@@ -1,0 +1,121 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredlabels
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredLabels
+        listKind: K8sRequiredLabelsList
+        plural: k8srequiredlabels
+        singular: k8srequiredlabels
+      validation:
+        openAPIV3Schema:
+          properties:
+            labels:
+              type: array
+              items: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8srequiredlabels
+
+        violation[{"msg": msg, "details": {"missing_labels": missing}}] {
+          provided := {label | input.review.object.metadata.labels[label]}
+          required := {label | label := input.parameters.labels[_]}
+          missing := required - provided
+          count(missing) > 0
+          msg := sprintf("you must provide labels: %v", [missing])
+        }
+
+
+
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sallowedimages
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sAllowedImages
+        listKind: K8sAlloweImagesList
+        plural: k8sallowedimages
+        singular: k8sallowedimage
+      validation:
+        openAPIV3Schema:
+          properties:
+            image:
+              type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sallowedimages
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          rimage := container.image
+          not startswith(rimage, input.parameters.image)
+          msg := sprintf("container <%v> has invalid image <%v>, allowed images can not contain %v", [container.name, container.image, input.parameters.image])
+        }
+
+
+        pimage := input.review.object.spec.containers[_].image
+        badimage := input.parameters.image[image]
+        not startswith(pimage, badimage)
+
+          satisfied := [good | repo = input.parameters.image ; good = not startswith(container.image, repo)]
+          not any(satisfied)
+
+
+
+
+
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          satisfied := [good | repo = input.parameters.repos[_] ; good = startswith(container.image, repo)]
+          not any(satisfied)
+          msg := sprintf("container <%v> has an invalid image repo <%v>, allowed repos are %v", [container.name, container.image, input.parameters.repos])
+        }
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.initContainers[_]
+          satisfied := [good | repo = input.parameters.repos[_] ; good = startswith(container.image, repo)]
+          not any(satisfied)
+          msg := sprintf("container <%v> has an invalid image repo <%v>, allowed repos are %v", [container.name, container.image, input.parameters.repos])
+        }
+
+
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8scronformats
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sCronFormats
+        listKind: K8sCronFormatsList
+        plural: k8scronformats
+        singular: k8scronformat
+      validation:
+        openAPIV3Schema:
+          properties:
+            cron:
+              type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8scronformats
+
+        violation[{"msg": msg}] {
+          providedcron := input.review.object.spec.cronSpec
+          requiredcron := input.parameters.cron
+          not startswith(providedcron, requiredcron)
+          msg := sprintf("cronSpec <%v> has invalid cron definition <%v>, allowed cronSpec must start with %v", [input.review.object.metadata.name, providercron, requiredcron])
+        }
+
+
+
+
