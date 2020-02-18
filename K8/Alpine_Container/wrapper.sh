@@ -8,8 +8,8 @@ BASE_DOMAIN=sysdeseng.com
 INSTALLER_VERSION="4.2.2"
 INSTALLER_TAR="openshift-install-linux-4.2.2.tar.gz"
 CLIENT_TAR="openshift-client-linux-4.2.2.tar.gz"
-AWSKEY=AKIA5VNKVVT5JERPYOKN
-AWSSECRET=vaYm/FThmjTDi0SgC0gOpU+0MDbFnF9nrAXToP6o
+AWSKEY=<your key>
+AWSSECRET=<your secret>
 ZONE=us-east-1
 pS=$(cat /tmp/cluster/secrets/pullsecret.json)
 
