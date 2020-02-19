@@ -11,7 +11,7 @@ then
   then
     $SUDO yum update >/dev/null 2>&1
     $SUDO yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo >/dev/null 2>&1
-    $SUDO yum install docker-ce docker-ce-cli containerd.io -y >/dev/null 2>&1
+    $SUDO yum install docker-ce -y >/dev/null 2>&1
     # $SUDO yum check-update
     # $SUDO curl -fsSL https://get.docker.com/ | sh >/dev/null 2>&1 
   else
